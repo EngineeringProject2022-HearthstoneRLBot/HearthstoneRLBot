@@ -25,6 +25,7 @@ def main():
 			test_full_game()
 	else:
 		test_full_game()
+		#asdasdas
 
 
 if __name__ == "__main__":
