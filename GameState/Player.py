@@ -1,3 +1,8 @@
+from .Hero import Hero
+from .HandCards import HandCard
+from .BoardCards import BoardCard
+
+
 class Player:
     def __init__(self):
         self.hero = Hero()
