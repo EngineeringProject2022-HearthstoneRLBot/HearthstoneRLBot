@@ -1,4 +1,3 @@
-
 class BoardCard:
-    def __init(self):
-        self.baseAtt = 10
+    def __init__(self):
+        self.baseAtt = 0
