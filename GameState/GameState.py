@@ -3,5 +3,6 @@ from .Player import Player
 
 class GameState:
     def __init__(self):
-        self.first = Player()
-        self.second = Player()
+        self.players = []
+        for i in range(2):
+            self.players.append(Player())
