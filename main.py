@@ -3,8 +3,11 @@ from fireplace import cards
 from fireplace.exceptions import GameOver
 from fireplace.utils import play_full_game
 
+import GameState
 
 sys.path.append("..")
+
+
 
 
 def test_full_game():
@@ -15,6 +18,8 @@ def test_full_game():
 
 
 def main():
+	gameStates = []
+	gameStates.append(GameState())
 	cards.db.initialize()
 	if len(sys.argv) > 1:
 		numgames = sys.argv[1]
@@ -25,7 +30,6 @@ def main():
 			test_full_game()
 	else:
 		test_full_game()
-		#asdasdas
 
 
 if __name__ == "__main__":
