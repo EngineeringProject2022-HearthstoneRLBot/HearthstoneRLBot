@@ -3,7 +3,7 @@ from fireplace import cards
 from fireplace.exceptions import GameOver
 from fireplace.utils import play_full_game
 
-import GameState
+from GameState.GameState import GameState
 
 sys.path.append("..")
 
