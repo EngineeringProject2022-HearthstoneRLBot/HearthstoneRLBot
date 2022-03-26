@@ -196,7 +196,7 @@ def main():
     game = setup_game()
     try:
         for player in game.players:
-            current = GameState()
+            current = GameState(game)
             # 1. Tutaj ustawić do current karty do wyboru
             print("Can mulligan %r" % player.choice.cards)
             mull_count = random.randint(0, len(player.choice.cards))
@@ -207,7 +207,7 @@ def main():
         while True:
             player = game.current_player
 
-            current = GameState()
+            current = GameState(game)
             # 2. Tutaj do current wrzucić aktualny stan gry
             while True:
                 heropower = player.hero.power

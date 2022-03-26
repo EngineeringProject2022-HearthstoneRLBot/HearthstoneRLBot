@@ -1,6 +1,6 @@
 class HandCard:
 
-    def __init__(self):
+    def __init__(self, card):
         self.cost = 0
         self.currentHealth = 0
         self.currentAttack = 0
@@ -59,4 +59,7 @@ class HandCard:
 
         self.buffs = []
         self.requirements = {}
+
+        #### Fetching actual data ####
+        self.currentAttack = card.atk
 
