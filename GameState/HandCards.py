@@ -1,6 +1,11 @@
+import fireplace
+from fireplace.dsl import LazyValue
+
+
 class HandCard:
 
     def __init__(self, card):
+        self.card = card
         self.cost = 0
         self.currentHealth = 0
         self.currentAttack = 0
@@ -61,5 +66,18 @@ class HandCard:
         self.requirements = {}
 
         #### Fetching actual data ####
-        self.currentAttack = card.atk
+        #self.currentAttack = card.atk
+
+
+    def mapToInput(self):
+        for x in self.play:
+            if isinstance(x, fireplace.actions.Buff):
+                selector = x.get_args(self.card)[0]
+                times = x.times
+                if isinstance(times, LazyValue):
+                    times = times.evaluate(self.card)
+                if self.card in x.get_targets(self.card,selector):
+                    buff = x.get_target_args(self.card,self.card)[0]
+                    value = buff.max_health * times
+
 

@@ -13,6 +13,8 @@ from xml.etree import ElementTree
 from hearthstone.enums import CardClass, CardType  # noqa
 
 # Autogenerate the list of cardset modules
+from GameState import HandCard
+
 _cards_module = os.path.join(os.path.dirname(__file__), "cards")
 CARD_SETS = [cs for _, cs, ispkg in iter_modules([_cards_module]) if ispkg]
 
@@ -189,10 +191,85 @@ def setup_game():
 
     return game
 
+from fireplace.player import Player
+from fireplace.game import BaseGame, CoinRules, Game
+class BaseTestGame(CoinRules, BaseGame):
+	def start(self):
+		super().start()
+		self.player1.max_mana = 10
+		self.player2.max_mana = 10
+
+def _random_class():
+	return CardClass(random.randint(2, 10))
+
+def init_game(class1=None, class2=None, exclude=(), game_class=BaseTestGame):
+	#log.info("Initializing a new game")
+	if class1 is None:
+		class1 = _random_class()
+	if class2 is None:
+		class2 = _random_class()
+	player1 = Player("Player1", *_draft(class1, exclude))
+	player2 = Player("Player2", *_draft(class2, exclude))
+	game = game_class(players=(player1, player2))
+	return game
+
+_draftcache = {}
+
+def _empty_mulligan(game):
+	for player in game.players:
+		if player.choice:
+			player.choice.choose()
+
+BLACKLIST = (
+	"GVG_007",  # Flame Leviathan
+	"AT_022",  # Fist of Jaraxxus
+	"AT_130",  # Sea Reaver
+)
+
+def _draft(card_class, exclude):
+	# random_draft() is fairly slow, this caches the drafts
+	if (card_class, exclude) not in _draftcache:
+		_draftcache[(card_class, exclude)] = random_draft(card_class, exclude + BLACKLIST)
+	return _draftcache[(card_class, exclude)], card_class.default_hero
+
+def prepare_game(*args, **kwargs):
+	game = init_game(*args, **kwargs)
+	game.start()
+	_empty_mulligan(game)
+
+	return game
+
+def test_cogmaster():
+    game = prepare_game()
+    cogmaster = game.player1.give("NEW1_018")
+    #cogmaster.play()
+    #assert cogmaster.atk == 6
+    dummy = game.player1.give("CS2_029")
+    #dummy.play()
+    frost = game.player1.give("NEW1_018")
+    get_script_definition("CS2_226")
+    frost.play()
+    theFrost = HandCard(frost)
+    theFrost.play=frost.data.scripts.play
+    theFrost.mapToInput()
+    #assert cogmaster.atk == 3
+    humility = game.player1.give("EX1_360")
+    humility.play(target=cogmaster)
+    #assert cogmaster.atk == 3
+    dummy.destroy()
+    #assert cogmaster.atk == 1
+    game.player1.give("GVG_093").play()
+    assert cogmaster.atk == 3
+    blessedchamp = game.player1.give("EX1_355")
+    blessedchamp.play(target=cogmaster)
+    assert cogmaster.atk == 4
+
 
 def main():
+
     gameStates = []
     cards.db.initialize()
+    test_cogmaster()
     game = setup_game()
     try:
         for player in game.players:
@@ -243,6 +320,9 @@ def main():
                 for character in player.characters:
                     if character.can_attack():
                         character.attack(random.choice(character.targets))
+                        if character.buffs:
+                            print("gay")
+
                     # 6. Tutaj do current wrzuć nowy stan gry (po ataku)
 
                 break

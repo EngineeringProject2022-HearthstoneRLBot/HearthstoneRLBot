@@ -16,3 +16,10 @@ class Player:
         self.boardCards = []
 #        for i in range(7):
 #            self.boardCards.append(BoardCard())
+
+    def mapToInput(self):
+        heroRow = []
+        boardRow = []
+        handRow = []
+        for card in self.handCards:
+            card.mapToInput()
