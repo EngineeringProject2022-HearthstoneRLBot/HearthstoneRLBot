@@ -5,70 +5,59 @@ from fireplace.dsl import LazyValue
 class HandCard:
 
     def __init__(self, card):
-        self.card = card
-        self.cost = 0
-        self.currentHealth = 0
-        self.currentAttack = 0
-        self.baseHealth = 0
-        self.baseAtt = 0
-        self.sleeping = 0
-        self.frozen = 0
-        self.charge = 0
-        self.rush = 0
-        self.taunt = 0
-        self.divineShield = 0
-        self.isNoneType = 0
-        self.isMurloc = 0
-        self.isPirate = 0
-        self.isTotem = 0
-        self.isBeast = 0
-        self.isDemon = 0
-        self.isDragon = 0
-        self.isMech = 0
-        self.isElemental = 0
-        self.isBuffed = 0
-        self.hasDeathrattle = 0
-        self.hasBattlecry = 0
-        self.hasAura = 0
-        self.hasCondEff = 0
-        self.hasEoTEff = 0
-        self.hasSoTEff = 0
-        self.spellDamage = 0
-        self.stealth = 0
-        self.isDamaged = 0
-        self.windfury = 0
-        self.position = 0
-        self.isWeapon = 0
-        self.isImmune = 0
-        self.cantAttack = 0
-        self.cantAttackHeroes = 0
-        self.armor = 0
-        self.cantBeAttacked = 0
-        self.isSecret = 0
+        self.handCardFeatures = {
+            "cost": card.cost,
+            "poweredUp": int(card.powered_up),
+            "isMinion": 1 if card.type == 4 else 0,
+            "isSpell": 1 if card.type == 5 else 0,
+            "isWeapon": 1 if card.type == 7 else 0,
+            "currDiscount": card.data.cost - card.cost
+        }
+        self.minionFeatures = {
+            "currentHealth": card.health,
+            "currentAttack": card.atk,
+            "baseHealth": card.data.health,
+            "baseAtt": card.data.atk,
+            "sleeping": int(card.asleep),
+            "frozen": int(card.frozen),
+            "charge": int(card.charge),
+            "rush": int(card.rush),
+            "taunt": int(card.rush),
+            "divineShield": int(card.divine_shield),
+            "isNoneType": 1 if card.race == 1 else 0,
+            "isMurloc": 1 if card.race == 14 else 0,
+            "isPirate": 1 if card.race == 23 else 0,
+            "isTotem": 1 if card.race == 21 else 0,
+            "isBeast": 1 if card.race == 20 else 0,
+            "isDemon": 1 if card.race == 15 else 0,
+            "isDragon": 1 if card.race == 24 else 0,
+            "isMech": 1 if card.race == 17 else 0,
+            "isElemental": 1 if card.race == 18 else 0,
+            "isBuffed": 1 if len(card.buffs) != 0 else 0,
+            "hasDeathrattle": 1 if len(card.deathrattles) != 0 else 0,
+            "hasBattlecry": int(card.has_battlecry),
+            "hasAura": int(card.aura),
+            "hasCondEff": 0,  # tricky one
+            "hasEoTEff": 0,  # tricky one
+            "hasSoTEff": 0,  # tricky one
+            "spellDamage": card.spellpower,
+            "stealth": int(card.stealthed),
+            "isDamaged": int(card.damaged),
+            "windfury": card.windfury,
+            "position": card.zone_position,  # probably to be ommitted
+            "isImmune": int(card.immune),
+            "cantAttack": int(card.cant_attack),
+            "cantAttackHeroes": int(card.cannot_attack_heroes),
+            "cantBeTargetedSpellsHeroPowers": 1 if card.cant_be_targeted_by_abilities == 1 and card.cant_be_targeted_by_hero_powers == 1 else 0,
 
-        #ciekawsze kombinacje:
-        self.deathrattle = []
-        self.activate = []
-        self.awaken = []
-        self.combo = []
-        self.costMod = []
-        self.draw = []
-        self.enrage = []
-        self.events = []
-        self.inspire = []
-        self.outcast = []
-        self.play = []
-        self.poweredUp = []
-        self.secret = []
-        self.update = []
+            "cleave": 0}
+        self.battlecrySpellEffectPlane = {}
+        self.endOfTurnEffectPlane = {}
+        self.startOfTurnEffectPlane = {}
+        self.conditionalEffectPlane = {}
+        self.onAttackPlane = {}
 
-        self.buffs = []
-        self.requirements = {}
-
-        #### Fetching actual data ####
-        #self.currentAttack = card.atk
-
-
+    # to serve as template for extracting more complext features
     def mapToInput(self):
         for x in self.play:
             if isinstance(x, fireplace.actions.Buff):
@@ -76,8 +65,6 @@ class HandCard:
                 times = x.times
                 if isinstance(times, LazyValue):
                     times = times.evaluate(self.card)
-                if self.card in x.get_targets(self.card,selector):
-                    buff = x.get_target_args(self.card,self.card)[0]
+                if self.card in x.get_targets(self.card, selector):
+                    buff = x.get_target_args(self.card, self.card)[0]
                     value = buff.max_health * times
-
-
