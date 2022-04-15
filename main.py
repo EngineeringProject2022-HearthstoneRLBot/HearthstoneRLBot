@@ -241,7 +241,21 @@ def prepare_game(*args, **kwargs):
 
 def test_cogmaster():
     game = prepare_game()
-    cogmaster = game.player1.give("NEW1_018")
+    frog = game.player1.give("EX1_103")
+    shat = game.player1.give("EX1_019")
+    frost = game.player1.give("CS2_226")
+    argus = game.player1.give("EX1_093")
+    bloodsail= game.player1.give("NEW1_018")
+    frog.play()
+    shat.play(target=frog)
+    whelp = game.player1.give("BRM_004")
+    #BRM_004 Twilight Whelp
+    #EX1_161 Naturalize
+    #EX1_103 frog
+    #EX1_019 shat
+    #CS2_226 frost
+    #EX1_093 argus
+    theCog= HandCard(bloodsail)
     #cogmaster.play()
     #assert cogmaster.atk == 6
     dummy = game.player1.give("CS2_029")
