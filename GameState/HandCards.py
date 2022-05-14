@@ -155,4 +155,5 @@ def mapStartOfTurn(card):
 
 def mapOnAttack(card):
     onAttackEffect = {}
+    print("AOT")
     return onAttackEffect
