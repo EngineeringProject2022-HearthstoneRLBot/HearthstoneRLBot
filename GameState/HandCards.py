@@ -58,14 +58,18 @@ class HandCard:
 
     # to serve as template for extracting more complex features
     def mapComplexFeatures(self, card):
-        battlecrySpellEffectPlane = {}
-        endOfTurnEffectPlane = {}
-        startOfTurnEffectPlane = {}
-        conditionalEffectPlane = {}
-        onAttackPlane = {}
+        battlecrySpellEffectPlane = self.mapBattlecrySpells(card)
+        endOfTurnEffectPlane = self.mapEndOfTurn(card)
+        startOfTurnEffectPlane = self.mapStartOfTurn(card)
+        conditionalEffectPlane = self.mapConditional(card)
+        onAttackPlane = self.mapOnAttack(card)
 
+        # buff.data.scripts.atk!!!
+        return battlecrySpellEffectPlane, endOfTurnEffectPlane, startOfTurnEffectPlane, conditionalEffectPlane, onAttackPlane
+
+    def mapBattlecrySpells(self, card):
+        currentBattlecryEffect = {}
         for x in card.data.scripts.play:
-            currentBattlecryEffect = {}
             if isinstance(x, fireplace.actions.Buff) or (
                     isinstance(x, fireplace.dsl.evaluator.Find) and isinstance(x._if, fireplace.actions.Buff)):
                 if isinstance(x, fireplace.actions.Buff):
@@ -120,9 +124,26 @@ class HandCard:
                         currentBattlecryEffect["MultiplyValue"] = 0
                     currentBattlecryEffect["Permanent"] = int(buff.one_turn_effect)
                 else:
-                    currentBattlecryEffect["Permanent"]=1
-                    currentBattlecryEffect["AddValue"]=1
+                    currentBattlecryEffect["Permanent"] = 1
+                    currentBattlecryEffect["AddValue"] = 1
+        return currentBattlecryEffect
 
+    # TODO
+    def mapEndOfTurn(self, card):
+        endOfTurnEffect = {}
+        return endOfTurnEffect
 
-                # buff.data.scripts.atk!!!
-        return battlecrySpellEffectPlane, endOfTurnEffectPlane, startOfTurnEffectPlane, conditionalEffectPlane, onAttackPlane
+    # TODO
+    def mapStartOfTurn(self, card):
+        startOfTurnEffect = {}
+        return startOfTurnEffect
+
+    # TODO
+    def mapConditional(self, card):
+        conditionalEffect = {}
+        return conditionalEffect
+
+    # TODO
+    def mapOnAttack(self, card):
+        onAttackEffect = {}
+        return onAttackEffect
