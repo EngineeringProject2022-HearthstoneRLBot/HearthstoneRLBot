@@ -58,92 +58,101 @@ class HandCard:
 
     # to serve as template for extracting more complex features
     def mapComplexFeatures(self, card):
-        battlecrySpellEffectPlane = self.mapBattlecrySpells(card)
-        endOfTurnEffectPlane = self.mapEndOfTurn(card)
-        startOfTurnEffectPlane = self.mapStartOfTurn(card)
-        conditionalEffectPlane = self.mapConditional(card)
-        onAttackPlane = self.mapOnAttack(card)
+        battlecrySpellEffectPlane = mapBattlecrySpells(card)
+        endOfTurnEffectPlane = mapEndOfTurn(card)
+        startOfTurnEffectPlane = mapStartOfTurn(card)
+        conditionalEffectPlane = mapConditional(card)
+        onAttackPlane = mapOnAttack(card)
 
         # buff.data.scripts.atk!!!
         return battlecrySpellEffectPlane, endOfTurnEffectPlane, startOfTurnEffectPlane, conditionalEffectPlane, onAttackPlane
 
-    def mapBattlecrySpells(self, card):
-        currentBattlecryEffect = {}
-        for x in card.data.scripts.play:
-            if isinstance(x, fireplace.actions.Buff) or (
-                    isinstance(x, fireplace.dsl.evaluator.Find) and isinstance(x._if, fireplace.actions.Buff)):
-                if isinstance(x, fireplace.actions.Buff):
-                    currentBattlecryEffect["AlwaysGet"] = 1
-                else:
-                    currentBattlecryEffect["AlwaysGet"] = 0
-                    x = x._if
-                selector = x.get_args(card)[0]
-                targets = x.get_targets(card, selector)
-                if isinstance(selector, fireplace.dsl.selector.FuncSelector) and len(targets) == 1 and targets[
-                    0] == card:
-                    selfFlag = True
-                times = x.times
-                if isinstance(times, LazyValue):
-                    times = times.evaluate(card)
-                    currentBattlecryEffect["SetAmount"] = 0
-                else:
-                    currentBattlecryEffect["SetAmount"] = 1
-                if x._kwargs != {}:
-                    currentBattlecryEffect["SetAmount"] = 0
-                buff = x.get_target_args(card, card)[0]
-                if hasattr(buff.data.scripts, "apply"):
-                    currentBattlecryEffect["setsAttackToHealth"] = 1
-                # hard coding- only inner fire has this
-                if hasattr(buff.data.scripts, "max_health"):
-                    pass
-                if currentBattlecryEffect.get("setsAttackToHealth") is None:
-                    currentBattlecryEffect["selfAttackValue"] = buff.atk * times
-                    currentBattlecryEffect["selfHealthValue"] = buff.max_health * times
-                    if hasattr(buff.data.scripts, "atk") or hasattr(buff.data.scripts,
-                                                                    "max_health") or "max_health" in x._kwargs:
-                        currentBattlecryEffect["AddValue"] = 0
-                        if (hasattr(buff.data.scripts, "atk") and buff.data.scripts.atk(0, 10) == buff.atk) or (
-                                hasattr(buff.data.scripts, "max_health") and buff.data.scripts.max_health(0,
-                                                                                                          10) == buff.max_health):
-                            currentBattlecryEffect["SetValue"] = 1
-                            currentBattlecryEffect["MultiplyValue"] = 0
-                        else:
-                            currentBattlecryEffect["SetValue"] = 0
-                            currentBattlecryEffect["MultiplyValue"] = 1
-                            if hasattr(buff.data.scripts, "atk"):
-                                currentBattlecryEffect["selfAttackValue"] = buff.data.scripts.atk(0, 1)
-                            if hasattr(buff.data.scripts, "max_health"):
-                                currentBattlecryEffect["selfHealthValue"] = buff.data.scripts.max_health(0, 1)
-                            # hard coding divine spirit
-                            if "max_health" in x._kwargs:
-                                currentBattlecryEffect["selfHealthValue"] = 2
 
-                    else:
-                        currentBattlecryEffect["AddValue"] = 1
-                        currentBattlecryEffect["SetValue"] = 0
+def mapBattlecrySpells(card):
+    currentBattlecryEffect = {}
+    for x in card.data.scripts.play:
+        if isinstance(x, fireplace.actions.Buff) or (
+                isinstance(x, fireplace.dsl.evaluator.Find) and isinstance(x._if, fireplace.actions.Buff)):
+            if isinstance(x, fireplace.actions.Buff):
+                currentBattlecryEffect["AlwaysGet"] = 1
+            else:
+                currentBattlecryEffect["AlwaysGet"] = 0
+                x = x._if
+            selector = x.get_args(card)[0]
+            targets = x.get_targets(card, selector)
+            if isinstance(selector, fireplace.dsl.selector.FuncSelector) and len(targets) == 1 and targets[
+                0] == card:
+                selfFlag = True
+            times = x.times
+            if isinstance(times, LazyValue):
+                times = times.evaluate(card)
+                currentBattlecryEffect["SetAmount"] = 0
+            else:
+                currentBattlecryEffect["SetAmount"] = 1
+            if x._kwargs != {}:
+                currentBattlecryEffect["SetAmount"] = 0
+            buff = x.get_target_args(card, card)[0]
+            if hasattr(buff.data.scripts, "apply"):
+                currentBattlecryEffect["setsAttackToHealth"] = 1
+            # hard coding- only inner fire has this
+            if hasattr(buff.data.scripts, "max_health"):
+                pass
+            if currentBattlecryEffect.get("setsAttackToHealth") is None:
+                currentBattlecryEffect["selfAttackValue"] = buff.atk * times
+                currentBattlecryEffect["selfHealthValue"] = buff.max_health * times
+                if hasattr(buff.data.scripts, "atk") or hasattr(buff.data.scripts,
+                                                                "max_health") or "max_health" in x._kwargs:
+                    currentBattlecryEffect["AddValue"] = 0
+                    if (hasattr(buff.data.scripts, "atk") and buff.data.scripts.atk(0, 10) == buff.atk) or (
+                            hasattr(buff.data.scripts, "max_health") and buff.data.scripts.max_health(0,
+                                                                                                      10) == buff.max_health):
+                        currentBattlecryEffect["SetValue"] = 1
                         currentBattlecryEffect["MultiplyValue"] = 0
-                    currentBattlecryEffect["Permanent"] = int(buff.one_turn_effect)
+                    else:
+                        currentBattlecryEffect["SetValue"] = 0
+                        currentBattlecryEffect["MultiplyValue"] = 1
+                        if hasattr(buff.data.scripts, "atk"):
+                            currentBattlecryEffect["selfAttackValue"] = buff.data.scripts.atk(0, 1)
+                        if hasattr(buff.data.scripts, "max_health"):
+                            currentBattlecryEffect["selfHealthValue"] = buff.data.scripts.max_health(0, 1)
+                        # hard coding divine spirit
+                        if "max_health" in x._kwargs:
+                            currentBattlecryEffect["selfHealthValue"] = 2
+
                 else:
-                    currentBattlecryEffect["Permanent"] = 1
                     currentBattlecryEffect["AddValue"] = 1
-        return currentBattlecryEffect
+                    currentBattlecryEffect["SetValue"] = 0
+                    currentBattlecryEffect["MultiplyValue"] = 0
+                currentBattlecryEffect["Permanent"] = int(buff.one_turn_effect)
+            else:
+                currentBattlecryEffect["Permanent"] = 1
+                currentBattlecryEffect["AddValue"] = 1
+    return currentBattlecryEffect
 
     # TODO
-    def mapEndOfTurn(self, card):
-        endOfTurnEffect = {}
-        return endOfTurnEffect
+
+
+def mapEndOfTurn(card):
+    endOfTurnEffect = {}
+    return endOfTurnEffect
 
     # TODO
-    def mapStartOfTurn(self, card):
-        startOfTurnEffect = {}
-        return startOfTurnEffect
+
+
+def mapConditional(card):
+    conditionalEffect = {}
+    return conditionalEffect
 
     # TODO
-    def mapConditional(self, card):
-        conditionalEffect = {}
-        return conditionalEffect
+
+
+def mapStartOfTurn(card):
+    startOfTurnEffect = {}
+    return startOfTurnEffect
 
     # TODO
-    def mapOnAttack(self, card):
-        onAttackEffect = {}
-        return onAttackEffect
+
+
+def mapOnAttack(card):
+    onAttackEffect = {}
+    return onAttackEffect
