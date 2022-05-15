@@ -241,21 +241,38 @@ def prepare_game(*args, **kwargs):
 
 def test_cogmaster():
     game = prepare_game()
+
+    comboCard2 = game.player1.give("AT_028")
+    comboCard2.play()
+    HandCard(comboCard2)
+
+
+    comboCard = game.player1.give("EX1_131")
+    comboCard.play()
+    HandCard(comboCard)
+
+    snowchugger = game.player1.give("GVG_002")
+    snowchugger.play()
+    HandCard(snowchugger)
+
+
     armorsmith = game.player1.give("CFM_756")
     armorsmith.play()
+    HandCard(armorsmith)
 
-    frog = game.player1.give("EX1_103")
-    shat = game.player1.give("EX1_019")
+
+    #frog = game.player1.give("EX1_103")
+    #shat = game.player1.give("EX1_019")
     #frost = game.player1.give("CS2_226")
     #argus = game.player1.give("EX1_093")
     #div = game.player1.give("CS2_236")
-    bloodsail= game.player1.give("NEW1_018")
-    bchampion = game.player1.give("EX1_355")
-    innerFire = game.player1.give("CS1_129")
-    aldor = game.player1.give("EX1_382")
-    frog.play()
-    HandCard(innerFire)
-    innerFire.play(target=frog)
+    #bloodsail= game.player1.give("NEW1_018")
+    #bchampion = game.player1.give("EX1_355")
+    #innerFire = game.player1.give("CS1_129")
+    #aldor = game.player1.give("EX1_382")
+    #frog.play()
+    #HandCard(innerFire)
+    #innerFire.play(target=frog)
     #whelp = game.player1.give("BRM_004")
     #CS1_129 inner fire
     #CS2_236 divine spirit
@@ -270,7 +287,7 @@ def test_cogmaster():
     #CFM_756 alley armorsmith
     #cogmaster.play()
     #assert cogmaster.atk == 6
-    dummy = game.player1.give("CS2_029")
+    #dummy = game.player1.give("CS2_029")
     #dummy.play()
 
 

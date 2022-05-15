@@ -158,8 +158,19 @@ def mapOnAttack(card):
     #snowchugger
     #cutpurse ale nie ma go chyba w kartach
     #alley armorsmith
+
+    #loop for detecting what combo does
+    for x in card.data.scripts.combo:
+        if isinstance(x, fireplace.actions.Hit):
+            print("Combo that simply does damage")
+        if isinstance(x, fireplace.actions.Buff):
+            print("Combo that buffs")
+        if isinstance(x, fireplace.actions.Summon):
+            print("Combo that summons")
+
+
     for x in card.data.scripts.events:
-        if isinstance(x, fireplace.actions.events.trigger):
-            if isinstance(x, fireplace.actions.events.trigger.damage):
-                print("A")
+        if isinstance(x, fireplace.actions.EventListener):
+            if isinstance(x.trigger, fireplace.actions.Damage):
+                print("On attack effect (event Damage)")
     return onAttackEffect
