@@ -241,6 +241,9 @@ def prepare_game(*args, **kwargs):
 
 def test_cogmaster():
     game = prepare_game()
+    armorsmith = game.player1.give("CFM_756")
+    armorsmith.play()
+
     frog = game.player1.give("EX1_103")
     shat = game.player1.give("EX1_019")
     #frost = game.player1.give("CS2_226")
@@ -264,10 +267,13 @@ def test_cogmaster():
     #EX1_019 shat
     #CS2_226 frost
     #EX1_093 argus
+    #CFM_756 alley armorsmith
     #cogmaster.play()
     #assert cogmaster.atk == 6
     dummy = game.player1.give("CS2_029")
     #dummy.play()
+
+
     frost = game.player1.give("NEW1_018")
     get_script_definition("CS2_226")
     frost.play()

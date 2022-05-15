@@ -155,5 +155,11 @@ def mapStartOfTurn(card):
 
 def mapOnAttack(card):
     onAttackEffect = {}
-    print("AOT")
+    #snowchugger
+    #cutpurse ale nie ma go chyba w kartach
+    #alley armorsmith
+    for x in card.data.scripts.events:
+        if isinstance(x, fireplace.actions.events.trigger):
+            if isinstance(x, fireplace.actions.events.trigger.damage):
+                print("A")
     return onAttackEffect
