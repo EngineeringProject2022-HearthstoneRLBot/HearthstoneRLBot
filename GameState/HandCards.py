@@ -1,6 +1,7 @@
 import fireplace
+from fireplace.actions import SetTag, Silence
 from fireplace.dsl import LazyValue
-from hearthstone.enums import Race
+from hearthstone.enums import Race, GameTag
 
 
 class HandCard:
@@ -73,64 +74,89 @@ def mapBattlecrySpells(card):
     for x in card.data.scripts.play:
         if isinstance(x, fireplace.actions.Buff) or (
                 isinstance(x, fireplace.dsl.evaluator.Find) and isinstance(x._if, fireplace.actions.Buff)):
-            if isinstance(x, fireplace.actions.Buff):
-                currentBattlecryEffect["AlwaysGet"] = 1
-            else:
-                currentBattlecryEffect["AlwaysGet"] = 0
-                x = x._if
-            selector = x.get_args(card)[0]
-            targets = x.get_targets(card, selector)
-            if isinstance(selector, fireplace.dsl.selector.FuncSelector) and len(targets) == 1 and targets[
-                0] == card:
-                selfFlag = True
-            times = x.times
-            if isinstance(times, LazyValue):
-                times = times.evaluate(card)
-                currentBattlecryEffect["SetAmount"] = 0
-            else:
-                currentBattlecryEffect["SetAmount"] = 1
-            if x._kwargs != {}:
-                currentBattlecryEffect["SetAmount"] = 0
-            buff = x.get_target_args(card, card)[0]
-            if hasattr(buff.data.scripts, "apply"):
-                currentBattlecryEffect["setsAttackToHealth"] = 1
-            # hard coding- only inner fire has this
-            if hasattr(buff.data.scripts, "max_health"):
-                pass
-            if currentBattlecryEffect.get("setsAttackToHealth") is None:
-                currentBattlecryEffect["selfAttackValue"] = buff.atk * times
-                currentBattlecryEffect["selfHealthValue"] = buff.max_health * times
-                if hasattr(buff.data.scripts, "atk") or hasattr(buff.data.scripts,
-                                                                "max_health") or "max_health" in x._kwargs:
-                    currentBattlecryEffect["AddValue"] = 0
-                    if (hasattr(buff.data.scripts, "atk") and buff.data.scripts.atk(0, 10) == buff.atk) or (
-                            hasattr(buff.data.scripts, "max_health") and buff.data.scripts.max_health(0,
-                                                                                                      10) == buff.max_health):
-                        currentBattlecryEffect["SetValue"] = 1
-                        currentBattlecryEffect["MultiplyValue"] = 0
-                    else:
-                        currentBattlecryEffect["SetValue"] = 0
-                        currentBattlecryEffect["MultiplyValue"] = 1
-                        if hasattr(buff.data.scripts, "atk"):
-                            currentBattlecryEffect["selfAttackValue"] = buff.data.scripts.atk(0, 1)
-                        if hasattr(buff.data.scripts, "max_health"):
-                            currentBattlecryEffect["selfHealthValue"] = buff.data.scripts.max_health(0, 1)
-                        # hard coding divine spirit
-                        if "max_health" in x._kwargs:
-                            currentBattlecryEffect["selfHealthValue"] = 2
-
-                else:
-                    currentBattlecryEffect["AddValue"] = 1
-                    currentBattlecryEffect["SetValue"] = 0
-                    currentBattlecryEffect["MultiplyValue"] = 0
-                currentBattlecryEffect["Permanent"] = int(buff.one_turn_effect)
-            else:
-                currentBattlecryEffect["Permanent"] = 1
-                currentBattlecryEffect["AddValue"] = 1
+            getBuffDetails(x, currentBattlecryEffect, card)
+        if isinstance(x, fireplace.actions.TargetedAction) or (
+                isinstance(x, fireplace.dsl.evaluator.Find) and isinstance(x._if, fireplace.actions.TargetedAction)):
+            getTargetedActionDetails(x, currentBattlecryEffect, card)
     return currentBattlecryEffect
 
     # TODO
 
+def getTargetedActionDetails(x, currentBattlecryEffect, card):
+    if isinstance(x, fireplace.dsl.evaluator.Find):
+        x = x._if
+    selector = x.get_args(card)[0]
+    targets = x.get_targets(card, selector)
+    if isinstance(selector, fireplace.dsl.selector.FuncSelector) and len(targets) == 1 and targets[0] == card:
+        currentBattlecryEffect["CanAffectSelf"] = 1
+    elif isinstance(selector, fireplace.dsl.selector.FuncSelector) and len(targets) == 1 and targets[0] is None:
+        currentBattlecryEffect["IChooseCard"] = 1
+    if isinstance(x, SetTag):
+        if GameTag.DIVINE_SHIELD in x._args[1]:
+            currentBattlecryEffect["GiveDivShield"] = 1
+        if GameTag.TAUNT in x._args[1]:
+            currentBattlecryEffect["GiveTaunt"] = 1
+        if GameTag.STEALTH in x._args[1]:
+            currentBattlecryEffect["GiveStealth"] = 1
+        if GameTag.SILENCE in x._args[1]:
+            currentBattlecryEffect["GivePoison"] = 1
+    if isinstance(x, Silence):
+        currentBattlecryEffect["GiveSilence"] = 1
+
+def getBuffDetails(x, currEffect, card):
+    if isinstance(x, fireplace.actions.Buff):
+        currEffect["AlwaysGet"] = 1
+    else:
+        currEffect["AlwaysGet"] = 0
+        x = x._if
+    selector = x.get_args(card)[0]
+    targets = x.get_targets(card, selector)
+    if isinstance(selector, fireplace.dsl.selector.FuncSelector) and len(targets) == 1 and targets[0] == card:
+        currEffect["CanAffectSelf"] = 1
+    times = x.times
+    if isinstance(times, LazyValue):
+        times = times.evaluate(card)
+        currEffect["SetAmount"] = 0
+    else:
+        currEffect["SetAmount"] = 1
+    if x._kwargs != {}:
+        currEffect["SetAmount"] = 0
+    buff = x.get_target_args(card, card)[0]
+    if hasattr(buff.data.scripts, "apply"):
+        currEffect["setsAttackToHealth"] = 1
+    # hard coding- only inner fire has this
+    if hasattr(buff.data.scripts, "max_health"):
+        pass
+    if currEffect.get("setsAttackToHealth") is None:
+        currEffect["selfAttackValue"] = buff.atk * times
+        currEffect["selfHealthValue"] = buff.max_health * times
+        if hasattr(buff.data.scripts, "atk") or hasattr(buff.data.scripts,
+                                                        "max_health") or "max_health" in x._kwargs:
+            currEffect["AddValue"] = 0
+            if (hasattr(buff.data.scripts, "atk") and buff.data.scripts.atk(0, 10) == buff.atk) or (
+                    hasattr(buff.data.scripts, "max_health") and buff.data.scripts.max_health(0,
+                                                                                              10) == buff.max_health):
+                currEffect["SetValue"] = 1
+                currEffect["MultiplyValue"] = 0
+            else:
+                currEffect["SetValue"] = 0
+                currEffect["MultiplyValue"] = 1
+                if hasattr(buff.data.scripts, "atk"):
+                    currEffect["selfAttackValue"] = buff.data.scripts.atk(0, 1)
+                if hasattr(buff.data.scripts, "max_health"):
+                    currEffect["selfHealthValue"] = buff.data.scripts.max_health(0, 1)
+                # hard coding divine spirit
+                if "max_health" in x._kwargs:
+                    currEffect["selfHealthValue"] = 2
+
+        else:
+            currEffect["AddValue"] = 1
+            currEffect["SetValue"] = 0
+            currEffect["MultiplyValue"] = 0
+        currEffect["Permanent"] = int(buff.one_turn_effect)
+    else:
+        currEffect["Permanent"] = 1
+        currEffect["AddValue"] = 1
 
 def mapEndOfTurn(card):
     endOfTurnEffect = {}
@@ -155,11 +181,11 @@ def mapStartOfTurn(card):
 
 def mapOnAttack(card):
     onAttackEffect = {}
-    #snowchugger
-    #cutpurse ale nie ma go chyba w kartach
-    #alley armorsmith
+    # snowchugger
+    # cutpurse ale nie ma go chyba w kartach
+    # alley armorsmith
 
-    #loop for detecting what combo does
+    # loop for detecting what combo does
     for x in card.data.scripts.combo:
         if isinstance(x, fireplace.actions.Hit):
             print("Combo that simply does damage")
@@ -167,7 +193,6 @@ def mapOnAttack(card):
             print("Combo that buffs")
         if isinstance(x, fireplace.actions.Summon):
             print("Combo that summons")
-
 
     for x in card.data.scripts.events:
         if isinstance(x, fireplace.actions.EventListener):
