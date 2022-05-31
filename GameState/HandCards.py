@@ -1,5 +1,5 @@
 import fireplace
-from fireplace.actions import SetTag, Silence
+from fireplace.actions import SetTag, Silence, Heal, Hit, Destroy
 from fireplace.dsl import LazyValue
 from hearthstone.enums import Race, GameTag
 
@@ -26,7 +26,7 @@ class HandCard:
                 "frozen": int(card.frozen),
                 "charge": int(card.charge),
                 "rush": int(card.rush),
-                "taunt": int(card.rush),
+                "taunt": int(card.taunt),
                 "divineShield": int(card.divine_shield),
                 "isNoneType": 1 if card.race == Race.INVALID else 0,
                 "isMurloc": 1 if card.race == Race.MURLOC else 0,
@@ -89,7 +89,7 @@ def getTargetedActionDetails(x, currentBattlecryEffect, card):
     targets = x.get_targets(card, selector)
     if isinstance(selector, fireplace.dsl.selector.FuncSelector) and len(targets) == 1 and targets[0] == card:
         currentBattlecryEffect["CanAffectSelf"] = 1
-    elif isinstance(selector, fireplace.dsl.selector.FuncSelector) and len(targets) == 1 and targets[0] is None:
+    elif isinstance(selector, fireplace.dsl.selector.FuncSelector) and targets[0] is None:
         currentBattlecryEffect["IChooseCard"] = 1
     if isinstance(x, SetTag):
         if GameTag.DIVINE_SHIELD in x._args[1]:
@@ -98,10 +98,19 @@ def getTargetedActionDetails(x, currentBattlecryEffect, card):
             currentBattlecryEffect["GiveTaunt"] = 1
         if GameTag.STEALTH in x._args[1]:
             currentBattlecryEffect["GiveStealth"] = 1
-        if GameTag.SILENCE in x._args[1]:
+        if GameTag.POISONOUS in x._args[1]:
             currentBattlecryEffect["GivePoison"] = 1
+        if GameTag.FROZEN in x._args[1]:
+            currentBattlecryEffect["Freeze"] = 1
     if isinstance(x, Silence):
         currentBattlecryEffect["GiveSilence"] = 1
+    if isinstance(x, Heal):
+        currentBattlecryEffect["HealAmount"] = x.get_args(card)[1]
+    if isinstance(x, Hit):
+        currentBattlecryEffect["HitAmount"] = x.get_args(card)[1]
+    if isinstance(x, Destroy):
+        currentBattlecryEffect["Destroy"] = 1
+
 
 def getBuffDetails(x, currEffect, card):
     if isinstance(x, fireplace.actions.Buff):
@@ -153,7 +162,7 @@ def getBuffDetails(x, currEffect, card):
             currEffect["AddValue"] = 1
             currEffect["SetValue"] = 0
             currEffect["MultiplyValue"] = 0
-        currEffect["Permanent"] = int(buff.one_turn_effect)
+        currEffect["Permanent"] = 1 if int(buff.one_turn_effect) == 0 else 1
     else:
         currEffect["Permanent"] = 1
         currEffect["AddValue"] = 1
@@ -184,7 +193,8 @@ def mapOnAttack(card):
     # snowchugger
     # cutpurse ale nie ma go chyba w kartach
     # alley armorsmith
-
+    for x in card.data.scripts.enrage:
+        getTargetedActionDetails(x,onAttackEffect,card)
     # loop for detecting what combo does
     for x in card.data.scripts.combo:
         if isinstance(x, fireplace.actions.Hit):
