@@ -13,6 +13,8 @@ from xml.etree import ElementTree
 from hearthstone.enums import CardClass, CardType  # noqa
 
 # Autogenerate the list of cardset modules
+from GameState import HandCard
+
 _cards_module = os.path.join(os.path.dirname(__file__), "cards")
 CARD_SETS = [cs for _, cs, ispkg in iter_modules([_cards_module]) if ispkg]
 
@@ -189,10 +191,151 @@ def setup_game():
 
     return game
 
+from fireplace.player import Player
+from fireplace.game import BaseGame, CoinRules, Game
+class BaseTestGame(CoinRules, BaseGame):
+	def start(self):
+		super().start()
+		self.player1.max_mana = 10
+		self.player2.max_mana = 10
+
+def _random_class():
+	return CardClass(random.randint(2, 10))
+
+def init_game(class1=None, class2=None, exclude=(), game_class=BaseTestGame):
+	#log.info("Initializing a new game")
+	if class1 is None:
+		class1 = _random_class()
+	if class2 is None:
+		class2 = _random_class()
+	player1 = Player("Player1", *_draft(class1, exclude))
+	player2 = Player("Player2", *_draft(class2, exclude))
+	game = game_class(players=(player1, player2))
+	return game
+
+_draftcache = {}
+
+def _empty_mulligan(game):
+	for player in game.players:
+		if player.choice:
+			player.choice.choose()
+
+BLACKLIST = (
+	"GVG_007",  # Flame Leviathan
+	"AT_022",  # Fist of Jaraxxus
+	"AT_130",  # Sea Reaver
+)
+
+def _draft(card_class, exclude):
+	# random_draft() is fairly slow, this caches the drafts
+	if (card_class, exclude) not in _draftcache:
+		_draftcache[(card_class, exclude)] = random_draft(card_class, exclude + BLACKLIST)
+	return _draftcache[(card_class, exclude)], card_class.default_hero
+
+def prepare_game(*args, **kwargs):
+	game = init_game(*args, **kwargs)
+	game.start()
+	_empty_mulligan(game)
+
+	return game
+
+def test_cogmaster():
+    game = prepare_game()
+    frostwolf = game.player1.give("CS2_226")
+    HandCard(frostwolf)
+    crab = game.player1.give("NEW1_017")
+    HandCard(crab)
+    silence = game.player1.give("EX1_332")
+    #  HandCard(silence)
+    frog = game.player1.give("EX1_103")
+    arge = game.player1.give("EX1_362")
+    #HandCard(arge)
+    #HandCard(frog)
+    amani = game.player1.give("EX1_393")
+    HandCard(amani)
+    edwin = game.player1.give("EX1_613")
+    HandCard(edwin)
+    baron = game.pla1.give("EX1_249")
+    HandCard(baron)
+    amani.play()
+    edwin.play()
+    comboCard2 = game.player1.give("AT_028")
+    comboCard2.play()
+    HandCard(comboCard2)
+
+
+    comboCard = game.player1.give("EX1_131")
+    comboCard.play()
+    HandCard(comboCard)
+
+    snowchugger = game.player1.give("GVG_002")
+    snowchugger.play()
+    HandCard(snowchugger)
+
+
+    armorsmith = game.player1.give("CFM_756")
+    armorsmith.play()
+    HandCard(armorsmith)
+
+    #crab = game.player1.give("NEW1_017")
+    #stormpike = game.player1.give("CS2_150")
+    #earthenring = game.player1.give("CS2_117")
+    #frostelem = game.player1.give("EX1_283")
+    #arge = game.player1.give("EX1_362")
+    #frog = game.player1.give("EX1_103")
+    #shat = game.player1.give("EX1_019")
+    #frostwolf = game.player1.give("CS2_226")
+    #argus = game.player1.give("EX1_093")
+    #div = game.player1.give("CS2_236")
+    #bloodsail= game.player1.give("NEW1_018")
+    #bchampion = game.player1.give("EX1_355")
+    #innerFire = game.player1.give("CS1_129")
+    #aldor = game.player1.give("EX1_382")
+    #frog.play()
+    #HandCard(innerFire)
+    #innerFire.play(target=frog)
+    #whelp = game.player1.give("BRM_004")
+    #CS1_129 inner fire
+    #CS2_236 divine spirit
+    #EX1_382 aldor
+    #EX1_355 blessed champion
+    #BRM_004 Twilight Whelp
+    #EX1_161 Naturalize
+    #EX1_103 frog
+    #EX1_019 shat
+    #CS2_226 frost
+    #EX1_093 argus
+    #CFM_756 alley armorsmith
+    #cogmaster.play()
+    #assert cogmaster.atk == 6
+    #dummy = game.player1.give("CS2_029")
+    #dummy.play()
+
+
+    frost = game.player1.give("NEW1_018")
+    get_script_definition("CS2_226")
+    frost.play()
+    theFrost = HandCard(frost)
+    theFrost.play=frost.data.scripts.play
+    theFrost.mapToInput()
+    #assert cogmaster.atk == 3
+    humility = game.player1.give("EX1_360")
+    humility.play(target=cogmaster)
+    #assert cogmaster.atk == 3
+    dummy.destroy()
+    #assert cogmaster.atk == 1
+    game.player1.give("GVG_093").play()
+    assert cogmaster.atk == 3
+    blessedchamp = game.player1.give("EX1_355")
+    blessedchamp.play(target=cogmaster)
+    assert cogmaster.atk == 4
+
 
 def main():
+
     gameStates = []
     cards.db.initialize()
+    test_cogmaster()
     game = setup_game()
     try:
         for player in game.players:
@@ -243,6 +386,9 @@ def main():
                 for character in player.characters:
                     if character.can_attack():
                         character.attack(random.choice(character.targets))
+                        if character.buffs:
+                            print("gay")
+
                     # 6. Tutaj do current wrzuć nowy stan gry (po ataku)
 
                 break

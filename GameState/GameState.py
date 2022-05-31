@@ -8,3 +8,11 @@ class GameState:
             self.players.append(Player(state, i+1))
 
        #for player in self.players:
+
+
+
+
+
+    def mapToInput(self):
+        for i in self.players:
+            i.mapToInput()
