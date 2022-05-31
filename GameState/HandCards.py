@@ -1,7 +1,7 @@
 import fireplace
 from fireplace.actions import SetTag, Silence, Heal, Hit, Destroy
 from fireplace.dsl import LazyValue
-from hearthstone.enums import Race, GameTag
+from hearthstone.enums import Race, GameTag, PlayReq
 
 
 class HandCard:
@@ -71,6 +71,11 @@ class HandCard:
 
 def mapBattlecrySpells(card):
     currentBattlecryEffect = {}
+    if len(card.requirements) != 0:
+        for x in card.data.scripts.requirements:
+            if type(x) is PlayReq:
+                currentBattlecryEffect["AlwaysGet"] = 0
+                break
     for x in card.data.scripts.play:
         if isinstance(x, fireplace.actions.Buff) or (
                 isinstance(x, fireplace.dsl.evaluator.Find) and isinstance(x._if, fireplace.actions.Buff)):
@@ -83,6 +88,11 @@ def mapBattlecrySpells(card):
     # TODO
 
 def getTargetedActionDetails(x, currentBattlecryEffect, card):
+    if "AlwaysGet" not in currentBattlecryEffect:
+        if isinstance(x, fireplace.dsl.evaluator.Find):
+            currentBattlecryEffect["AlwaysGet"] = 0
+        else:
+            currentBattlecryEffect["AlwaysGet"] = 1
     if isinstance(x, fireplace.dsl.evaluator.Find):
         x = x._if
     selector = x.get_args(card)[0]
@@ -113,10 +123,13 @@ def getTargetedActionDetails(x, currentBattlecryEffect, card):
 
 
 def getBuffDetails(x, currEffect, card):
-    if isinstance(x, fireplace.actions.Buff):
-        currEffect["AlwaysGet"] = 1
-    else:
-        currEffect["AlwaysGet"] = 0
+    if "AlwaysGet" not in currEffect:
+        if isinstance(x, fireplace.actions.Buff):
+            currEffect["AlwaysGet"] = 1
+        else:
+            currEffect["AlwaysGet"] = 0
+            x = x._if
+    if isinstance(x, fireplace.dsl.evaluator.Find):
         x = x._if
     selector = x.get_args(card)[0]
     targets = x.get_targets(card, selector)
