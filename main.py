@@ -1,4 +1,7 @@
+import operator
 import sys
+
+import fireplace
 from fireplace import cards
 from fireplace.exceptions import GameOver
 from fireplace.utils import play_full_game
@@ -21,6 +24,100 @@ CARD_SETS = [cs for _, cs, ispkg in iter_modules([_cards_module]) if ispkg]
 from GameState.GameState import GameState
 
 sys.path.append("..")
+
+
+def decodeFuncSelector(func):
+    if func == fireplace.dsl.selector.SELF:
+        return " SELF "
+    if func == fireplace.dsl.selector.TARGET:
+        return " TARGET "
+    if func == fireplace.dsl.selector.OTHER_CLASS_CHARACTER:
+        return " OTHER_CLASS "
+    if func == fireplace.dsl.selector.FRIENDLY_CLASS_CHARACTER:
+        return " FRIENDLY_CLASS "
+    if func == fireplace.dsl.selector.LEFTMOST_HAND:
+        return " LEFTMOST_HAND "
+    if func == fireplace.dsl.selector.RIGHTMOST_HAND:
+        return " RIGHTMOST_HAND "
+    if func == fireplace.dsl.selector.OWNER:
+        return " OWNER "
+    if func == fireplace.dsl.selector.ATTACK_TARGET:
+        return " ATTACK TARGET "
+
+def decodeOp(op):
+    if op == operator.or_:
+        return "|"
+    if op == operator.add:
+        return "?+?"
+    if op == operator.and_:
+        return "+"
+    if op == operator.sub:
+        return "-"
+    if op == operator.eq:
+        return "=="
+    if op == operator.le:
+        return "<="
+    return ">O<"
+
+def decodeEnum(enum):
+    if isinstance(enum, str):
+        return enum
+    if enum == fireplace.dsl.selector.Zone.PLAY:
+        return " : "
+    if enum == fireplace.dsl.selector.CardType.MINION:
+        return " M "
+    if enum == fireplace.dsl.selector.CardType.HERO: #na hero sie gra np leczenie/buffa
+        return " H "
+    if enum == fireplace.dsl.selector.CardType.PLAYER: #na gracza sie gra np przyzwanie(przyzwij minionka)
+        return " P "
+    if enum == fireplace.dsl.selector.GameTag.CONTROLLER:
+        return " C "
+    if enum == fireplace.dsl.selector.GameTag.DORMANT:
+        return " D "
+    if enum == fireplace.dsl.selector.GameTag.DAMAGE:
+        return " DMG "
+    return ">E<"
+
+def decodeController(controller):
+    if isinstance(controller, fireplace.dsl.selector.Opponent):
+        return " Opponent "
+    else:
+        return " Self "
+
+def decodeBoardPosition(direction):
+    if direction == fireplace.dsl.selector.BoardPositionSelector.Direction.LEFT:
+        return " L"
+    elif direction == fireplace.dsl.selector.BoardPositionSelector.Direction.RIGHT:
+        return " R"
+    else:
+        return " >D<"
+
+def decodeTarget(target):
+    if target is None:
+        return " NULL "
+    if isinstance(target, fireplace.dsl.selector.RandomSelector):
+        return "RANDOM "+"("+decodeTarget(target.child)+")" + "  T:"+str(target.times)
+
+    if isinstance(target, fireplace.dsl.selector.SetOpSelector):
+        return "("+decodeTarget(target.left)+")" + decodeOp(target.op) + "("+decodeTarget(target.right)+")"
+
+    if isinstance(target, fireplace.dsl.selector.EnumSelector):
+        return decodeEnum(target.tag_enum)
+
+    if isinstance(target, fireplace.dsl.selector.ComparisonSelector):
+        return "("+decodeTarget(target.left)+")" + decodeOp(target.op) + "("+decodeTarget(target.right)+")"
+
+    if isinstance(target, fireplace.dsl.selector.AttrValue):
+        return decodeEnum(target.tag)
+    if isinstance(target, fireplace.dsl.selector.Controller):
+        return decodeController(target)
+    if isinstance(target, fireplace.dsl.selector.FuncSelector):
+        return decodeFuncSelector(target)
+    if isinstance(target, int):
+        return str(target)
+    if isinstance(target, fireplace.dsl.selector.BoardPositionSelector):
+        return decodeBoardPosition(target.direction)+"("+decodeTarget(target.child)+")"
+    return " Unknown "
 
 
 class CardList(list):
@@ -241,41 +338,42 @@ def prepare_game(*args, **kwargs):
 
 def test_cogmaster():
     game = prepare_game()
-    frostwolf = game.player1.give("CS2_226")
-    HandCard(frostwolf)
-    crab = game.player1.give("NEW1_017")
-    HandCard(crab)
-    silence = game.player1.give("EX1_332")
-    #  HandCard(silence)
-    frog = game.player1.give("EX1_103")
-    arge = game.player1.give("EX1_362")
-    #HandCard(arge)
-    #HandCard(frog)
-    amani = game.player1.give("EX1_393")
-    HandCard(amani)
-    edwin = game.player1.give("EX1_613")
-    HandCard(edwin)
-    baron = game.pla1.give("EX1_249")
-    HandCard(baron)
-    amani.play()
-    edwin.play()
-    comboCard2 = game.player1.give("AT_028")
-    comboCard2.play()
-    HandCard(comboCard2)
 
-
-    comboCard = game.player1.give("EX1_131")
-    comboCard.play()
-    HandCard(comboCard)
-
-    snowchugger = game.player1.give("GVG_002")
-    snowchugger.play()
-    HandCard(snowchugger)
-
-
-    armorsmith = game.player1.give("CFM_756")
-    armorsmith.play()
-    HandCard(armorsmith)
+    # frostwolf = game.player1.give("CS2_226")
+    # HandCard(frostwolf)
+    # crab = game.player1.give("NEW1_017")
+    # HandCard(crab)
+    # silence = game.player1.give("EX1_332")
+    # #  HandCard(silence)
+    # frog = game.player1.give("EX1_103")
+    # arge = game.player1.give("EX1_362")
+    # #HandCard(arge)
+    # #HandCard(frog)
+    # amani = game.player1.give("EX1_393")
+    # HandCard(amani)
+    # edwin = game.player1.give("EX1_613")
+    # HandCard(edwin)
+    # baron = game.pla1.give("EX1_249")
+    # HandCard(baron)
+    # amani.play()
+    # edwin.play()
+    # comboCard2 = game.player1.give("AT_028")
+    # comboCard2.play()
+    # HandCard(comboCard2)
+    #
+    #
+    # comboCard = game.player1.give("EX1_131")
+    # comboCard.play()
+    # HandCard(comboCard)
+    #
+    # snowchugger = game.player1.give("GVG_002")
+    # snowchugger.play()
+    # HandCard(snowchugger)
+    #
+    #
+    # armorsmith = game.player1.give("CFM_756")
+    # armorsmith.play()
+    # HandCard(armorsmith)
 
     #crab = game.player1.give("NEW1_017")
     #stormpike = game.player1.give("CS2_150")
@@ -285,6 +383,27 @@ def test_cogmaster():
     #frog = game.player1.give("EX1_103")
     #shat = game.player1.give("EX1_019")
     #frostwolf = game.player1.give("CS2_226")
+    anima = game.player1.give("CS2_059")
+    anima2 = game.player1.give("EX1_298")
+    anima3 = game.player1.give("CS2_117")
+    anima4 = game.player1.give("CS2_057")
+    anima5 = game.player1.give("FP1_013")
+    anima6 = game.player1.give("CS2_062")
+    anima7 = game.player2.give("EX1_349")
+    anima8 = game.player2.give("LOE_024t")
+    anima9 = game.player2.give("Mekka2")
+    anima10 = game.player2.give("Mekka3")
+    x=HandCard(anima)
+    y=HandCard(anima2)
+    z=HandCard(anima3)
+    a=HandCard(anima4)
+    b=HandCard(anima5)
+    d=HandCard(anima6)
+    i=HandCard(anima7)
+    e=HandCard(anima8)
+    f=HandCard(anima9)
+    g=HandCard(anima10)
+    #frost = game.player1.give("CS2_226")
     #argus = game.player1.give("EX1_093")
     #div = game.player1.give("CS2_236")
     #bloodsail= game.player1.give("NEW1_018")
