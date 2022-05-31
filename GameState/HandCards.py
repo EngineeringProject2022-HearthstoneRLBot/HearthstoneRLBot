@@ -1,3 +1,6 @@
+
+import operator
+
 import fireplace
 from fireplace.actions import SetTag, Silence, Heal, Hit, Destroy
 from fireplace.dsl import LazyValue
@@ -180,8 +183,110 @@ def getBuffDetails(x, currEffect, card):
         currEffect["Permanent"] = 1
         currEffect["AddValue"] = 1
 
+
+def decodeFuncSelector(func):
+    if func == fireplace.dsl.selector.SELF:
+        return " SELF "
+    if func == fireplace.dsl.selector.TARGET:
+        return " TARGET "
+    if func == fireplace.dsl.selector.OTHER_CLASS_CHARACTER:
+        return " OTHER_CLASS "
+    if func == fireplace.dsl.selector.FRIENDLY_CLASS_CHARACTER:
+        return " FRIENDLY_CLASS "
+    if func == fireplace.dsl.selector.LEFTMOST_HAND:
+        return " LEFTMOST_HAND "
+    if func == fireplace.dsl.selector.RIGHTMOST_HAND:
+        return " RIGHTMOST_HAND "
+    if func == fireplace.dsl.selector.OWNER:
+        return " OWNER "
+    if func == fireplace.dsl.selector.ATTACK_TARGET:
+        return " ATTACK TARGET "
+
+def decodeOp(op):
+    if op == operator.or_:
+        return "|"
+    if op == operator.add:
+        return "?+?"
+    if op == operator.and_:
+        return "*"
+    if op == operator.sub:
+        return "-"
+    if op == operator.eq:
+        return "=="
+    if op == operator.le:
+        return "<="
+    return ">O<"
+
+def decodeEnum(enum):
+    if isinstance(enum, str):
+        return enum
+    if enum == fireplace.dsl.selector.Zone.PLAY:
+        return " : "
+    if enum == fireplace.dsl.selector.CardType.MINION:
+        return " M "
+    if enum == fireplace.dsl.selector.CardType.HERO: #na hero sie gra np leczenie/buffa
+        return " H "
+    if enum == fireplace.dsl.selector.CardType.PLAYER: #na gracza sie gra np przyzwanie(przyzwij minionka)
+        return " P "
+    if enum == fireplace.dsl.selector.GameTag.CONTROLLER:
+        return " C "
+    if enum == fireplace.dsl.selector.GameTag.DORMANT:
+        return " D "
+    if enum == fireplace.dsl.selector.GameTag.DAMAGE:
+        return " DMG "
+    return ">E<"
+
+def decodeController(controller):
+    if isinstance(controller, fireplace.dsl.selector.Opponent):
+        return " Opponent "
+    else:
+        return " Self "
+
+def decodeBoardPosition(direction):
+    if direction == fireplace.dsl.selector.BoardPositionSelector.Direction.LEFT:
+        return " L"
+    elif direction == fireplace.dsl.selector.BoardPositionSelector.Direction.RIGHT:
+        return " R"
+    else:
+        return " >D<"
+
+def decodeTarget(target):
+    if target is None:
+        return " NULL "
+    if isinstance(target, fireplace.dsl.selector.RandomSelector):
+        return "RANDOM "+"("+decodeTarget(target.child)+")" + "  T:"+str(target.times)
+
+    if isinstance(target, fireplace.dsl.selector.SetOpSelector):
+        return "("+decodeTarget(target.left)+")" + decodeOp(target.op) + "("+decodeTarget(target.right)+")"
+
+    if isinstance(target, fireplace.dsl.selector.EnumSelector):
+        return decodeEnum(target.tag_enum)
+
+    if isinstance(target, fireplace.dsl.selector.ComparisonSelector):
+        return "("+decodeTarget(target.left)+")" + decodeOp(target.op) + "("+decodeTarget(target.right)+")"
+
+    if isinstance(target, fireplace.dsl.selector.AttrValue):
+        return decodeEnum(target.tag)
+    if isinstance(target, fireplace.dsl.selector.Controller):
+        return decodeController(target)
+    if isinstance(target, fireplace.dsl.selector.FuncSelector):
+        return decodeFuncSelector(target)
+    if isinstance(target, int):
+        return str(target)
+    if isinstance(target, fireplace.dsl.selector.BoardPositionSelector):
+        return decodeBoardPosition(target.direction)+"("+decodeTarget(target.child)+")"
+    return " Unknown "
+
 def mapEndOfTurn(card):
     endOfTurnEffect = {}
+    for x in card.data.scripts.events:
+        if isinstance(x, fireplace.actions.EventListener) and isinstance(x.trigger, fireplace.actions.EndTurn):
+            print("znalazlem end turn efekt u "+card.data.strings[GameTag.CARDNAME]['enUS'])
+            for y in x.actions:
+                print(decodeTarget(y._args[0]))
+                if isinstance(y, fireplace.actions.Hit):
+                    print("Znalazlem damage "+str(y._args[1]))
+                    endOfTurnEffect["Damage"] = y._args[1]
     return endOfTurnEffect
 
     # TODO
