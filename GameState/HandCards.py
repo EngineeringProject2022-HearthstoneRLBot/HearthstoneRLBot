@@ -1,8 +1,8 @@
-
 import operator
 
 import fireplace
-from fireplace.actions import SetTag, Silence, Heal, Hit, Destroy
+from fireplace.actions import SetTag, Silence, Heal, Hit, Destroy, GainArmor, Draw, Discard, Summon
+from fireplace.card import Card
 from fireplace.dsl import LazyValue
 from hearthstone.enums import Race, GameTag, PlayReq
 
@@ -80,70 +80,110 @@ def mapBattlecrySpells(card):
                 currentBattlecryEffect["AlwaysGet"] = 0
                 break
     for x in card.data.scripts.play:
-        if isinstance(x, fireplace.actions.Buff) or (
-                isinstance(x, fireplace.dsl.evaluator.Find) and isinstance(x._if, fireplace.actions.Buff)):
-            getBuffDetails(x, currentBattlecryEffect, card)
+        # if isinstance(x, fireplace.actions.Buff) or (
+        #        isinstance(x, fireplace.dsl.evaluator.Find) and isinstance(x._if, fireplace.actions.Buff)):
+        #    getBuffDetails(x, currentBattlecryEffect, card)
         if isinstance(x, fireplace.actions.TargetedAction) or (
                 isinstance(x, fireplace.dsl.evaluator.Find) and isinstance(x._if, fireplace.actions.TargetedAction)):
             getTargetedActionDetails(x, currentBattlecryEffect, card)
+        #if isinstance(x, fireplace.actions.TargetedAction) or (
+        #        isinstance(x, fireplace.dsl.evaluator.Find) and isinstance(x._if, fireplace.actions.TargetedAction)):
+        #    getTargetedActionDetails(x, currentBattlecryEffect, card)
     return currentBattlecryEffect
 
     # TODO
+
 
 def getTargetedActionDetails(x, currentBattlecryEffect, card):
     if "AlwaysGet" not in currentBattlecryEffect:
         if isinstance(x, fireplace.dsl.evaluator.Find):
             currentBattlecryEffect["AlwaysGet"] = 0
+            x = x._if
         else:
             currentBattlecryEffect["AlwaysGet"] = 1
-    if isinstance(x, fireplace.dsl.evaluator.Find):
-        x = x._if
     selector = x.get_args(card)[0]
-    targets = x.get_targets(card, selector)
-    if isinstance(selector, fireplace.dsl.selector.FuncSelector) and len(targets) == 1 and targets[0] == card:
-        currentBattlecryEffect["CanAffectSelf"] = 1
-    elif isinstance(selector, fireplace.dsl.selector.FuncSelector) and targets[0] is None:
-        currentBattlecryEffect["IChooseCard"] = 1
-    if isinstance(x, SetTag):
+    times = 0
+    if hasattr(x, "times"):
+        times = getTimes(x, card, currentBattlecryEffect)
+    # targets = x.get_targets(card, selector)
+    # if isinstance(selector, fireplace.dsl.selector.FuncSelector) and len(targets) == 1 and targets[0] == card:
+    #    currentBattlecryEffect["CanAffectSelf"] = 1
+    # elif isinstance(selector, fireplace.dsl.selector.FuncSelector) and targets[0] is None:
+    #    currentBattlecryEffect["IChooseCard"] = 1
+    # else:
+
+    if isinstance(x, fireplace.actions.Buff):
+        currentBattlecryEffect["BuffTargets"] = decodeTarget(selector)
+        getBuffDetails(x, currentBattlecryEffect, card, times)
+    elif isinstance(x, SetTag):
         if GameTag.DIVINE_SHIELD in x._args[1]:
+            currentBattlecryEffect["BuffTargets"] = decodeTarget(selector)
             currentBattlecryEffect["GiveDivShield"] = 1
-        if GameTag.TAUNT in x._args[1]:
+        elif GameTag.TAUNT in x._args[1]:
+            currentBattlecryEffect["BuffTargets"] = decodeTarget(selector)
             currentBattlecryEffect["GiveTaunt"] = 1
-        if GameTag.STEALTH in x._args[1]:
+        elif GameTag.STEALTH in x._args[1]:
+            currentBattlecryEffect["BuffTargets"] = decodeTarget(selector)
             currentBattlecryEffect["GiveStealth"] = 1
-        if GameTag.POISONOUS in x._args[1]:
+        elif GameTag.POISONOUS in x._args[1]:
+            currentBattlecryEffect["BuffTargets"] = decodeTarget(selector)
             currentBattlecryEffect["GivePoison"] = 1
-        if GameTag.FROZEN in x._args[1]:
+        elif GameTag.FROZEN in x._args[1]:
+            currentBattlecryEffect["BuffTargets"] = decodeTarget(selector)
             currentBattlecryEffect["Freeze"] = 1
-    if isinstance(x, Silence):
+    elif isinstance(x, Silence):
+        currentBattlecryEffect["BuffTargets"] = decodeTarget(selector)
         currentBattlecryEffect["GiveSilence"] = 1
-    if isinstance(x, Heal):
-        currentBattlecryEffect["HealAmount"] = x.get_args(card)[1]
-    if isinstance(x, Hit):
-        currentBattlecryEffect["HitAmount"] = x.get_args(card)[1]
-    if isinstance(x, Destroy):
+    elif isinstance(x, Heal):
+        currentBattlecryEffect["HealTargets"] = decodeTarget(selector)
+        currentBattlecryEffect["HealAmount"] = getAmount(x, card, currentBattlecryEffect)
+    elif isinstance(x, Hit):
+        currentBattlecryEffect["HitTargets"] = decodeTarget(selector)
+        currentBattlecryEffect["HitAmount"] = getAmount(x, card, currentBattlecryEffect)
+    elif isinstance(x, Destroy):
+        currentBattlecryEffect["DestroyTargets"] = decodeTarget(selector)
         currentBattlecryEffect["Destroy"] = 1
+    elif isinstance(x, GainArmor):
+        currentBattlecryEffect["GainArmorTargets"] = decodeTarget(selector)
+        currentBattlecryEffect["GainArmorAmount"] = getAmount(x, card, currentBattlecryEffect)
+    elif isinstance(x, Draw):
+        currentBattlecryEffect["DrawCardsTargets"] = decodeTarget(selector)
+        currentBattlecryEffect["DrawCards"] = 1
+    elif isinstance(x, Discard):
+        currentBattlecryEffect["DiscardTargets"] = decodeTarget(selector)
+        currentBattlecryEffect["DiscardCards"] = 1
+    elif isinstance(x, Summon):
+        getSummonDetails(x, card, currentBattlecryEffect)
 
-
-def getBuffDetails(x, currEffect, card):
-    if "AlwaysGet" not in currEffect:
-        if isinstance(x, fireplace.actions.Buff):
-            currEffect["AlwaysGet"] = 1
-        else:
-            currEffect["AlwaysGet"] = 0
-            x = x._if
-    if isinstance(x, fireplace.dsl.evaluator.Find):
-        x = x._if
+def getSummonDetails(x, card, currentEffect):
     selector = x.get_args(card)[0]
-    targets = x.get_targets(card, selector)
-    if isinstance(selector, fireplace.dsl.selector.FuncSelector) and len(targets) == 1 and targets[0] == card:
-        currEffect["CanAffectSelf"] = 1
+    currentEffect["Summon"] = 1
+    currentEffect["SummonTagets"] = decodeTarget(selector)
+    toSummon = Card(x.get_args(card)[1])
+    currentEffect["SummonedHealth"] = toSummon.health
+    currentEffect["SummonedAttack"] = toSummon.atk
+    currentEffect["SummonedCost"] = toSummon.cost
+
+def getAmount(x, card, currEffect):
+    if type(x.get_args(card)[-1]) is not int:
+        print("DEPENDANT SOMETHING FOUND!!!")
+        currEffect["SetAmount"] = 0
+        return x.get_args(card)[-1].evaluate(card)
+    else:
+        currEffect["SetAmount"] = 1
+        return x.get_args(card)[-1]
+
+def getTimes(x, card, currEffect):
     times = x.times
     if isinstance(times, LazyValue):
         times = times.evaluate(card)
         currEffect["SetAmount"] = 0
     else:
         currEffect["SetAmount"] = 1
+    return times
+
+
+def getBuffDetails(x, currEffect, card, times):
     if x._kwargs != {}:
         currEffect["SetAmount"] = 0
     buff = x.get_target_args(card, card)[0]
@@ -153,8 +193,8 @@ def getBuffDetails(x, currEffect, card):
     if hasattr(buff.data.scripts, "max_health"):
         pass
     if currEffect.get("setsAttackToHealth") is None:
-        currEffect["selfAttackValue"] = buff.atk * times
-        currEffect["selfHealthValue"] = buff.max_health * times
+        currEffect["AttackValue"] = buff.atk * times
+        currEffect["HealthValue"] = buff.max_health * times
         if hasattr(buff.data.scripts, "atk") or hasattr(buff.data.scripts,
                                                         "max_health") or "max_health" in x._kwargs:
             currEffect["AddValue"] = 0
@@ -167,9 +207,9 @@ def getBuffDetails(x, currEffect, card):
                 currEffect["SetValue"] = 0
                 currEffect["MultiplyValue"] = 1
                 if hasattr(buff.data.scripts, "atk"):
-                    currEffect["selfAttackValue"] = buff.data.scripts.atk(0, 1)
+                    currEffect["AttackValue"] = buff.data.scripts.atk(0, 1)
                 if hasattr(buff.data.scripts, "max_health"):
-                    currEffect["selfHealthValue"] = buff.data.scripts.max_health(0, 1)
+                    currEffect["HealthValue"] = buff.data.scripts.max_health(0, 1)
                 # hard coding divine spirit
                 if "max_health" in x._kwargs:
                     currEffect["selfHealthValue"] = 2
@@ -202,6 +242,7 @@ def decodeFuncSelector(func):
     if func == fireplace.dsl.selector.ATTACK_TARGET:
         return " ATTACK TARGET "
 
+
 def decodeOp(op):
     if op == operator.or_:
         return "|"
@@ -217,6 +258,7 @@ def decodeOp(op):
         return "<="
     return ">O<"
 
+
 def decodeEnum(enum):
     if isinstance(enum, str):
         return enum
@@ -224,9 +266,9 @@ def decodeEnum(enum):
         return " : "
     if enum == fireplace.dsl.selector.CardType.MINION:
         return " M "
-    if enum == fireplace.dsl.selector.CardType.HERO: #na hero sie gra np leczenie/buffa
+    if enum == fireplace.dsl.selector.CardType.HERO:  # na hero sie gra np leczenie/buffa
         return " H "
-    if enum == fireplace.dsl.selector.CardType.PLAYER: #na gracza sie gra np przyzwanie(przyzwij minionka)
+    if enum == fireplace.dsl.selector.CardType.PLAYER:  # na gracza sie gra np przyzwanie(przyzwij minionka)
         return " P "
     if enum == fireplace.dsl.selector.GameTag.CONTROLLER:
         return " C "
@@ -236,11 +278,13 @@ def decodeEnum(enum):
         return " DMG "
     return ">E<"
 
+
 def decodeController(controller):
     if isinstance(controller, fireplace.dsl.selector.Opponent):
         return " Opponent "
     else:
         return " Self "
+
 
 def decodeBoardPosition(direction):
     if direction == fireplace.dsl.selector.BoardPositionSelector.Direction.LEFT:
@@ -250,20 +294,21 @@ def decodeBoardPosition(direction):
     else:
         return " >D<"
 
+
 def decodeTarget(target):
     if target is None:
         return " NULL "
     if isinstance(target, fireplace.dsl.selector.RandomSelector):
-        return "RANDOM "+"("+decodeTarget(target.child)+")" + "  T:"+str(target.times)
+        return "RANDOM " + "(" + decodeTarget(target.child) + ")" + "  T:" + str(target.times)
 
     if isinstance(target, fireplace.dsl.selector.SetOpSelector):
-        return "("+decodeTarget(target.left)+")" + decodeOp(target.op) + "("+decodeTarget(target.right)+")"
+        return "(" + decodeTarget(target.left) + ")" + decodeOp(target.op) + "(" + decodeTarget(target.right) + ")"
 
     if isinstance(target, fireplace.dsl.selector.EnumSelector):
         return decodeEnum(target.tag_enum)
 
     if isinstance(target, fireplace.dsl.selector.ComparisonSelector):
-        return "("+decodeTarget(target.left)+")" + decodeOp(target.op) + "("+decodeTarget(target.right)+")"
+        return "(" + decodeTarget(target.left) + ")" + decodeOp(target.op) + "(" + decodeTarget(target.right) + ")"
 
     if isinstance(target, fireplace.dsl.selector.AttrValue):
         return decodeEnum(target.tag)
@@ -274,18 +319,19 @@ def decodeTarget(target):
     if isinstance(target, int):
         return str(target)
     if isinstance(target, fireplace.dsl.selector.BoardPositionSelector):
-        return decodeBoardPosition(target.direction)+"("+decodeTarget(target.child)+")"
+        return decodeBoardPosition(target.direction) + "(" + decodeTarget(target.child) + ")"
     return " Unknown "
+
 
 def mapEndOfTurn(card):
     endOfTurnEffect = {}
     for x in card.data.scripts.events:
         if isinstance(x, fireplace.actions.EventListener) and isinstance(x.trigger, fireplace.actions.EndTurn):
-            print("znalazlem end turn efekt u "+card.data.strings[GameTag.CARDNAME]['enUS'])
+            print("znalazlem end turn efekt u " + card.data.strings[GameTag.CARDNAME]['enUS'])
             for y in x.actions:
                 print(decodeTarget(y._args[0]))
                 if isinstance(y, fireplace.actions.Hit):
-                    print("Znalazlem damage "+str(y._args[1]))
+                    print("Znalazlem damage " + str(y._args[1]))
                     endOfTurnEffect["Damage"] = y._args[1]
     return endOfTurnEffect
 
@@ -305,6 +351,7 @@ def mapStartOfTurn(card):
 
     # TODO
 
+
 def mapOnAttack(card):
     comboEffect = {}
     inspireEffect = {}
@@ -314,7 +361,7 @@ def mapOnAttack(card):
     # cutpurse ale nie ma go chyba w kartach
     # alley armorsmith
     for x in card.data.scripts.enrage:
-        getTargetedActionDetails(x,onAttackEffect,card)
+        getTargetedActionDetails(x, onAttackEffect, card)
     # loop for detecting what combo does
     for x in card.data.scripts.combo:
         effect = card.get_actions("combo")[0].get_target_args(card, card)[0]
@@ -324,9 +371,9 @@ def mapOnAttack(card):
 
         if isinstance(x, fireplace.actions.Buff):
             print("Combo that buffs")
-            #86
-            #87 patrzysz czy x times czy lazy value
-            #94 linijka refer to buff
+            # 86
+            # 87 patrzysz czy x times czy lazy value
+            # 94 linijka refer to buff
             selector = x.get_args(card)[0]
             targets = x.get_targets(card, selector)
             if isinstance(selector, fireplace.dsl.selector.FuncSelector) and len(targets) == 1 and targets[0] == card:
@@ -341,41 +388,35 @@ def mapOnAttack(card):
             comboEffect["selfAttackValue"] = effect.atk * times
             comboEffect["selfHealthValue"] = effect.max_health * times
 
-            if hasattr(effect.data.scripts, "atk") or hasattr(effect.data.scripts,"max_health"):
-                    comboEffect["AddValue"] = 0
-                    if (hasattr(effect.data.scripts, "atk") and effect.data.scripts.atk(0, 10) == effect.atk) or (
-                                hasattr(effect.data.scripts, "max_health") and effect.data.scripts.max_health(0,10) == effect.max_health):
-                            comboEffect["SetValue"] = 1
-                            comboEffect["MultiplyValue"] = 0
-                    else:
-                        comboEffect["SetValue"] = 0
-                        comboEffect["MultiplyValue"] = 1
-                        if hasattr(effect.data.scripts, "atk"):
-                            comboEffect["selfAttackValue"] = comboEffect.data.scripts.atk(0, 1)
-                        if hasattr(effect.data.scripts, "max_health"):
-                            comboEffect["selfHealthValue"] = effect.data.scripts.max_health(0, 1)
+            if hasattr(effect.data.scripts, "atk") or hasattr(effect.data.scripts, "max_health"):
+                comboEffect["AddValue"] = 0
+                if (hasattr(effect.data.scripts, "atk") and effect.data.scripts.atk(0, 10) == effect.atk) or (
+                        hasattr(effect.data.scripts, "max_health") and effect.data.scripts.max_health(0,
+                                                                                                      10) == effect.max_health):
+                    comboEffect["SetValue"] = 1
+                    comboEffect["MultiplyValue"] = 0
+                else:
+                    comboEffect["SetValue"] = 0
+                    comboEffect["MultiplyValue"] = 1
+                    if hasattr(effect.data.scripts, "atk"):
+                        comboEffect["selfAttackValue"] = comboEffect.data.scripts.atk(0, 1)
+                    if hasattr(effect.data.scripts, "max_health"):
+                        comboEffect["selfHealthValue"] = effect.data.scripts.max_health(0, 1)
             else:
                 comboEffect["AddValue"] = 1
                 comboEffect["SetValue"] = 0
                 comboEffect["MultiplyValue"] = 0
             comboEffect["Permanent"] = int(effect.one_turn_effect)
-        #else:
-         #       comboEffect["Permanent"] = 1
-          #      comboEffect["AddValue"] = 1
+        # else:
+        #       comboEffect["Permanent"] = 1
+        #      comboEffect["AddValue"] = 1
 
-
-
-
-
-
-
-        #przy summonie nalezy rozpracowac selector, bo sa karty ktore summonuja dla przeciwnika!!!
+        # przy summonie nalezy rozpracowac selector, bo sa karty ktore summonuja dla przeciwnika!!!
         if isinstance(x, fireplace.actions.Summon):
             selector = x.get_args(card)[0]
             targets = x.get_targets(card, selector)
             print("Combo that summons a: "
                   + str(effect[0].atk) + " " + str(effect[0].health) + " minion of cost: " + str(effect[0].cost))
-
 
     for x in card.data.scripts.events:
         if isinstance(x, fireplace.actions.EventListener):
