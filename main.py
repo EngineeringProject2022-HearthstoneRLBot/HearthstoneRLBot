@@ -44,6 +44,7 @@ def decodeFuncSelector(func):
     if func == fireplace.dsl.selector.ATTACK_TARGET:
         return " ATTACK TARGET "
 
+
 def decodeOp(op):
     if op == operator.or_:
         return "|"
@@ -59,6 +60,7 @@ def decodeOp(op):
         return "<="
     return ">O<"
 
+
 def decodeEnum(enum):
     if isinstance(enum, str):
         return enum
@@ -66,9 +68,9 @@ def decodeEnum(enum):
         return " : "
     if enum == fireplace.dsl.selector.CardType.MINION:
         return " M "
-    if enum == fireplace.dsl.selector.CardType.HERO: #na hero sie gra np leczenie/buffa
+    if enum == fireplace.dsl.selector.CardType.HERO:  # na hero sie gra np leczenie/buffa
         return " H "
-    if enum == fireplace.dsl.selector.CardType.PLAYER: #na gracza sie gra np przyzwanie(przyzwij minionka)
+    if enum == fireplace.dsl.selector.CardType.PLAYER:  # na gracza sie gra np przyzwanie(przyzwij minionka)
         return " P "
     if enum == fireplace.dsl.selector.GameTag.CONTROLLER:
         return " C "
@@ -78,11 +80,13 @@ def decodeEnum(enum):
         return " DMG "
     return ">E<"
 
+
 def decodeController(controller):
     if isinstance(controller, fireplace.dsl.selector.Opponent):
         return " Opponent "
     else:
         return " Self "
+
 
 def decodeBoardPosition(direction):
     if direction == fireplace.dsl.selector.BoardPositionSelector.Direction.LEFT:
@@ -92,20 +96,21 @@ def decodeBoardPosition(direction):
     else:
         return " >D<"
 
+
 def decodeTarget(target):
     if target is None:
         return " NULL "
     if isinstance(target, fireplace.dsl.selector.RandomSelector):
-        return "RANDOM "+"("+decodeTarget(target.child)+")" + "  T:"+str(target.times)
+        return "RANDOM " + "(" + decodeTarget(target.child) + ")" + "  T:" + str(target.times)
 
     if isinstance(target, fireplace.dsl.selector.SetOpSelector):
-        return "("+decodeTarget(target.left)+")" + decodeOp(target.op) + "("+decodeTarget(target.right)+")"
+        return "(" + decodeTarget(target.left) + ")" + decodeOp(target.op) + "(" + decodeTarget(target.right) + ")"
 
     if isinstance(target, fireplace.dsl.selector.EnumSelector):
         return decodeEnum(target.tag_enum)
 
     if isinstance(target, fireplace.dsl.selector.ComparisonSelector):
-        return "("+decodeTarget(target.left)+")" + decodeOp(target.op) + "("+decodeTarget(target.right)+")"
+        return "(" + decodeTarget(target.left) + ")" + decodeOp(target.op) + "(" + decodeTarget(target.right) + ")"
 
     if isinstance(target, fireplace.dsl.selector.AttrValue):
         return decodeEnum(target.tag)
@@ -116,7 +121,7 @@ def decodeTarget(target):
     if isinstance(target, int):
         return str(target)
     if isinstance(target, fireplace.dsl.selector.BoardPositionSelector):
-        return decodeBoardPosition(target.direction)+"("+decodeTarget(target.child)+")"
+        return decodeBoardPosition(target.direction) + "(" + decodeTarget(target.child) + ")"
     return " Unknown "
 
 
@@ -288,100 +293,67 @@ def setup_game():
 
     return game
 
+
 from fireplace.player import Player
 from fireplace.game import BaseGame, CoinRules, Game
+
+
 class BaseTestGame(CoinRules, BaseGame):
-	def start(self):
-		super().start()
-		self.player1.max_mana = 10
-		self.player2.max_mana = 10
+    def start(self):
+        super().start()
+        self.player1.max_mana = 10
+        self.player2.max_mana = 10
+
 
 def _random_class():
-	return CardClass(random.randint(2, 10))
+    return CardClass(random.randint(2, 10))
+
 
 def init_game(class1=None, class2=None, exclude=(), game_class=BaseTestGame):
-	#log.info("Initializing a new game")
-	if class1 is None:
-		class1 = _random_class()
-	if class2 is None:
-		class2 = _random_class()
-	player1 = Player("Player1", *_draft(class1, exclude))
-	player2 = Player("Player2", *_draft(class2, exclude))
-	game = game_class(players=(player1, player2))
-	return game
+    # log.info("Initializing a new game")
+    if class1 is None:
+        class1 = _random_class()
+    if class2 is None:
+        class2 = _random_class()
+    player1 = Player("Player1", *_draft(class1, exclude))
+    player2 = Player("Player2", *_draft(class2, exclude))
+    game = game_class(players=(player1, player2))
+    return game
+
 
 _draftcache = {}
 
+
 def _empty_mulligan(game):
-	for player in game.players:
-		if player.choice:
-			player.choice.choose()
+    for player in game.players:
+        if player.choice:
+            player.choice.choose()
+
 
 BLACKLIST = (
-	"GVG_007",  # Flame Leviathan
-	"AT_022",  # Fist of Jaraxxus
-	"AT_130",  # Sea Reaver
+    "GVG_007",  # Flame Leviathan
+    "AT_022",  # Fist of Jaraxxus
+    "AT_130",  # Sea Reaver
 )
 
+
 def _draft(card_class, exclude):
-	# random_draft() is fairly slow, this caches the drafts
-	if (card_class, exclude) not in _draftcache:
-		_draftcache[(card_class, exclude)] = random_draft(card_class, exclude + BLACKLIST)
-	return _draftcache[(card_class, exclude)], card_class.default_hero
+    # random_draft() is fairly slow, this caches the drafts
+    if (card_class, exclude) not in _draftcache:
+        _draftcache[(card_class, exclude)] = random_draft(card_class, exclude + BLACKLIST)
+    return _draftcache[(card_class, exclude)], card_class.default_hero
+
 
 def prepare_game(*args, **kwargs):
-	game = init_game(*args, **kwargs)
-	game.start()
-	_empty_mulligan(game)
+    game = init_game(*args, **kwargs)
+    game.start()
+    _empty_mulligan(game)
 
-	return game
+    return game
+
 
 def test_cogmaster():
     game = prepare_game()
-
-    # frostwolf = game.player1.give("CS2_226")
-    # HandCard(frostwolf)
-    # crab = game.player1.give("NEW1_017")
-    # HandCard(crab)
-    # silence = game.player1.give("EX1_332")
-    # #  HandCard(silence)
-    # frog = game.player1.give("EX1_103")
-    # arge = game.player1.give("EX1_362")
-    # #HandCard(arge)
-    # #HandCard(frog)
-    # amani = game.player1.give("EX1_393")
-    # HandCard(amani)
-    # edwin = game.player1.give("EX1_613")
-    # HandCard(edwin)
-    # baron = game.pla1.give("EX1_249")
-    # HandCard(baron)
-    # amani.play()
-    # edwin.play()
-    # comboCard2 = game.player1.give("AT_028")
-    # comboCard2.play()
-    # HandCard(comboCard2)
-    #
-    #
-    # comboCard = game.player1.give("EX1_131")
-    # comboCard.play()
-    # HandCard(comboCard)
-    #
-    # snowchugger = game.player1.give("GVG_002")
-    # snowchugger.play()
-    # HandCard(snowchugger)
-    #
-    #
-    # armorsmith = game.player1.give("CFM_756")
-    # armorsmith.play()
-    # HandCard(armorsmith)
-    darkBargain = game.player1.give("AT_025")
-    HandCard(darkBargain)
-    soulFire = game.player1.give("EX1_308")
-    HandCard(soulFire)
-    shieldSlam = game.player1.give("EX1_410")
-    HandCard(shieldSlam)
-    SHKnight = game.player1.give("CS2_151")
-    HandCard(SHKnight)
     #novEng = game.player1.give("EX1_015")
     #shieldBlock = game.player1.give("EX1_606")
     #HandCard(shieldBlock)
@@ -446,19 +418,96 @@ def test_cogmaster():
     #dummy = game.player1.give("CS2_029")
     #dummy.play()
 
+    card_list = [
+        "EX1_004",
+        "EX1_597",
+        "BT_493",
+        "BT_761",
+        "EX1_575",
+        "GVG_089",
+        "GVG_039",
+        "CFM_639",
+        "GVG_020",
+        "OG_286",
+        "CFM_654",
+        "OG_173",
+        "FP1_003",
+        "CS2_059",
+        "BRM_028",
+        "KAR_044",
+        "OG_200",
+        "FP1_005",
+        "FP1_027",
+        "CFM_609",
+        "GVG_111",
+        "EX1_006",
+        "EX1_341",
+        "LOE_007t",
+        "EX1_102",
+        "AT_073",
+        "GVG_103",
+        "GVG_077",
+        "FP1_013",
+        "GVG_076",
+        "LOE_115",
+        "LOOT_170",
+        "EX1_573",
+        "CS2_008",
+        "EX1_160",
+        "NEW1_007",
+        "EX1_571",
+        "EX1_578",
+        "EX1_506"
+    ]
+    cardList =[]
+    for item in card_list:
+        try:
+            card = game.player1.give(item)
+            cardList.append(HandCard(card))
+        except KeyError:
+            print('NIE MA')
+
+        game.player1.discard_hand()
+
+    # frost = game.player1.give("CS2_226")
+    # argus = game.player1.give("EX1_093")
+    # div = game.player1.give("CS2_236")
+    # bloodsail= game.player1.give("NEW1_018")
+    # bchampion = game.player1.give("EX1_355")
+    # innerFire = game.player1.give("CS1_129")
+    # aldor = game.player1.give("EX1_382")
+    # frog.play()
+    # HandCard(innerFire)
+    # innerFire.play(target=frog)
+    # whelp = game.player1.give("BRM_004")
+    # CS1_129 inner fire
+    # CS2_236 divine spirit
+    # EX1_382 aldor
+    # EX1_355 blessed champion
+    # BRM_004 Twilight Whelp
+    # EX1_161 Naturalize
+    # EX1_103 frog
+    # EX1_019 shat
+    # CS2_226 frost
+    # EX1_093 argus
+    # CFM_756 alley armorsmith
+    # cogmaster.play()
+    # assert cogmaster.atk == 6
+    # dummy = game.player1.give("CS2_029")
+    # dummy.play()
 
     frost = game.player1.give("NEW1_018")
     get_script_definition("CS2_226")
     frost.play()
     theFrost = HandCard(frost)
-    theFrost.play=frost.data.scripts.play
+    theFrost.play = frost.data.scripts.play
     theFrost.mapToInput()
-    #assert cogmaster.atk == 3
+    # assert cogmaster.atk == 3
     humility = game.player1.give("EX1_360")
     humility.play(target=cogmaster)
-    #assert cogmaster.atk == 3
+    # assert cogmaster.atk == 3
     dummy.destroy()
-    #assert cogmaster.atk == 1
+    # assert cogmaster.atk == 1
     game.player1.give("GVG_093").play()
     assert cogmaster.atk == 3
     blessedchamp = game.player1.give("EX1_355")
@@ -467,7 +516,6 @@ def test_cogmaster():
 
 
 def main():
-
     gameStates = []
     cards.db.initialize()
     test_cogmaster()
@@ -532,6 +580,7 @@ def main():
     except GameOver:
         print("Game ended");
 
-#test1
+
+# test1
 if __name__ == "__main__":
     main()
