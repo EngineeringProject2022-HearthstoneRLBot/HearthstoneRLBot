@@ -409,62 +409,37 @@ def mapOnAttack(card):
         getTargetedActionDetails(x, onAttackEffect, card)
     # loop for detecting what combo does
     for x in card.data.scripts.combo:
-        effect = card.get_actions("combo")[0].get_target_args(card, card)[0]
-        comboEffect["AlwaysGet"] = 0
+        #effect = card.get_actions("combo")[0].get_target_args(card, card)[0]
+        onAttackEffect["AlwaysGet"] = 0
         if isinstance(x, fireplace.actions.Hit):
-            print("Combo that simply does damage")
+            if isinstance(x, fireplace.actions.TargetedAction) or (
+                    isinstance(x, fireplace.dsl.evaluator.Find) and isinstance(x._if,
+                                                                               fireplace.actions.TargetedAction)):
+                getTargetedActionDetails(x, onAttackEffect, card)
+            #print("Combo that simply does damage")
 
         if isinstance(x, fireplace.actions.Buff):
-            print("Combo that buffs")
-            # 86
-            # 87 patrzysz czy x times czy lazy value
-            # 94 linijka refer to buff
-            selector = x.get_args(card)[0]
-            targets = x.get_targets(card, selector)
-            if isinstance(selector, fireplace.dsl.selector.FuncSelector) and len(targets) == 1 and targets[0] == card:
-                selfFlag = True
-            times = x.times
-            if isinstance(times, LazyValue):
-                times = times.evaluate(card)
-                print("Number of times trigger: ", times)
-                comboEffect["SetAmount"] = 0
-            else:
-                comboEffect["SetAmount"] = 1
-            comboEffect["selfAttackValue"] = effect.atk * times
-            comboEffect["selfHealthValue"] = effect.max_health * times
-
-            if hasattr(effect.data.scripts, "atk") or hasattr(effect.data.scripts, "max_health"):
-                comboEffect["AddValue"] = 0
-                if (hasattr(effect.data.scripts, "atk") and effect.data.scripts.atk(0, 10) == effect.atk) or (
-                        hasattr(effect.data.scripts, "max_health") and effect.data.scripts.max_health(0,
-                                                                                                      10) == effect.max_health):
-                    comboEffect["SetValue"] = 1
-                    comboEffect["MultiplyValue"] = 0
-                else:
-                    comboEffect["SetValue"] = 0
-                    comboEffect["MultiplyValue"] = 1
-                    if hasattr(effect.data.scripts, "atk"):
-                        comboEffect["selfAttackValue"] = comboEffect.data.scripts.atk(0, 1)
-                    if hasattr(effect.data.scripts, "max_health"):
-                        comboEffect["selfHealthValue"] = effect.data.scripts.max_health(0, 1)
-            else:
-                comboEffect["AddValue"] = 1
-                comboEffect["SetValue"] = 0
-                comboEffect["MultiplyValue"] = 0
-            comboEffect["Permanent"] = int(effect.one_turn_effect)
-        # else:
-        #       comboEffect["Permanent"] = 1
-        #      comboEffect["AddValue"] = 1
-
-        # przy summonie nalezy rozpracowac selector, bo sa karty ktore summonuja dla przeciwnika!!!
+            if isinstance(x, fireplace.actions.TargetedAction) or (
+                    isinstance(x, fireplace.dsl.evaluator.Find) and isinstance(x._if,
+                                                                               fireplace.actions.TargetedAction)):
+                getTargetedActionDetails(x, onAttackEffect, card)
+        #     print("Combo that buffs")
+        #     # 86
+        #     # 87 patrzysz czy x times czy lazy value
+        #     # 94 linijka refer to buff
+        # # przy summonie nalezy rozpracowac selector, bo sa karty ktore summonuja dla przeciwnika!!!
         if isinstance(x, fireplace.actions.Summon):
-            selector = x.get_args(card)[0]
-            targets = x.get_targets(card, selector)
-            print("Combo that summons a: "
-                  + str(effect[0].atk) + " " + str(effect[0].health) + " minion of cost: " + str(effect[0].cost))
+            if isinstance(x, fireplace.actions.TargetedAction) or (
+                    isinstance(x, fireplace.dsl.evaluator.Find) and isinstance(x._if,
+                                                                               fireplace.actions.TargetedAction)):
+                getTargetedActionDetails(x, onAttackEffect, card)
 
     for x in card.data.scripts.events:
         if isinstance(x, fireplace.actions.EventListener):
             if isinstance(x.trigger, fireplace.actions.Damage):
-                print("On attack effect (event Damage)")
+                if isinstance(x, fireplace.actions.TargetedAction) or (
+                        isinstance(x, fireplace.dsl.evaluator.Find) and isinstance(x._if,
+                                                                                   fireplace.actions.TargetedAction)):
+                    getTargetedActionDetails(x, onAttackEffect, card)
+                #print("On attack effect (event Damage)")
     return onAttackEffect
