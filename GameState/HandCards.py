@@ -98,10 +98,18 @@ def getTargetedActionDetails(x, currentBattlecryEffect, card):
     if "AlwaysGet" not in currentBattlecryEffect:
         if isinstance(x, fireplace.dsl.evaluator.Find):
             currentBattlecryEffect["AlwaysGet"] = 0
-            x = x._if
+            if x._if is None:
+                x = x._else
+            else:
+                x = x._if
         else:
             currentBattlecryEffect["AlwaysGet"] = 1
-    selector = x.get_args(card)[0]
+    if isinstance(x, fireplace.dsl.evaluator.Dead):
+        selector = x.selector
+    elif isinstance(x, fireplace.dsl.LazyNumEvaluator):
+        selector = x.num.selector
+    else:
+        selector = x.get_args(card)[0]
     times = 0
     if hasattr(x, "times"):
         times = getTimes(x, card, currentBattlecryEffect)
@@ -113,52 +121,54 @@ def getTargetedActionDetails(x, currentBattlecryEffect, card):
     # else:
 
     if isinstance(x, fireplace.actions.Buff):
-        currentBattlecryEffect["BuffTargets"] = decodeTarget(selector)
+        currentBattlecryEffect["BuffTargets"] = decodeWithRequirements(decodeTarget(selector), card.data.requirements)
         getBuffDetails(x, currentBattlecryEffect, card, times)
     elif isinstance(x, SetTag):
         if GameTag.DIVINE_SHIELD in x._args[1]:
-            currentBattlecryEffect["BuffTargets"] = decodeTarget(selector)
+            currentBattlecryEffect["BuffTargets"] = decodeWithRequirements(decodeTarget(selector), card.data.requirements)
             currentBattlecryEffect["GiveDivShield"] = 1
         elif GameTag.TAUNT in x._args[1]:
-            currentBattlecryEffect["BuffTargets"] = decodeTarget(selector)
+            currentBattlecryEffect["BuffTargets"] = decodeWithRequirements(decodeTarget(selector), card.data.requirements)
             currentBattlecryEffect["GiveTaunt"] = 1
         elif GameTag.STEALTH in x._args[1]:
-            currentBattlecryEffect["BuffTargets"] = decodeTarget(selector)
+            currentBattlecryEffect["BuffTargets"] = decodeWithRequirements(decodeTarget(selector), card.data.requirements)
             currentBattlecryEffect["GiveStealth"] = 1
         elif GameTag.POISONOUS in x._args[1]:
-            currentBattlecryEffect["BuffTargets"] = decodeTarget(selector)
+            currentBattlecryEffect["BuffTargets"] = decodeWithRequirements(decodeTarget(selector), card.data.requirements)
             currentBattlecryEffect["GivePoison"] = 1
         elif GameTag.FROZEN in x._args[1]:
-            currentBattlecryEffect["BuffTargets"] = decodeTarget(selector)
+            currentBattlecryEffect["BuffTargets"] = decodeWithRequirements(decodeTarget(selector), card.data.requirements)
             currentBattlecryEffect["Freeze"] = 1
     elif isinstance(x, Silence):
-        currentBattlecryEffect["BuffTargets"] = decodeTarget(selector)
+        currentBattlecryEffect["BuffTargets"] = decodeWithRequirements(decodeTarget(selector), card.data.requirements)
         currentBattlecryEffect["GiveSilence"] = 1
     elif isinstance(x, Heal):
-        currentBattlecryEffect["HealTargets"] = decodeTarget(selector)
+        currentBattlecryEffect["HealTargets"] = decodeWithRequirements(decodeTarget(selector), card.data.requirements)
         currentBattlecryEffect["HealAmount"] = getAmount(x, card, currentBattlecryEffect)
     elif isinstance(x, Hit):
-        currentBattlecryEffect["HitTargets"] = decodeTarget(selector)
+        currentBattlecryEffect["HitTargets"] = decodeWithRequirements(decodeTarget(selector), card.data.requirements)
         currentBattlecryEffect["HitAmount"] = getAmount(x, card, currentBattlecryEffect)
     elif isinstance(x, Destroy):
-        currentBattlecryEffect["DestroyTargets"] = decodeTarget(selector)
+        currentBattlecryEffect["DestroyTargets"] = decodeWithRequirements(decodeTarget(selector), card.data.requirements)
         currentBattlecryEffect["Destroy"] = 1
     elif isinstance(x, GainArmor):
-        currentBattlecryEffect["GainArmorTargets"] = decodeTarget(selector)
+        currentBattlecryEffect["GainArmorTargets"] = decodeWithRequirements(decodeTarget(selector), card.data.requirements)
         currentBattlecryEffect["GainArmorAmount"] = getAmount(x, card, currentBattlecryEffect)
     elif isinstance(x, Draw):
-        currentBattlecryEffect["DrawCardsTargets"] = decodeTarget(selector)
+        currentBattlecryEffect["DrawCardsTargets"] = decodeWithRequirements(decodeTarget(selector), card.data.requirements)
         currentBattlecryEffect["DrawCards"] = 1
     elif isinstance(x, Discard):
-        currentBattlecryEffect["DiscardTargets"] = decodeTarget(selector)
+        currentBattlecryEffect["DiscardTargets"] = decodeWithRequirements(decodeTarget(selector), card.data.requirements)
         currentBattlecryEffect["DiscardCards"] = 1
     elif isinstance(x, Summon):
         getSummonDetails(x, card, currentBattlecryEffect)
+    if selector is not None:
+        decodeResultStr(decodeWithRequirements(decodeTarget(selector), card.data.requirements))
 
 def getSummonDetails(x, card, currentEffect):
     selector = x.get_args(card)[0]
     currentEffect["Summon"] = 1
-    currentEffect["SummonTagets"] = decodeTarget(selector)
+    currentEffect["SummonTagets"] = decodeWithRequirements(decodeTarget(selector), card.data.requirements)
     toSummon = Card(x.get_args(card)[1])
     currentEffect["SummonedHealth"] = toSummon.health
     currentEffect["SummonedAttack"] = toSummon.atk
@@ -223,114 +233,22 @@ def getBuffDetails(x, currEffect, card, times):
         currEffect["Permanent"] = 1
         currEffect["AddValue"] = 1
 
+def decodeWithRequirements(result, requirements):
+    if PlayReq.REQ_MINION_TARGET in requirements:
+        result = result & (~(1<<21))
+    if PlayReq.REQ_HERO_TARGET in requirements:
+        result = result & (~(1<<22))
+    if PlayReq.REQ_FRIENDLY_TARGET in requirements:
+        result = result & (~(1<<24))
+    if PlayReq.REQ_ENEMY_TARGET in requirements:
+        result = result & (~(1<<23)) & (~(1<<25))
+    return result
 
 def decodeFuncSelector(func):
     if func == fireplace.dsl.selector.SELF:
-        return " SELF "
-    if func == fireplace.dsl.selector.TARGET:
-        return " TARGET "
-    if func == fireplace.dsl.selector.OTHER_CLASS_CHARACTER:
-        return " OTHER_CLASS "
-    if func == fireplace.dsl.selector.FRIENDLY_CLASS_CHARACTER:
-        return " FRIENDLY_CLASS "
-    if func == fireplace.dsl.selector.LEFTMOST_HAND:
-        return " LEFTMOST_HAND "
-    if func == fireplace.dsl.selector.RIGHTMOST_HAND:
-        return " RIGHTMOST_HAND "
-    if func == fireplace.dsl.selector.OWNER:
-        return " OWNER "
-    if func == fireplace.dsl.selector.ATTACK_TARGET:
-        return " ATTACK TARGET "
-
-
-def decodeOp(op):
-    if op == operator.or_:
-        return "|"
-    if op == operator.add:
-        return "?+?"
-    if op == operator.and_:
-        return "*"
-    if op == operator.sub:
-        return "-"
-    if op == operator.eq:
-        return "=="
-    if op == operator.le:
-        return "<="
-    return ">O<"
-
-
-def decodeEnum(enum):
-    if isinstance(enum, str):
-        return enum
-    if enum == fireplace.dsl.selector.Zone.PLAY:
-        return " : "
-    if enum == fireplace.dsl.selector.CardType.MINION:
-        return " M "
-    if enum == fireplace.dsl.selector.CardType.HERO:  # na hero sie gra np leczenie/buffa
-        return " H "
-    if enum == fireplace.dsl.selector.CardType.PLAYER:  # na gracza sie gra np przyzwanie(przyzwij minionka)
-        return " P "
-    if enum == fireplace.dsl.selector.GameTag.CONTROLLER:
-        return " C "
-    if enum == fireplace.dsl.selector.GameTag.DORMANT:
-        return " D "
-    if enum == fireplace.dsl.selector.GameTag.DAMAGE:
-        return " DMG "
-    if enum == fireplace.dsl.selector.GameTag.SECRET:
-        return " SEC "
-    if enum == fireplace.dsl.selector.Zone.SECRET:
-        return " ZSC "
-    return ">E<"
-
-
-def decodeController(controller):
-    if isinstance(controller, fireplace.dsl.selector.Opponent):
-        return " Opponent "
-    else:
-        return " Self "
-
-
-def decodeBoardPosition(direction):
-    if direction == fireplace.dsl.selector.BoardPositionSelector.Direction.LEFT:
-        return " L"
-    elif direction == fireplace.dsl.selector.BoardPositionSelector.Direction.RIGHT:
-        return " R"
-    else:
-        return " >D<"
-
-
-def decodeTarget(target):
-    if target is None:
-        return " NULL "
-    if isinstance(target, fireplace.dsl.selector.RandomSelector):
-        return "RANDOM " + "(" + decodeTarget(target.child) + ")" + "  T:" + str(target.times)
-
-    if isinstance(target, fireplace.dsl.selector.SetOpSelector):
-        return "(" + decodeTarget(target.left) + ")" + decodeOp(target.op) + "(" + decodeTarget(target.right) + ")"
-
-    if isinstance(target, fireplace.dsl.selector.EnumSelector):
-        return decodeEnum(target.tag_enum)
-
-    if isinstance(target, fireplace.dsl.selector.ComparisonSelector):
-        return "(" + decodeTarget(target.left) + ")" + decodeOp(target.op) + "(" + decodeTarget(target.right) + ")"
-
-    if isinstance(target, fireplace.dsl.selector.AttrValue):
-        return decodeEnum(target.tag)
-    if isinstance(target, fireplace.dsl.selector.Controller):
-        return decodeController(target)
-    if isinstance(target, fireplace.dsl.selector.FuncSelector):
-        return decodeFuncSelector(target)
-    if isinstance(target, int):
-        return str(target)
-    if isinstance(target, fireplace.dsl.selector.BoardPositionSelector):
-        return decodeBoardPosition(target.direction) + "(" + decodeTarget(target.child) + ")"
-    return " Unknown "
-
-def decodeFuncSelector2(func):
-    if func == fireplace.dsl.selector.SELF:
         return 1 << 25
     if func == fireplace.dsl.selector.TARGET:
-        return ~0
+        return 0b111111 << 20
     if func == fireplace.dsl.selector.OTHER_CLASS_CHARACTER:
         return ~0
     if func == fireplace.dsl.selector.FRIENDLY_CLASS_CHARACTER:
@@ -345,7 +263,7 @@ def decodeFuncSelector2(func):
         return ~0
     return 0
 
-def decodeOp2(left, op, right):
+def decodeOp(left, op, right):
     if op == operator.or_:
         return left | right
     if op == operator.add:
@@ -360,7 +278,7 @@ def decodeOp2(left, op, right):
         return left | right # nie wiem w sumie
     return ">O<"
 
-def decodeEnum2(enum):
+def decodeEnum(enum):
     if isinstance(enum, str):
         return 0
     if enum == fireplace.dsl.selector.Zone.PLAY:
@@ -383,13 +301,13 @@ def decodeEnum2(enum):
         return (0b11 << 23)
     return (1 << 26)
 
-def decodeController2(controller):
+def decodeController(controller):
     if isinstance(controller, fireplace.dsl.selector.Opponent):
         return ~(1 << 23) & ~(1 << 25)
     else:
         return ~(1 << 24)
 
-def decodeBoardPosition2(direction):
+def decodeBoardPosition(direction):
     if direction == fireplace.dsl.selector.BoardPositionSelector.Direction.LEFT:
         return 1 << 28
     elif direction == fireplace.dsl.selector.BoardPositionSelector.Direction.RIGHT:
@@ -400,36 +318,36 @@ def decodeBoardPosition2(direction):
 # 1 << 31 oznacza random
 # ostatnie 4 bity(czyli max. 16) oznaczają 'times' czyli ile celów losuje
 # jeśli target.times będzie >=16 to mam nadzieję że tak nie będzie bo się spowrotem wyzeruje
-def decodeTarget2(target):
+def decodeTarget(target):
     if target is None:
         return 0 #unknown value(co to znaczy w ogóle ze target is none)
     if isinstance(target, fireplace.dsl.selector.RandomSelector):
-        return (1 << 31)+decodeTarget2(target.child)+(target.times%16)
+        return (1 << 31)+decodeTarget(target.child)+(target.times%16)
 
     if isinstance(target, fireplace.dsl.selector.SetOpSelector):
-        return decodeOp2(decodeTarget2(target.left), target.op, decodeTarget2(target.right))
+        return decodeOp(decodeTarget(target.left), target.op, decodeTarget(target.right))
 
     if isinstance(target, fireplace.dsl.selector.EnumSelector):
-        return decodeEnum2(target.tag_enum)
+        return decodeEnum(target.tag_enum)
 
     if isinstance(target, fireplace.dsl.selector.ComparisonSelector):
-        return decodeOp2(decodeTarget2(target.left), target.op, decodeTarget2(target.right))
+        return decodeOp(decodeTarget(target.left), target.op, decodeTarget(target.right))
 
     if isinstance(target, fireplace.dsl.selector.AttrValue):
-        return decodeEnum2(target.tag)
+        return decodeEnum(target.tag)
     if isinstance(target, fireplace.dsl.selector.Controller):
-        return decodeController2(target)
+        return decodeController(target)
     if isinstance(target, fireplace.dsl.selector.FuncSelector) | isinstance(target, fireplace.dsl.selector.FilterSelector):
-        return decodeFuncSelector2(target)
+        return decodeFuncSelector(target)
     if isinstance(target, int):
         return 0
     if isinstance(target, fireplace.dsl.selector.BoardPositionSelector):
-        return decodeBoardPosition2(target.direction)
+        return decodeBoardPosition(target.direction)
     return " Unknown " #wyjatek i dobrze
 
-def decodeResult(result):
+def decodeResultStr(result):
     if result & 1 << 31:
-        print("Random")
+        print("Random tyle razy: "+str(result&0b1111))
     if result & 1 << 28:
         print("Lewo")
     if result & 1 << 27:
@@ -446,31 +364,20 @@ def decodeResult(result):
         print("Miniony")
     if result & 1 << 21:
         print("Na boha")
-    print("Tyle razy: " + str(result & 0b1111))
+
 
 
 def mapEndOfTurn(card):
     endOfTurnEffect = {}
-
+    if len(card.requirements) != 0:
+        for x in card.data.scripts.requirements:
+            if type(x) is PlayReq:
+                endOfTurnEffect["AlwaysGet"] = 0
+                break
     for x in card.data.scripts.events:
-        if isinstance(x, fireplace.actions.EventListener) and isinstance(x.trigger, fireplace.actions.EndTurn):
-            print("znalazlem end turn efekt u " + card.data.strings[GameTag.CARDNAME]['enUS'])
-            for y in x.actions:
-                result = 0
-                if isinstance(y, fireplace.dsl.Find) | isinstance(y, fireplace.dsl.Dead):
-                    print("TO JEST FIND")
-                    result = decodeTarget2(y.selector)
-                    print(decodeTarget(y.selector))
-                else:
-                    result = decodeTarget2(y._args[0])
-                    print(decodeTarget(y._args[0]))
-
-                print("0bR00LRCSEAMH00000000000000000TIME")
-                print(bin(result).zfill(34))
-                decodeResult(result)
-                if isinstance(y, fireplace.actions.Hit):
-                    print("Znalazlem damage " + str(y._args[1]))
-                    endOfTurnEffect["Damage"] = y._args[1]
+        for y in x.actions:
+            getTargetedActionDetails(y, endOfTurnEffect, card)
+    print(card.data.strings[GameTag.CARDNAME]['enUS']+"  "+str(endOfTurnEffect))
     return endOfTurnEffect
 
     # TODO
