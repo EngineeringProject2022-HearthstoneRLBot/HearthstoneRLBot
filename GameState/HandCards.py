@@ -1,9 +1,9 @@
 import operator
 
 import fireplace
-from fireplace.actions import SetTag, Silence, Heal, Hit, Destroy, GainArmor, Draw, Discard, Summon
+from fireplace.actions import SetTag, Silence, Heal, Hit, Destroy, GainArmor, Draw, Discard, Summon, Bounce
 from fireplace.card import Card
-from fireplace.dsl import LazyValue
+from fireplace.dsl import LazyValue, RandomEntourage
 from hearthstone.enums import Race, GameTag, PlayReq
 
 
@@ -154,15 +154,23 @@ def getTargetedActionDetails(x, currentBattlecryEffect, card):
         currentBattlecryEffect["DiscardCards"] = 1
     elif isinstance(x, Summon):
         getSummonDetails(x, card, currentBattlecryEffect)
+    elif isinstance(x, Bounce):
+        currentBattlecryEffect["BounceTargets"] = decodeTarget(selector)
+        currentBattlecryEffect["BounceCards"] = 1
 
 def getSummonDetails(x, card, currentEffect):
     selector = x.get_args(card)[0]
     currentEffect["Summon"] = 1
     currentEffect["SummonTagets"] = decodeTarget(selector)
-    toSummon = Card(x.get_args(card)[1])
-    currentEffect["SummonedHealth"] = toSummon.health
-    currentEffect["SummonedAttack"] = toSummon.atk
-    currentEffect["SummonedCost"] = toSummon.cost
+    toSummonID = x.get_args(card)[1]
+    if type(toSummonID) is RandomEntourage:
+        #TODO hmmm
+        currentEffect["FromEntourage"] = 1
+    else:
+        toSummon = Card(toSummonID)
+        currentEffect["SummonedHealth"] = toSummon.health
+        currentEffect["SummonedAttack"] = toSummon.atk
+        currentEffect["SummonedCost"] = toSummon.cost
 
 def getAmount(x, card, currEffect):
     if type(x.get_args(card)[-1]) is not int:
@@ -218,7 +226,7 @@ def getBuffDetails(x, currEffect, card, times):
             currEffect["AddValue"] = 1
             currEffect["SetValue"] = 0
             currEffect["MultiplyValue"] = 0
-        currEffect["Permanent"] = 1 if int(buff.one_turn_effect) == 0 else 1
+        currEffect["Permanent"] = 1 if int(buff.one_turn_effect) == 0 else 0
     else:
         currEffect["Permanent"] = 1
         currEffect["AddValue"] = 1
