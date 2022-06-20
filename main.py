@@ -44,7 +44,6 @@ def decodeFuncSelector(func):
     if func == fireplace.dsl.selector.ATTACK_TARGET:
         return " ATTACK TARGET "
 
-
 def decodeOp(op):
     if op == operator.or_:
         return "|"
@@ -60,7 +59,6 @@ def decodeOp(op):
         return "<="
     return ">O<"
 
-
 def decodeEnum(enum):
     if isinstance(enum, str):
         return enum
@@ -68,9 +66,9 @@ def decodeEnum(enum):
         return " : "
     if enum == fireplace.dsl.selector.CardType.MINION:
         return " M "
-    if enum == fireplace.dsl.selector.CardType.HERO:  # na hero sie gra np leczenie/buffa
+    if enum == fireplace.dsl.selector.CardType.HERO: #na hero sie gra np leczenie/buffa
         return " H "
-    if enum == fireplace.dsl.selector.CardType.PLAYER:  # na gracza sie gra np przyzwanie(przyzwij minionka)
+    if enum == fireplace.dsl.selector.CardType.PLAYER: #na gracza sie gra np przyzwanie(przyzwij minionka)
         return " P "
     if enum == fireplace.dsl.selector.GameTag.CONTROLLER:
         return " C "
@@ -80,13 +78,11 @@ def decodeEnum(enum):
         return " DMG "
     return ">E<"
 
-
 def decodeController(controller):
     if isinstance(controller, fireplace.dsl.selector.Opponent):
         return " Opponent "
     else:
         return " Self "
-
 
 def decodeBoardPosition(direction):
     if direction == fireplace.dsl.selector.BoardPositionSelector.Direction.LEFT:
@@ -96,21 +92,20 @@ def decodeBoardPosition(direction):
     else:
         return " >D<"
 
-
 def decodeTarget(target):
     if target is None:
         return " NULL "
     if isinstance(target, fireplace.dsl.selector.RandomSelector):
-        return "RANDOM " + "(" + decodeTarget(target.child) + ")" + "  T:" + str(target.times)
+        return "RANDOM "+"("+decodeTarget(target.child)+")" + "  T:"+str(target.times)
 
     if isinstance(target, fireplace.dsl.selector.SetOpSelector):
-        return "(" + decodeTarget(target.left) + ")" + decodeOp(target.op) + "(" + decodeTarget(target.right) + ")"
+        return "("+decodeTarget(target.left)+")" + decodeOp(target.op) + "("+decodeTarget(target.right)+")"
 
     if isinstance(target, fireplace.dsl.selector.EnumSelector):
         return decodeEnum(target.tag_enum)
 
     if isinstance(target, fireplace.dsl.selector.ComparisonSelector):
-        return "(" + decodeTarget(target.left) + ")" + decodeOp(target.op) + "(" + decodeTarget(target.right) + ")"
+        return "("+decodeTarget(target.left)+")" + decodeOp(target.op) + "("+decodeTarget(target.right)+")"
 
     if isinstance(target, fireplace.dsl.selector.AttrValue):
         return decodeEnum(target.tag)
@@ -121,7 +116,7 @@ def decodeTarget(target):
     if isinstance(target, int):
         return str(target)
     if isinstance(target, fireplace.dsl.selector.BoardPositionSelector):
-        return decodeBoardPosition(target.direction) + "(" + decodeTarget(target.child) + ")"
+        return decodeBoardPosition(target.direction)+"("+decodeTarget(target.child)+")"
     return " Unknown "
 
 
@@ -354,6 +349,58 @@ def prepare_game(*args, **kwargs):
 
 def test_cogmaster():
     game = prepare_game()
+
+    # frostwolf = game.player1.give("CS2_226")
+    # HandCard(frostwolf)
+    # crab = game.player1.give("NEW1_017")
+    # HandCard(crab)
+    # silence = game.player1.give("EX1_332")
+    # #  HandCard(silence)
+    # frog = game.player1.give("EX1_103")
+    # arge = game.player1.give("EX1_362")
+    # #HandCard(arge)
+    # #HandCard(frog)
+    # amani = game.player1.give("EX1_393")
+    # HandCard(amani)
+    # edwin = game.player1.give("EX1_613")
+    # HandCard(edwin)
+    # baron = game.pla1.give("EX1_249")
+    # HandCard(baron)
+    # amani.play()
+    # edwin.play()
+    # comboCard2 = game.player1.give("AT_028")
+    # comboCard2.play()
+    # HandCard(comboCard2)
+    #
+    #
+    # comboCard = game.player1.give("EX1_131")
+    # comboCard.play()
+    # HandCard(comboCard)
+    #
+    # snowchugger = game.player1.give("GVG_002")
+    # snowchugger.play()
+    # HandCard(snowchugger)
+    #
+    #
+    # armorsmith = game.player1.give("CFM_756")
+    # armorsmith.play()
+    # HandCard(armorsmith)
+    shadowstep = game.player1.give("EX1_144")
+    HandCard(shadowstep)
+    #animalCompanion = game.player1.give("NEW1_031")
+    #HandCard(animalCompanion)
+    #animalCompanion.play(animalCompanion)
+
+    abusive = game.player1.give("CS2_188")
+    HandCard(abusive)
+    darkBargain = game.player1.give("AT_025")
+    HandCard(darkBargain)
+    soulFire = game.player1.give("EX1_308")
+    HandCard(soulFire)
+    shieldSlam = game.player1.give("EX1_410")
+    HandCard(shieldSlam)
+    SHKnight = game.player1.give("CS2_151")
+    HandCard(SHKnight)
     #novEng = game.player1.give("EX1_015")
     #shieldBlock = game.player1.give("EX1_606")
     #HandCard(shieldBlock)
@@ -496,26 +543,27 @@ def test_cogmaster():
     # dummy = game.player1.give("CS2_029")
     # dummy.play()
 
-    frost = game.player1.give("NEW1_018")
-    get_script_definition("CS2_226")
-    frost.play()
-    theFrost = HandCard(frost)
-    theFrost.play = frost.data.scripts.play
-    theFrost.mapToInput()
+    # frost = game.player1.give("NEW1_018")
+    # get_script_definition("CS2_226")
+    # frost.play()
+    # theFrost = HandCard(frost)
+    # theFrost.play = frost.data.scripts.play
+    # theFrost.mapToInput()
+    # # assert cogmaster.atk == 3
+    # humility = game.player1.give("EX1_360")
+    # humility.play(target=cogmaster)
+    # # assert cogmaster.atk == 3
+    # dummy.destroy()
+    # # assert cogmaster.atk == 1
+    # game.player1.give("GVG_093").play()
     # assert cogmaster.atk == 3
-    humility = game.player1.give("EX1_360")
-    humility.play(target=cogmaster)
-    # assert cogmaster.atk == 3
-    dummy.destroy()
-    # assert cogmaster.atk == 1
-    game.player1.give("GVG_093").play()
-    assert cogmaster.atk == 3
-    blessedchamp = game.player1.give("EX1_355")
-    blessedchamp.play(target=cogmaster)
-    assert cogmaster.atk == 4
+    # blessedchamp = game.player1.give("EX1_355")
+    # blessedchamp.play(target=cogmaster)
+    # assert cogmaster.atk == 4
 
 
 def main():
+
     gameStates = []
     cards.db.initialize()
     test_cogmaster()
