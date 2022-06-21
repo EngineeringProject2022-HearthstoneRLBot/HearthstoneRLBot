@@ -392,7 +392,7 @@ def test_cogmaster():
     # armorsmith = game.player1.give("CFM_756")
     # armorsmith.play()
     # HandCard(armorsmith)
-    shadowstep = game.player1.give("EX1_144")
+    shadowstep = game.player1.give("NEW1_040")
     HandCard(shadowstep)
     #animalCompanion = game.player1.give("NEW1_031")
     #HandCard(animalCompanion)

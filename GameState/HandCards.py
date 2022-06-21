@@ -388,11 +388,12 @@ def decodeResultStr(result):
 
 def mapEndOfTurn(card):
     endOfTurnEffect = {}
-    if len(card.requirements) != 0:
-        for x in card.data.scripts.requirements:
-            if type(x) is PlayReq:
-                endOfTurnEffect["AlwaysGet"] = 0
-                break
+    #po co mi to?
+    #if len(card.requirements) != 0:
+    #    for x in card.data.scripts.requirements:
+    #        if type(x) is PlayReq:
+    #            endOfTurnEffect["AlwaysGet"] = 0
+    #            break
     for x in card.data.scripts.events:
         for y in x.actions:
             getTargetedActionDetails(y, endOfTurnEffect, card)
@@ -411,6 +412,9 @@ def mapConditional(card):
 
 def mapStartOfTurn(card):
     startOfTurnEffect = {}
+    for x in card.data.scripts.events:
+        for y in x.actions:
+            getTargetedActionDetails(y, startOfTurnEffect, card)
     return startOfTurnEffect
 
     # TODO
