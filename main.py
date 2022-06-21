@@ -398,7 +398,7 @@ def test_cogmaster():
     #HandCard(animalCompanion)
     #animalCompanion.play(animalCompanion)
 
-    abusive = game.player1.give("CS2_188")
+    abusive = game.player1.give("FP1_013")
     HandCard(abusive)
     darkBargain = game.player1.give("AT_025")
     HandCard(darkBargain)

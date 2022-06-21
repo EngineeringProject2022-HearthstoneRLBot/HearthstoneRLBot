@@ -177,20 +177,23 @@ def getSummonDetails(x, card, currentEffect):
     selector = x.get_args(card)[0]
     currentEffect["Summon"] = 1
     currentEffect["SummonTagets"] = decodeWithRequirements(decodeTarget(selector), card.data.requirements)
-    toSummon = Card(x.get_args(card)[1])
-    currentEffect["SummonedHealth"] = toSummon.health
-    currentEffect["SummonedAttack"] = toSummon.atk
-    currentEffect["SummonedCost"] = toSummon.cost
-    currentEffect["SummonTagets"] = decodeTarget(selector)
-    toSummonID = x.get_args(card)[1]
-    if type(toSummonID) is RandomEntourage:
-        #TODO hmmm
-        currentEffect["FromEntourage"] = 1
-    else:
-        toSummon = Card(toSummonID)
+    try:
+        toSummon = Card(x.get_args(card)[1])
         currentEffect["SummonedHealth"] = toSummon.health
         currentEffect["SummonedAttack"] = toSummon.atk
         currentEffect["SummonedCost"] = toSummon.cost
+        currentEffect["SummonTagets"] = decodeTarget(selector)
+        toSummonID = x.get_args(card)[1]
+        if type(toSummonID) is RandomEntourage:
+            #TODO hmmm
+            currentEffect["FromEntourage"] = 1
+        else:
+            toSummon = Card(toSummonID)
+            currentEffect["SummonedHealth"] = toSummon.health
+            currentEffect["SummonedAttack"] = toSummon.atk
+            currentEffect["SummonedCost"] = toSummon.cost
+    except:
+        currentEffect["UnknownSummon"] = True
 
 def getAmount(x, card, currEffect):
     if type(x.get_args(card)[-1]) is not int:
@@ -395,8 +398,9 @@ def mapEndOfTurn(card):
     #            endOfTurnEffect["AlwaysGet"] = 0
     #            break
     for x in card.data.scripts.events:
-        for y in x.actions:
-            getTargetedActionDetails(y, endOfTurnEffect, card)
+        if isinstance(x.trigger, fireplace.actions.EndTurn):
+            for y in x.actions:
+                getTargetedActionDetails(y, endOfTurnEffect, card)
 
     return endOfTurnEffect
 
@@ -413,8 +417,9 @@ def mapConditional(card):
 def mapStartOfTurn(card):
     startOfTurnEffect = {}
     for x in card.data.scripts.events:
-        for y in x.actions:
-            getTargetedActionDetails(y, startOfTurnEffect, card)
+        if isinstance(x.trigger, fireplace.actions.BeginTurn):
+            for y in x.actions:
+                getTargetedActionDetails(y, startOfTurnEffect, card)
     return startOfTurnEffect
 
     # TODO
