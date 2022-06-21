@@ -23,6 +23,12 @@ class Hero:
         self.currentHeroState["weaponAtt"] = 0 if hero.controller.weapon is None else hero.controller.weapon.data.atk
         self.currentHeroState["weaponDurability"] = 0 if hero.controller.weapon is None else hero.controller.weapon.data.durability
         #currentHeroState["weaponBuff"] = nie wiem co tu moze byc tbh
+        self.currentHeroState["canAttack"] = 0 if hero.num_attacks == hero.max_attacks else 1 #jeszcze tu nie jestem tego pewny jak cos
+
         #Hero power needs to be implemented!
+        for x in hero.power.data.scripts.activate: #.activate albo .entourage
+            print("tmp")
+
+
 
         print("")
