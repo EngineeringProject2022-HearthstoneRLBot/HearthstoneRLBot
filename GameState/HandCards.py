@@ -424,28 +424,19 @@ def mapOnAttack(card):
     for x in card.data.scripts.combo:
         #effect = card.get_actions("combo")[0].get_target_args(card, card)[0]
         onAttackEffect["AlwaysGet"] = 0
-        if isinstance(x, fireplace.actions.Hit):
-            if isinstance(x, fireplace.actions.TargetedAction) or (
-                    isinstance(x, fireplace.dsl.evaluator.Find) and isinstance(x._if,
-                                                                               fireplace.actions.TargetedAction)):
-                getTargetedActionDetails(x, onAttackEffect, card)
-            #print("Combo that simply does damage")
+        if isinstance(x, fireplace.actions.TargetedAction) or (
+                isinstance(x, fireplace.dsl.evaluator.Find) and isinstance(x._if,
+                                                                            fireplace.actions.TargetedAction)):
 
-        if isinstance(x, fireplace.actions.Buff):
-            if isinstance(x, fireplace.actions.TargetedAction) or (
-                    isinstance(x, fireplace.dsl.evaluator.Find) and isinstance(x._if,
-                                                                               fireplace.actions.TargetedAction)):
-                getTargetedActionDetails(x, onAttackEffect, card)
-        #     print("Combo that buffs")
-        #     # 86
-        #     # 87 patrzysz czy x times czy lazy value
-        #     # 94 linijka refer to buff
-        # # przy summonie nalezy rozpracowac selector, bo sa karty ktore summonuja dla przeciwnika!!!
-        if isinstance(x, fireplace.actions.Summon):
-            if isinstance(x, fireplace.actions.TargetedAction) or (
-                    isinstance(x, fireplace.dsl.evaluator.Find) and isinstance(x._if,
-                                                                               fireplace.actions.TargetedAction)):
-                getTargetedActionDetails(x, onAttackEffect, card)
+            getTargetedActionDetails(x, onAttackEffect, card)
+
+    for x in card.data.scripts.deathrattle:
+        onAttackEffect["AlwaysGet"] = 1
+        if isinstance(x, fireplace.actions.TargetedAction) or (
+                isinstance(x, fireplace.dsl.evaluator.Find) and isinstance(x._if,
+                                                                            fireplace.actions.TargetedAction)):
+            getTargetedActionDetails(x, onAttackEffect, card)
+
 
     for x in card.data.scripts.events:
         if isinstance(x, fireplace.actions.EventListener):
