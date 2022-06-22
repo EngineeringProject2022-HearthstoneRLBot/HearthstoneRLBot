@@ -17,6 +17,7 @@ from hearthstone.enums import CardClass, CardType  # noqa
 
 # Autogenerate the list of cardset modules
 from GameState import HandCard
+from GameState import Hero
 
 _cards_module = os.path.join(os.path.dirname(__file__), "cards")
 CARD_SETS = [cs for _, cs, ispkg in iter_modules([_cards_module]) if ispkg]
@@ -300,8 +301,10 @@ class BaseTestGame(CoinRules, BaseGame):
         self.player2.max_mana = 10
 
 
+
 def _random_class():
     return CardClass(random.randint(2, 10))
+
 
 
 def init_game(class1=None, class2=None, exclude=(), game_class=BaseTestGame):
@@ -316,6 +319,7 @@ def init_game(class1=None, class2=None, exclude=(), game_class=BaseTestGame):
     return game
 
 
+
 _draftcache = {}
 
 
@@ -323,6 +327,7 @@ def _empty_mulligan(game):
     for player in game.players:
         if player.choice:
             player.choice.choose()
+
 
 
 BLACKLIST = (
@@ -339,12 +344,14 @@ def _draft(card_class, exclude):
     return _draftcache[(card_class, exclude)], card_class.default_hero
 
 
+
 def prepare_game(*args, **kwargs):
     game = init_game(*args, **kwargs)
     game.start()
     _empty_mulligan(game)
 
     return game
+
 
 
 def test_cogmaster():
@@ -385,8 +392,10 @@ def test_cogmaster():
     # armorsmith = game.player1.give("CFM_756")
     # armorsmith.play()
     # HandCard(armorsmith)
+
     # shadowstep = game.player1.give("EX1_144")
     # HandCard(shadowstep)
+
     #animalCompanion = game.player1.give("NEW1_031")
     #HandCard(animalCompanion)
     #animalCompanion.play(animalCompanion)
@@ -466,6 +475,9 @@ def test_cogmaster():
     #dummy.play()
 
     card_list = [
+        "EX1_613",
+        "AT_028",
+        "NEW1_037"
         "GVG_099",
         "GVG_104",
         "FP1_001",
@@ -519,6 +531,7 @@ def test_cogmaster():
     game.player1.discard_hand()
     cardList =[]
     for item in card_list:
+        print(item)
         try:
             card = game.player1.give(item)
             cardList.append(HandCard(card))
