@@ -506,11 +506,13 @@ def test_cogmaster():
         "EX1_578",
         "EX1_506"
     ]
+    game.player1.discard_hand()
     cardList =[]
     for item in card_list:
         try:
             card = game.player1.give(item)
             cardList.append(HandCard(card))
+            game.player1.discard_hand()
         except KeyError:
             print('NIE MA')
 
