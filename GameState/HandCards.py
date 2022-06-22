@@ -7,6 +7,9 @@ from fireplace.dsl import LazyValue, RandomEntourage
 from hearthstone.enums import Race, GameTag, PlayReq
 
 
+
+
+
 class HandCard:
 
     def __init__(self, card):
@@ -57,24 +60,28 @@ class HandCard:
                 "cantAttackHeroes": int(card.cannot_attack_heroes),
                 "cantBeTargetedSpellsHeroPowers": 1 if card.cant_be_targeted_by_abilities == 1 and card.cant_be_targeted_by_hero_powers == 1 else 0,
                 "cleave": 0}
-        self.battlecrySpellEffectPlane, self.endOfTurnEffectPlane, self.startOfTurnEffectPlane, self.conditionalEffectPlane, self.onAttackPlane = self.mapComplexFeatures(
+        self.battlecrySpellEffectPlane, self.endOfTurnEffectPlane, self.startOfTurnEffectPlane, self.conditionalEffectPlane, self.onAttackPlane, self.deathrattleEffectPlane = self.mapComplexFeatures(
             card)
 
     # to serve as template for extracting more complex features
     def mapComplexFeatures(self, card):
+        if card.data.strings[GameTag.CARDNAME]['enUS'] == "Echoing Ooze":
+            asda = 33
         battlecrySpellEffectPlane = mapBattlecrySpells(card)
         endOfTurnEffectPlane = mapEndOfTurn(card)
         startOfTurnEffectPlane = mapStartOfTurn(card)
         conditionalEffectPlane = mapConditional(card)
         onAttackPlane = mapOnAttack(card)
+        deathrattleEffectPlane = mapDeathrattle(card)
+
         print("BTC "+card.data.strings[GameTag.CARDNAME]['enUS'] + "  " + str(battlecrySpellEffectPlane))
         print("EOT "+card.data.strings[GameTag.CARDNAME]['enUS'] + "  " + str(endOfTurnEffectPlane))
         print("SOT "+card.data.strings[GameTag.CARDNAME]['enUS'] + "  " + str(startOfTurnEffectPlane))
         print("CON "+card.data.strings[GameTag.CARDNAME]['enUS'] + "  " + str(conditionalEffectPlane))
         print("ONA "+card.data.strings[GameTag.CARDNAME]['enUS'] + "  " + str(onAttackPlane))
-
+        print("DR " + card.data.strings[GameTag.CARDNAME]['enUS'] + "  " + str(deathrattleEffectPlane))
         # buff.data.scripts.atk!!!
-        return battlecrySpellEffectPlane, endOfTurnEffectPlane, startOfTurnEffectPlane, conditionalEffectPlane, onAttackPlane
+        return battlecrySpellEffectPlane, endOfTurnEffectPlane, startOfTurnEffectPlane, conditionalEffectPlane, onAttackPlane, deathrattleEffectPlane
 
 
 def mapBattlecrySpells(card):
@@ -88,9 +95,9 @@ def mapBattlecrySpells(card):
         # if isinstance(x, fireplace.actions.Buff) or (
         #        isinstance(x, fireplace.dsl.evaluator.Find) and isinstance(x._if, fireplace.actions.Buff)):
         #    getBuffDetails(x, currentBattlecryEffect, card)
-        if isinstance(x, fireplace.actions.TargetedAction) or (
-                isinstance(x, fireplace.dsl.evaluator.Find) and isinstance(x._if, fireplace.actions.TargetedAction)):
-            getTargetedActionDetails(x, currentBattlecryEffect, card)
+        # if isinstance(x, fireplace.actions.TargetedAction) or (
+        #         isinstance(x, fireplace.dsl.evaluator.Find) and isinstance(x._if, fireplace.actions.TargetedAction)):
+        getTargetedActionDetails(x, currentBattlecryEffect, card)
         #if isinstance(x, fireplace.actions.TargetedAction) or (
         #        isinstance(x, fireplace.dsl.evaluator.Find) and isinstance(x._if, fireplace.actions.TargetedAction)):
         #    getTargetedActionDetails(x, currentBattlecryEffect, card)
@@ -100,21 +107,27 @@ def mapBattlecrySpells(card):
 
 
 def getTargetedActionDetails(x, currentBattlecryEffect, card):
-    if "AlwaysGet" not in currentBattlecryEffect:
-        if isinstance(x, fireplace.dsl.evaluator.Find):
-            currentBattlecryEffect["AlwaysGet"] = 0
-            if x._if is None:
-                x = x._else
-            else:
-                x = x._if
+    while hasattr(x, "_if"):
+                # isinstance(x, fireplace.dsl.evaluator.Find):
+        currentBattlecryEffect["AlwaysGet"] = 0
+        if x._if is None:
+            x = x._else
         else:
-            currentBattlecryEffect["AlwaysGet"] = 1
-    if isinstance(x, fireplace.dsl.evaluator.Dead):
-        selector = x.selector
-    elif isinstance(x, fireplace.dsl.LazyNumEvaluator):
-        selector = x.num.selector
+            x = x._if
     else:
-        selector = x.get_args(card)[0]
+        if "AlwaysGet" not in currentBattlecryEffect:
+            currentBattlecryEffect["AlwaysGet"] = 1
+    # if isinstance(x, fireplace.dsl.evaluator.Dead):
+    #     selector = x.selector
+    # elif isinstance(x, fireplace.dsl.LazyNumEvaluator):
+    #     selector = x.num.selector
+    # else:
+    if type(x) is tuple:
+
+        x = x[-1]
+    if hasattr(x, "actions"):
+        x = x.actions[-1]
+    selector = x.get_args(card)[0]
     times = 0
     if hasattr(x, "times"):
         times = getTimes(x, card, currentBattlecryEffect)
@@ -199,7 +212,10 @@ def getAmount(x, card, currEffect):
     if type(x.get_args(card)[-1]) is not int:
         print("DEPENDANT SOMETHING FOUND!!!")
         currEffect["SetAmount"] = 0
-        return x.get_args(card)[-1].evaluate(card)
+        try:
+            return x.get_args(card)[-1].evaluate(card)
+        except:
+            currEffect["UnknownAmount"] = 1
     else:
         currEffect["SetAmount"] = 1
         return x.get_args(card)[-1]
@@ -368,6 +384,9 @@ def decodeTarget(target):
     return " Unknown " #wyjatek i dobrze
 
 def decodeResultStr(result):
+    if type(result) is str:
+        print(result)
+        return
     if result & 1 << 31:
         print("Random tyle razy: "+str(result&0b1111))
     if result & 1 << 28:
@@ -445,12 +464,7 @@ def mapOnAttack(card):
 
             getTargetedActionDetails(x, onAttackEffect, card)
 
-    for x in card.data.scripts.deathrattle:
-        onAttackEffect["AlwaysGet"] = 1
-        if isinstance(x, fireplace.actions.TargetedAction) or (
-                isinstance(x, fireplace.dsl.evaluator.Find) and isinstance(x._if,
-                                                                            fireplace.actions.TargetedAction)):
-            getTargetedActionDetails(x, onAttackEffect, card)
+
 
 
     for x in card.data.scripts.events:
@@ -462,3 +476,12 @@ def mapOnAttack(card):
                     getTargetedActionDetails(x, onAttackEffect, card)
                 #print("On attack effect (event Damage)")
     return onAttackEffect
+
+
+
+def mapDeathrattle(card):
+    deathrattleEffect = {}
+    for x in card.data.scripts.deathrattle:
+        deathrattleEffect["AlwaysGet"] = 1
+        getTargetedActionDetails(x, deathrattleEffect, card)
+    return deathrattleEffect
