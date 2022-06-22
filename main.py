@@ -512,7 +512,6 @@ def test_cogmaster():
         try:
             card = game.player1.give(item)
             cardList.append(HandCard(card))
-            game.player1.discard_hand()
         except KeyError:
             print('NIE MA')
 
