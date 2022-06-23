@@ -392,85 +392,144 @@ def test_cogmaster():
     # armorsmith = game.player1.give("CFM_756")
     # armorsmith.play()
     # HandCard(armorsmith)
-    shadowstep = game.player1.give("EX1_144")
-    HandCard(shadowstep)
+
+    # shadowstep = game.player1.give("EX1_144")
+    # HandCard(shadowstep)
+
     #animalCompanion = game.player1.give("NEW1_031")
     #HandCard(animalCompanion)
     #animalCompanion.play(animalCompanion)
 
-    abusive = game.player1.give("CS2_188")
-    HandCard(abusive)
-    darkBargain = game.player1.give("AT_025")
-    HandCard(darkBargain)
-    soulFire = game.player1.give("EX1_308")
-    HandCard(soulFire)
-    shieldSlam = game.player1.give("EX1_410")
-    HandCard(shieldSlam)
-    SHKnight = game.player1.give("CS2_151")
-    HandCard(SHKnight)
-
-    game.player1.discard_hand()
-    game.player2.discard_hand()
-
-    #spell1 = game.player1.give("NEW1_031")
-    #HandCard(spell1)
-
-    #weapon = game.player1.give("CS2_106") #fiery war axe
-    weapon = game.player1.give("EX1_567") #doomhammer
-    weapon.play()
-
-    tmp = Hero()
-
-    hero1 = game.player1.hero
-    hero2 = game.player2.hero
-
-
-    #tmp.HeroDecode(hero1)
-    #tmp.HeroDecode(hero2)
-
-    combo1 = game.player1.give("EX1_613")
-    HandCard(combo1)
-
-    combo2 = game.player1.give("AT_028")
-    HandCard(combo2)
-
-    combo3 = game.player1.give("EX1_131")
-    HandCard(combo3)
-
-    dr1 = game.player1.give("EX1_097")
-    HandCard(dr1)
-
-    dr2 = game.player1.give("EX1_534")
-    HandCard(dr2)
-
-    dr3 = game.player1.give("EX1_029")
-    HandCard(dr3)
-
-    #dr4 = game.player1.give("GVG_096")
-    #HandCard(dr4)
-
-    dr5 = game.player1.give("EX1_096")
-    HandCard(dr5)
-
-    dr6 = game.player1.give("EX1_556")
-    HandCard(dr6)
-
-    dr7 = game.player1.give("FP1_023")
-    HandCard(dr7)
-
-    bc1 = game.player1.give("CS2_188")
-    HandCard(bc1)
-
-    game.player1.discard_hand()
-    game.player2.discard_hand()
-
-
+    # abusive = game.player1.give("CS2_188")
+    # HandCard(abusive)
+    # darkBargain = game.player1.give("AT_025")
+    # HandCard(darkBargain)
+    # soulFire = game.player1.give("EX1_308")
+    # HandCard(soulFire)
+    # shieldSlam = game.player1.give("EX1_410")
+    # HandCard(shieldSlam)
+    # SHKnight = game.player1.give("CS2_151")
+    # HandCard(SHKnight)
+    #novEng = game.player1.give("EX1_015")
+    #shieldBlock = game.player1.give("EX1_606")
+    #HandCard(shieldBlock)
+    #naturalize = game.player1.give("EX1_161")
+    #HandCard(novEng)
+    #HandCard(naturalize)
+    #mechWarper = game.player1.give("GVG_006")
+    #HandCard(mechWarper)
+    #crab = game.player1.give("NEW1_017")
+    #stormpike = game.player1.give("CS2_150")
+    #earthenring = game.player1.give("CS2_117")
+    #frostelem = game.player1.give("EX1_283")
+    #arge = game.player1.give("EX1_362")
+    #frog = game.player1.give("EX1_103")
+    #shat = game.player1.give("EX1_019")
+    #frostwolf = game.player1.give("CS2_226")
+    # anima = game.player1.give("CS2_059")
+    # anima2 = game.player1.give("EX1_298")
+    # anima3 = game.player1.give("CS2_117")
+    # anima4 = game.player1.give("CS2_057")
+    # anima5 = game.player1.give("FP1_013")
+    # anima6 = game.player1.give("CS2_062")
+    # anima7 = game.player2.give("EX1_349")
+    # anima8 = game.player2.give("LOE_024t")
+    # anima9 = game.player2.give("Mekka2")
+    # anima10 = game.player2.give("Mekka3")
+    # x=HandCard(anima)
+    # y=HandCard(anima2)
+    # z=HandCard(anima3)
+    # a=HandCard(anima4)
+    # b=HandCard(anima5)
+    # d=HandCard(anima6)
+    # i=HandCard(anima7)
+    # e=HandCard(anima8)
+    # f=HandCard(anima9)
+    # g=HandCard(anima10)
+    #frost = game.player1.give("CS2_226")
+    #HandCard(frost)
+    #argus = game.player1.give("EX1_093")
+    #div = game.player1.give("CS2_236")
+    #bloodsail= game.player1.give("NEW1_018")
+    #bchampion = game.player1.give("EX1_355")
+    #innerFire = game.player1.give("CS1_129")
+    #aldor = game.player1.give("EX1_382")
+    #frog.play()
+    #HandCard(innerFire)
+    #innerFire.play(target=frog)
+    #whelp = game.player1.give("BRM_004")
+    #CS1_129 inner fire
+    #CS2_236 divine spirit
+    #EX1_382 aldor
+    #EX1_355 blessed champion
+    #BRM_004 Twilight Whelp
+    #EX1_161 Naturalize
+    #EX1_103 frog
+    #EX1_019 shat
+    #CS2_226 frost
+    #EX1_093 argus
+    #CFM_756 alley armorsmith
+    #cogmaster.play()
+    #assert cogmaster.atk == 6
+    #dummy = game.player1.give("CS2_029")
+    #dummy.play()
 
     card_list = [
+        "NEW1_031",
         "EX1_613",
         "AT_028",
         "NEW1_037"
+        "GVG_099",
+        "GVG_104",
+        "FP1_001",
+        "FP1_029",
+        "AT_122",
+        "AT_040",
+        "AT_026",
+        "BRM_020",
+        "BRM_005",
+        "LOE_073",
+        "EX1_004",
+        "EX1_597",
+        "BT_493",
+        "BT_761",
+        "EX1_575",
+        "GVG_089",
+        "GVG_039",
+        "CFM_639",
+        "GVG_020",
+        "OG_286",
+        "CFM_654",
+        "OG_173",
+        "FP1_003",
+        "CS2_059",
+        "BRM_028",
+        "KAR_044",
+        "OG_200",
+        "FP1_005",
+        "FP1_027",
+        "CFM_609",
+        "GVG_111",
+        "EX1_006",
+        "EX1_341",
+        "LOE_007t",
+        "EX1_102",
+        "AT_073",
+        "GVG_103",
+        "GVG_077",
+        "FP1_013",
+        "GVG_076",
+        "LOE_115",
+        "LOOT_170",
+        "EX1_573",
+        "CS2_008",
+        "EX1_160",
+        "NEW1_007",
+        "EX1_571",
+        "EX1_578",
+        "EX1_506"
     ]
+    game.player1.discard_hand()
     cardList =[]
     for item in card_list:
         print(item)
@@ -533,66 +592,68 @@ def main():
     gameStates = []
     cards.db.initialize()
     test_cogmaster()
-    game = setup_game()
-    try:
-        for player in game.players:
-            current = GameState(game)
-            # 1. Tutaj ustawić do current karty do wyboru
-            print("Can mulligan %r" % player.choice.cards)
-            mull_count = random.randint(0, len(player.choice.cards))
-            cards_to_mulligan = random.sample(player.choice.cards, mull_count)
-            player.choice.choose(*cards_to_mulligan)
-            gameStates.append(current)
+    play_game = input("Do you wish to play a full game? 1 - yes 0 - no")
+    if play_game == 1:
+        game = setup_game()
+        try:
+            for player in game.players:
+                current = GameState(game)
+                # 1. Tutaj ustawić do current karty do wyboru
+                print("Can mulligan %r" % player.choice.cards)
+                mull_count = random.randint(0, len(player.choice.cards))
+                cards_to_mulligan = random.sample(player.choice.cards, mull_count)
+                player.choice.choose(*cards_to_mulligan)
+                gameStates.append(current)
 
-        while True:
-            player = game.current_player
-
-            current = GameState(game)
-            # 2. Tutaj do current wrzucić aktualny stan gry
             while True:
-                heropower = player.hero.power
-                if heropower.is_usable() and random.random() < 0.1:
-                    if heropower.requires_target():
-                        heropower.use(target=random.choice(heropower.targets))
-                    else:
-                        heropower.use()
-                    # 3. Tutaj do current wrzuć nowy stan gry (po użyciu umiejętności)
-                    continue
+                player = game.current_player
 
-                # iterate over our hand and play whatever is playable
-                for card in player.hand:
-                    if card.is_playable() and random.random() < 0.5:
-                        target = None
-                        if card.must_choose_one:
-                            card = random.choice(card.choose_cards)
-                        if card.requires_target():
-                            target = random.choice(card.targets)
-                        print("Playing %r on %r" % (card, target))
-                        card.play(target=target)
-
-                        # 4. Tutaj do current wrzuć nowy stan gry (po użyciu karty)
-
-                        if player.choice:
-                            choice = random.choice(player.choice.cards)
-                            print("Choosing card %r" % (choice))
-                            player.choice.choose(choice)
-                        # 5. Tutaj do current wrzuć nowy stan gry (po użyciu karty i wyborze)
+                current = GameState(game)
+                # 2. Tutaj do current wrzucić aktualny stan gry
+                while True:
+                    heropower = player.hero.power
+                    if heropower.is_usable() and random.random() < 0.1:
+                        if heropower.requires_target():
+                            heropower.use(target=random.choice(heropower.targets))
+                        else:
+                            heropower.use()
+                        # 3. Tutaj do current wrzuć nowy stan gry (po użyciu umiejętności)
                         continue
 
-                # Randomly attack with whatever can attack
-                for character in player.characters:
-                    if character.can_attack():
-                        character.attack(random.choice(character.targets))
-                        if character.buffs:
-                            print("gay")
+                    # iterate over our hand and play whatever is playable
+                    for card in player.hand:
+                        if card.is_playable() and random.random() < 0.5:
+                            target = None
+                            if card.must_choose_one:
+                                card = random.choice(card.choose_cards)
+                            if card.requires_target():
+                                target = random.choice(card.targets)
+                            print("Playing %r on %r" % (card, target))
+                            card.play(target=target)
 
-                    # 6. Tutaj do current wrzuć nowy stan gry (po ataku)
+                            # 4. Tutaj do current wrzuć nowy stan gry (po użyciu karty)
 
-                break
+                            if player.choice:
+                                choice = random.choice(player.choice.cards)
+                                print("Choosing card %r" % (choice))
+                                player.choice.choose(choice)
+                            # 5. Tutaj do current wrzuć nowy stan gry (po użyciu karty i wyborze)
+                            continue
 
-            game.end_turn()
-    except GameOver:
-        print("Game ended");
+                    # Randomly attack with whatever can attack
+                    for character in player.characters:
+                        if character.can_attack():
+                            character.attack(random.choice(character.targets))
+                            if character.buffs:
+                                print("gay")
+
+                        # 6. Tutaj do current wrzuć nowy stan gry (po ataku)
+
+                    break
+
+                game.end_turn()
+        except GameOver:
+            print("Game ended");
 
 
 # test1
