@@ -191,6 +191,7 @@ def getSummonDetails(x, card, currentEffect):
     currentEffect["Summon"] = 1
     currentEffect["Times"] = x.times
     currentEffect["SummonTagets"] = decodeWithRequirements(decodeTarget(selector), card.data.requirements)
+
     try:
         toSummonID = x.get_args(card)[1]
         if type(toSummonID) is RandomEntourage:
@@ -210,6 +211,9 @@ def getSummonDetails(x, card, currentEffect):
             currentEffect["SummonedCalculatedValue"] = 1
         else:
             toSummon = Card(toSummonID)
+            if(type(toSummon) == fireplace.card.Weapon):
+              print("Weapon is being summoned!")
+              return
             currentEffect["SummonedAvgHealth"] = toSummon.health
             currentEffect["SummonedAvgAttack"] = toSummon.atk
             currentEffect["SummonedAvgCost"] = toSummon.cost
