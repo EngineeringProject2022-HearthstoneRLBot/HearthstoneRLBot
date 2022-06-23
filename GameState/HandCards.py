@@ -178,6 +178,9 @@ def getSummonDetails(x, card, currentEffect):
     currentEffect["Summon"] = 1
     currentEffect["SummonTagets"] = decodeWithRequirements(decodeTarget(selector), card.data.requirements)
     toSummon = Card(x.get_args(card)[1])
+    if(type(toSummon) == fireplace.card.Weapon):
+        print("Weapon is being summoned!")
+        return
     currentEffect["SummonedHealth"] = toSummon.health
     currentEffect["SummonedAttack"] = toSummon.atk
     currentEffect["SummonedCost"] = toSummon.cost

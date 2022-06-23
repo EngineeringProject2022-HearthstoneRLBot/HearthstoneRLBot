@@ -1,3 +1,12 @@
+import fireplace
+from fireplace.actions import SetTag, Silence, Heal, Hit, Destroy, GainArmor, Draw, Discard, Summon, Bounce
+from fireplace.card import Card
+from fireplace.dsl import LazyValue, RandomEntourage
+from hearthstone.enums import Race, GameTag, PlayReq
+
+from GameState.HandCards import getTargetedActionDetails
+
+
 class Hero:
     def __init__(self):
         self.currentHeroState = {}
@@ -25,9 +34,19 @@ class Hero:
         #currentHeroState["weaponBuff"] = nie wiem co tu moze byc tbh
         self.currentHeroState["canAttack"] = 0 if hero.num_attacks == hero.max_attacks else 1 #jeszcze tu nie jestem tego pewny jak cos
 
+
+        heroPower = {}
         #Hero power needs to be implemented!
-        for x in hero.power.data.scripts.activate: #.activate albo .entourage
-            print("tmp")
+        if len(hero.power.data.scripts.activate) is not None:
+            for x in hero.power.data.scripts.activate: #.activate albo .entourage
+                heroPower["AlwaysGet"] = 1
+                if isinstance(x, fireplace.actions.TargetedAction) or (
+                        isinstance(x, fireplace.dsl.evaluator.Find) and isinstance(x._if,
+                                                                                   fireplace.actions.TargetedAction)):
+                    print(x)
+                    getTargetedActionDetails(x, heroPower, hero)
+        elif hero.power.data.scripts.entourage:
+            print("Entourage" + hero.power.data.scripts.entourage)
 
 
 
