@@ -201,10 +201,10 @@ def getSummonDetails(x, card, currentEffect):
             sum_atk = 0
             sum_cost = 0
             for y in card.entourage:
-                card = Card(y)
-                sum_atk += card.atk
-                sum_health += card.health
-                sum_cost += card.cost
+                entourageMember = Card(y)
+                sum_atk += entourageMember.atk
+                sum_health += entourageMember.health
+                sum_cost += entourageMember.cost
             currentEffect["SummonedAvgHealth"] = sum_health / len(card.entourage)
             currentEffect["SummonedAvgAttack"] = sum_atk / len(card.entourage)
             currentEffect["SummonedAvgCost"] = sum_cost / len(card.entourage)

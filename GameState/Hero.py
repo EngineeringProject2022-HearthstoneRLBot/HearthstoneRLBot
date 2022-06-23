@@ -37,17 +37,23 @@ class Hero:
 
         heroPower = {}
         #Hero power needs to be implemented!
-        if len(hero.power.data.scripts.activate) is not None:
+        if str(hero) != "Thrall":
             for x in hero.power.data.scripts.activate: #.activate albo .entourage
                 heroPower["AlwaysGet"] = 1
-                if isinstance(x, fireplace.actions.TargetedAction) or (
-                        isinstance(x, fireplace.dsl.evaluator.Find) and isinstance(x._if,
-                                                                                   fireplace.actions.TargetedAction)):
-                    print(x)
-                    getTargetedActionDetails(x, heroPower, hero)
-        elif hero.power.data.scripts.entourage:
-            print("Entourage" + hero.power.data.scripts.entourage)
-
-
-
+                getTargetedActionDetails(x, heroPower, hero)
+        else:
+            heroPower["AlwaysGet"] = 1
+            heroPower["FromEntourage"] = 1
+            sum_health = 0
+            sum_atk = 0
+            sum_cost = 0
+            for y in hero.power.data.scripts.entourage:
+                card = Card(y)
+                sum_atk += card.atk
+                sum_health += card.health
+                sum_cost += card.cost
+            heroPower["SummonedAvgHealth"] = sum_health / len(hero.power.data.scripts.entourage)
+            heroPower["SummonedAvgAttack"] = sum_atk / len(hero.power.data.scripts.entourage)
+            heroPower["SummonedAvgCost"] = sum_cost / len(hero.power.data.scripts.entourage)
+            heroPower["SummonedCalculatedValue"] = 1
         print("")
