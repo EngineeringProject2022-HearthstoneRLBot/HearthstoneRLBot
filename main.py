@@ -536,6 +536,9 @@ def test_cogmaster():
         try:
             card = game.player1.give(item)
             cardList.append(HandCard(card))
+            test = HandCard(card)
+            test.encode_state()
+
         except KeyError:
             print('NIE MA')
 

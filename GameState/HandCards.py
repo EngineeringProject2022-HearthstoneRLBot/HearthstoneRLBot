@@ -5,7 +5,7 @@ from fireplace.actions import SetTag, Silence, Heal, Hit, Destroy, GainArmor, Dr
 from fireplace.card import Card
 from fireplace.dsl import LazyValue, RandomEntourage
 from hearthstone.enums import Race, GameTag, PlayReq
-
+import numpy as np
 
 
 
@@ -47,9 +47,6 @@ class HandCard:
                 "hasDeathrattle": 1 if len(card.deathrattles) != 0 else 0,
                 "hasBattlecry": int(card.has_battlecry),
                 "hasAura": int(card.aura),
-                "hasCondEff": 0,  # tricky one
-                "hasEoTEff": 0,  # tricky one
-                "hasSoTEff": 0,  # tricky one
                 "spellDamage": card.spellpower,
                 "stealth": int(card.stealthed),
                 "isDamaged": int(card.damaged),
@@ -59,9 +56,16 @@ class HandCard:
                 "cantAttack": int(card.cant_attack),
                 "cantAttackHeroes": int(card.cannot_attack_heroes),
                 "cantBeTargetedSpellsHeroPowers": 1 if card.cant_be_targeted_by_abilities == 1 and card.cant_be_targeted_by_hero_powers == 1 else 0,
-                "cleave": 0}
+                }
         self.battlecrySpellEffectPlane, self.endOfTurnEffectPlane, self.startOfTurnEffectPlane, self.conditionalEffectPlane, self.onAttackPlane, self.deathrattleEffectPlane = self.mapComplexFeatures(
             card)
+
+    def encode_state(self):
+        basicFeatures = np.zeros(144)
+        basicFeatures[0:6] = [x for x in self.handCardFeatures.values()]
+        if self.handCardFeatures["isMinion"] == 1:
+            basicFeatures[51:83] = [x for x in self.minionFeatures.values()]
+        print("test")
 
     # to serve as template for extracting more complex features
     def mapComplexFeatures(self, card):
@@ -498,3 +502,6 @@ def mapDeathrattle(card):
         deathrattleEffect["AlwaysGet"] = 1
         getTargetedActionDetails(x, deathrattleEffect, card)
     return deathrattleEffect
+
+
+
