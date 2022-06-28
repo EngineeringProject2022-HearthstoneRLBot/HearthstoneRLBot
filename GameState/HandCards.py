@@ -59,7 +59,7 @@ class HandCard:
             card)
 
     def encode_state(self):
-        basicFeatures = np.zeros(144)
+        basicFeatures = np.zeros(169)
         basicFeatures[0:6] = [x for x in self.handCardFeatures.values()]
         if self.handCardFeatures["isMinion"] == 1:
             basicFeatures[51:83] = [x for x in self.minionFeatures.values()]
@@ -95,7 +95,7 @@ class HandCard:
 
 
 def encode_complex_plane(dictionary):
-    arr = np.zeros(144)
+    arr = np.zeros(169)
     arr[0] = dictionary.get("HealthValue", 0)
     arr[1] = dictionary.get("AttackValue", 0)
     arr[2] = dictionary.get("setsHealthToAttack", 0)
@@ -109,9 +109,9 @@ def encode_complex_plane(dictionary):
     arr[10] = dictionary.get("GiveStealth", 0)
     arr[11] = dictionary.get("GiveSilence", 0)
     arr[12] = dictionary.get("Freeze", 0)
-    arr[13:28] = encode_targets(dictionary.get("BuffTargets"), None)
-    arr[29] = dictionary.get("UnknownAmount", 0)
-    arr[30] = dictionary.get("")
+    arr[13:29] = encode_targets(dictionary.get("BuffTargets", None))
+    arr[30] = dictionary.get("UnknownAmount", 0)
+    arr[31] = dictionary.get("")
 
 
 def encode_targets(target):
@@ -510,7 +510,7 @@ def mapStartOfTurn(card):
                 getTargetedActionDetails(y, startOfTurnEffect, card)
     return startOfTurnEffect
 
-    # TODO
+
 
 
 def mapOnAttack(card):
@@ -539,7 +539,10 @@ def mapOnAttack(card):
 
 def mapDeathrattle(card):
     deathrattleEffect = {}
+    found = False
     for x in card.data.scripts.deathrattle:
+        found = True
         deathrattleEffect["AlwaysGet"] = 1
         getTargetedActionDetails(x, deathrattleEffect, card)
+
     return deathrattleEffect
