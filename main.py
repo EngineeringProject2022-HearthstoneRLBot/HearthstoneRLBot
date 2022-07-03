@@ -475,6 +475,7 @@ def test_cogmaster():
     #dummy.play()
 
     card_list = [
+        "EX1_308",
         "NEW1_031",
         "EX1_613",
         "AT_028",
