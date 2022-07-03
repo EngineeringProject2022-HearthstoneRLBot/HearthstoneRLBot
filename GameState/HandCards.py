@@ -115,12 +115,23 @@ def encode_complex_plane(dictionary):
 
 
 def encode_targets(target):
+    arr = np.zeros(16)
     if target is None:
-        return np.zeros(16)
+        return arr
     else:
-        return np.zeros(16)
-        # TODO
-
+        arr[0] = (target & 1 << 25) > 0 # self
+        arr[1] = (target & 1 << 21) > 0 # herosy
+        arr[2] = (target & 1 << 22) > 0 # miniony
+        arr[3] = (target & 1 << 23) > 0 # our
+        arr[4] = (target & 1 << 24) > 0 # enemy
+        arr[5] = ((target & (1 << 27)) > 0) and ((target & (1 << 28)) > 0) # adjacenty
+        arr[6] = not ((target & 1 << 31) > 0) and ((target & 1 << 26) > 0) # nie jest randomem i nie jest conditionalem
+        arr[7] = not ((target & 1 << 31) > 0) and not ((target & 1 << 26) > 0) # nie jest randomem i jest conditionalem
+        arr[9] = target & 0b1111 # ile razy
+        arr[8] = (target & 1 << 31) > 0 and arr[9] > 1 # jesli jest randomem i ileś razy z subsetu to bedzie differnt each time
+        arr[10] = not ((target & 1 << 31) > 0) and not arr[6] and not arr[7] and not arr[0] # jesli nie jest randomem i nie efektuje wszystkich z subsetu
+        print(arr)
+        decodeResultStr(target)
 
 def mapBattlecrySpells(card):
     currentBattlecryEffect = {}
