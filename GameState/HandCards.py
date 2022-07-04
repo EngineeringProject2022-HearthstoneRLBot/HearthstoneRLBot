@@ -11,6 +11,8 @@ import numpy as np
 class HandCard:
 
     def __init__(self, card):
+        # for debugging matrix encoding
+        self.card = card
         self.handCardFeatures = {
             "cost": card.cost,
             "poweredUp": int(card.powered_up),
@@ -19,7 +21,6 @@ class HandCard:
             "isWeapon": 1 if card.type == 7 else 0,
             "currDiscount": card.data.cost - card.cost
         }
-        self.minionFeatures = {}
         if self.handCardFeatures["isMinion"]:
             self.minionFeatures = {
                 "currentHealth": card.health,
@@ -33,14 +34,14 @@ class HandCard:
                 "taunt": int(card.taunt),
                 "divineShield": int(card.divine_shield),
                 "isNoneType": 1 if card.race == Race.INVALID else 0,
-                "isMurloc": 1 if card.race == Race.MURLOC else 0,
-                "isPirate": 1 if card.race == Race.PIRATE else 0,
-                "isTotem": 1 if card.race == Race.TOTEM else 0,
-                "isBeast": 1 if card.race == Race.BEAST else 0,
-                "isDemon": 1 if card.race == Race.DEMON else 0,
-                "isDragon": 1 if card.race == Race.DRAGON else 0,
-                "isMech": 1 if card.race == Race.MECHANICAL else 0,
-                "isElemental": 1 if card.race == Race.ELEMENTAL else 0,
+                "isMurloc": 1 if (card.race == Race.MURLOC or card.race == Race.ALL) else 0,
+                "isPirate": 1 if (card.race == Race.PIRATE or card.race == Race.ALL) else 0,
+                "isTotem": 1 if (card.race == Race.TOTEM or card.race == Race.ALL) else 0,
+                "isBeast": 1 if (card.race == Race.BEAST or card.race == Race.ALL) else 0,
+                "isDemon": 1 if (card.race == Race.DEMON or card.race == Race.ALL) else 0,
+                "isDragon": 1 if (card.race == Race.DRAGON or card.race == Race.ALL) else 0,
+                "isMech": 1 if (card.race == Race.MECHANICAL or card.race == Race.ALL) else 0,
+                "isElemental": 1 if (card.race == Race.ELEMENTAL or card.race == Race.ALL) else 0,
                 "isBuffed": 1 if len(card.buffs) != 0 else 0,
                 "hasDeathrattle": 1 if len(card.deathrattles) != 0 else 0,
                 "hasBattlecry": int(card.has_battlecry),
@@ -55,6 +56,11 @@ class HandCard:
                 "cantAttackHeroes": int(card.cannot_attack_heroes),
                 "cantBeTargetedSpellsHeroPowers": 1 if card.cant_be_targeted_by_abilities == 1 and card.cant_be_targeted_by_hero_powers == 1 else 0,
             }
+        elif self.handCardFeatures["isWeapon"]:
+            self.weaponFeatures = {
+                "currentdurability": card.durability,
+                "currentAttack": card.atk,
+                "baseDurability": card.max_durability}
         self.battlecrySpellEffectPlane, self.endOfTurnEffectPlane, self.startOfTurnEffectPlane, self.conditionalEffectPlane, self.onAttackPlane, self.deathrattleEffectPlane = self.mapComplexFeatures(
             card)
 
@@ -63,6 +69,8 @@ class HandCard:
         basicFeatures[0:6] = [x for x in self.handCardFeatures.values()]
         if self.handCardFeatures["isMinion"] == 1:
             basicFeatures[51:83] = [x for x in self.minionFeatures.values()]
+        elif self.handCardFeatures["isWeapon"] == 1:
+            basicFeatures[51:54] = [x for x in self.weaponFeatures.values()]
 
         BattlecrySpell = encode_complex_plane(self.battlecrySpellEffectPlane)
         EoT = encode_complex_plane(self.endOfTurnEffectPlane)
@@ -266,11 +274,11 @@ def encode_targets(target, length=16):
 
 def mapBattlecrySpells(card):
     currentBattlecryEffect = {}
-    if len(card.requirements) != 0:
-        for x in card.data.scripts.requirements:
-            if type(x) is PlayReq and x is not PlayReq.REQ_TARGET_TO_PLAY:
-                currentBattlecryEffect["AlwaysGet"] = 0
-                break
+    # if len(card.requirements) != 0:
+    #     for x in card.data.scripts.requirements:
+    #         if type(x) is PlayReq and x is not PlayReq.REQ_TARGET_TO_PLAY:
+    #             currentBattlecryEffect["AlwaysGet"] = 0
+    #             break
     for x in card.data.scripts.play:
         # if isinstance(x, fireplace.actions.Buff) or (
         #        isinstance(x, fireplace.dsl.evaluator.Find) and isinstance(x._if, fireplace.actions.Buff)):
