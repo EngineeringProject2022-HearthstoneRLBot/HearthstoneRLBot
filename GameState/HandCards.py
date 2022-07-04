@@ -109,7 +109,10 @@ def encode_complex_plane(dictionary):
     arr[10] = dictionary.get("GiveStealth", 0)
     arr[11] = dictionary.get("GiveSilence", 0)
     arr[12] = dictionary.get("Freeze", 0)
-    arr[13:30] = encode_targets(dictionary.get("BuffTargets", None))
+    # I miscounted and cannot be bothered right now to correct. So i have added a
+    # perimeter to determine the length of
+    # target padding which here is changed to 17 from the default 16
+    arr[13:30] = encode_targets(dictionary.get("BuffTargets"), 17)
     arr[30] = dictionary.get("UnknownAmount", 0)
     always = dictionary.get("AlwaysGetBuff")
     if always is not None:
@@ -133,7 +136,7 @@ def encode_complex_plane(dictionary):
     if arr[37] == 1:
         arr[38] = dictionary.get("DiscardCardsTimes")
         # TODO only return the 2 relevant fields
-        #arr[40:42] = encode_targets(dictionary.get("DiscardTargets"))
+        arr[40:42] = encode_targets(dictionary.get("DiscardTargets"))[3:5]
         arr[39] = dictionary.get("UnknownAmountDiscard", 0)
         set = dictionary.get("SetAmountDiscard")
         if set is not None:
@@ -147,30 +150,119 @@ def encode_complex_plane(dictionary):
                 arr[45] = 1
             else:
                 arr[44] = 1
+    arr[46] = dictionary.get("HitAmount", 0)
+    arr[47:63] = encode_targets(dictionary.get("HitTargets"))
+    arr[63] = dictionary.get("UnknownAmountHit", 0)
+    always = dictionary.get("AlwaysGetHit")
+    if always is not None:
+        if always == 0:
+            arr[65] = 1
+        else:
+            arr[64] = 1
+    set = dictionary.get("SetAmountHit")
+    if set is not None:
+        if set == 0:
+            arr[67] = 1
+        else:
+            arr[66] = 1
+    arr[68] = dictionary.get("HealAmount", 0)
+    arr[69:85] = encode_targets(dictionary.get("HealTargets"))
+    arr[85] = dictionary.get("UnknownAmountHeal", 0)
+    always = dictionary.get("AlwaysGetHeal")
+    if always is not None:
+        if always == 0:
+            arr[87] = 1
+        else:
+            arr[86] = 1
+    set = dictionary.get("SetAmountHeal")
+    if set is not None:
+        if set == 0:
+            arr[89] = 1
+        else:
+            arr[88] = 1
+    if dictionary.get("Destroy", 0) == 1:
+        arr[90] = 1
+        arr[91:107] = encode_targets(dictionary.get("DestroyTargets"))
+        arr[107] = dictionary.get("UnknownAmountDestroy", 0)
+        always = dictionary.get("AlwaysGetDestroy")
+        if always is not None:
+            if always == 0:
+                arr[109] = 1
+            else:
+                arr[108] = 1
+        set = dictionary.get("SetAmountDestroy")
+        if set is not None:
+            if set == 0:
+                arr[111] = 1
+            else:
+                arr[110] = 1
+    if dictionary.get("Summon", 0) == 1:
+        arr[112] = 1
+        arr[113] = dictionary.get("SummonTimes", 0)
+        arr[114] = dictionary.get("UnknownAmountSummon", 0)
+        arr[115:117] = encode_targets(dictionary.get("SummonTargets"))[3:5]
+        arr[117] = dictionary.get("SummonedAvgAttack", 0)
+        arr[118] = dictionary.get("SummonedAvgHealth", 0)
+        arr[119] = dictionary.get("SummonedAvgCost", 0)
+        always = dictionary.get("AlwaysGetSummon")
+        if always is not None:
+            if always == 0:
+                arr[121] = 1
+            else:
+                arr[120] = 1
+        set = dictionary.get("SetAmountSummon")
+        if set is not None:
+            if set == 0:
+                arr[123] = 1
+            else:
+                arr[122] = 1
+        arr[124] = dictionary.get("UnknownSummon", 0)
+        arr[125] = dictionary.get("WeaponSummon", 0)
+        arr[126] = dictionary.get("SummonFromEntourage", 0)
+    arr[127] = dictionary.get("GainArmorAmount", 0)
+    arr[128] = dictionary.get("UnknownAmountArmor", 0)
+    arr[129:131] = encode_targets(dictionary.get("GainArmorTargets"))[3:5]
+    always = dictionary.get("AlwaysGetSummon")
+    if always is not None:
+        if always == 0:
+            arr[132] = 1
+        else:
+            arr[131] = 1
+    set = dictionary.get("SetAmountSummon")
+    if set is not None:
+        if set == 0:
+            arr[134] = 1
+        else:
+            arr[133] = 1
+    if dictionary.get("BounceCards", 0):
+        arr[135] = 1
+        arr[136:152] = encode_targets(dictionary.get("BounceTargets"), 0)
+        arr[152] = dictionary.get("UnknownAmountBounce", 0)
+    return arr
 
 
-
-
-
-def encode_targets(target):
-    arr = np.zeros(16)
+def encode_targets(target, length=16):
+    arr = np.zeros(length)
     if target is None:
         return arr
     else:
-        arr[0] = (target & 1 << 25) > 0 # self
-        arr[1] = (target & 1 << 21) > 0 # herosy
-        arr[2] = (target & 1 << 22) > 0 # miniony
-        arr[3] = (target & 1 << 23) > 0 # our
-        arr[4] = (target & 1 << 24) > 0 # enemy
-        arr[5] = ((target & (1 << 27)) > 0) and ((target & (1 << 28)) > 0) # adjacenty
-        arr[6] = not ((target & 1 << 31) > 0) and ((target & 1 << 26) > 0) # nie jest randomem i nie jest conditionalem
-        arr[7] = not ((target & 1 << 31) > 0) and not ((target & 1 << 26) > 0) # nie jest randomem i jest conditionalem
-        arr[9] = target & 0b1111 # ile razy
-        arr[8] = (target & 1 << 31) > 0 and arr[9] > 1 # jesli jest randomem i ileś razy z subsetu to bedzie differnt each time
-        arr[10] = not ((target & 1 << 31) > 0) and not arr[6] and not arr[7] and not arr[0] # jesli nie jest randomem i nie efektuje wszystkich z subsetu
+        arr[0] = (target & 1 << 25) > 0  # self
+        arr[1] = (target & 1 << 21) > 0  # herosy
+        arr[2] = (target & 1 << 22) > 0  # miniony
+        arr[3] = (target & 1 << 23) > 0  # our
+        arr[4] = (target & 1 << 24) > 0  # enemy
+        arr[5] = ((target & (1 << 27)) > 0) and ((target & (1 << 28)) > 0)  # adjacenty
+        arr[6] = not ((target & 1 << 31) > 0) and ((target & 1 << 26) > 0)  # nie jest randomem i nie jest conditionalem
+        arr[7] = not ((target & 1 << 31) > 0) and not ((target & 1 << 26) > 0)  # nie jest randomem i jest conditionalem
+        arr[9] = target & 0b1111  # ile razy
+        arr[8] = (target & 1 << 31) > 0 and arr[
+            9] > 1  # jesli jest randomem i ileś razy z subsetu to bedzie differnt each time
+        arr[10] = not ((target & 1 << 31) > 0) and not arr[6] and not arr[7] and not arr[
+            0]  # jesli nie jest randomem i nie efektuje wszystkich z subsetu
         print(arr)
         decodeResultStr(target)
         return arr
+
 
 def mapBattlecrySpells(card):
     currentBattlecryEffect = {}
@@ -342,14 +434,14 @@ def getTargetedActionDetails(x, currentBattlecryEffect, card):
 def getSummonDetails(x, card, currentEffect):
     selector = x.get_args(card)[0]
     currentEffect["Summon"] = 1
-    currentEffect["Times"] = x.times
+    currentEffect["SummonTimes"] = getTimes(x, card, currentEffect, "Summon")
     currentEffect["SummonTagets"] = decodeWithRequirements(decodeTarget(selector), card.data.requirements)
 
     try:
         toSummonID = x.get_args(card)[1]
         if type(toSummonID) is RandomEntourage:
             # TODO hmmm
-            currentEffect["FromEntourage"] = 1
+            currentEffect["SummonFromEntourage"] = 1
             sum_health = 0
             sum_atk = 0
             sum_cost = 0
@@ -364,27 +456,28 @@ def getSummonDetails(x, card, currentEffect):
             currentEffect["SummonedCalculatedValue"] = 1
         else:
             toSummon = Card(toSummonID)
-            if (type(toSummon) == fireplace.card.Weapon):
-                print("Weapon is being summoned!")
-                return
-            currentEffect["SummonedAvgHealth"] = toSummon.health
             currentEffect["SummonedAvgAttack"] = toSummon.atk
             currentEffect["SummonedAvgCost"] = toSummon.cost
+            if (type(toSummon) == fireplace.card.Weapon):
+                currentEffect["WeaponSummon"] = 1
+                currentEffect["SummonedAvgHealth"] = toSummon.durability
+            else:
+                currentEffect["SummonedAvgHealth"] = toSummon.health
     except:
-        currentEffect["UnknownSummon"] = True
+        currentEffect["UnknownSummon"] = 1
     currentEffect["SummonTagets"] = decodeTarget(selector)
 
 
 def getAmount(x, card, currEffect, key):
     if type(x.get_args(card)[-1]) is not int:
         print("DEPENDANT SOMETHING FOUND!!!")
-        currEffect["SetAmount"+key] = 0
+        currEffect["SetAmount" + key] = 0
         try:
             return x.get_args(card)[-1].evaluate(card)
         except:
-            currEffect["UnknownAmount"+key] = 1
+            currEffect["UnknownAmount" + key] = 1
     else:
-        currEffect["SetAmount"+key] = 1
+        currEffect["SetAmount" + key] = 1
         return x.get_args(card)[-1]
 
 
@@ -394,10 +487,10 @@ def getTimes(x, card, currEffect, key):
         try:
             times = times.evaluate(card)
         except:
-            currEffect["UnknownAmount"+key] = 1
-        currEffect["SetAmount"+key] = 0
+            currEffect["UnknownAmount" + key] = 1
+        currEffect["SetAmount" + key] = 0
     else:
-        currEffect["SetAmount"+key] = 1
+        currEffect["SetAmount" + key] = 1
     return times
 
 
@@ -616,8 +709,6 @@ def mapStartOfTurn(card):
             for y in x.actions:
                 getTargetedActionDetails(y, startOfTurnEffect, card)
     return startOfTurnEffect
-
-
 
 
 def mapOnAttack(card):
