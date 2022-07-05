@@ -701,15 +701,37 @@ def mapEndOfTurn(card):
     return endOfTurnEffect
 
     # TODO
-
+def iterateThroughActions(actions, effect, card):
+    for y in actions:
+        getTargetedActionDetails(y, effect, card)
 
 def mapConditional(card):
+
     conditionalEffect = {}
+
     # loop for detecting what combo does
     for x in card.data.scripts.combo:
         # effect = card.get_actions("combo")[0].get_target_args(card, card)[0]
         conditionalEffect["AlwaysGet"] = 0
         getTargetedActionDetails(x, conditionalEffect, card)
+
+    for x in card.data.scripts.play:
+        pass
+
+    for x in card.data.scripts.events:
+        if isinstance(x.trigger, fireplace.actions.Death):
+            iterateThroughActions(x.actions, conditionalEffect, card)
+        if isinstance(x.trigger, fireplace.actions.Hit):
+            iterateThroughActions(x.actions, conditionalEffect, card)
+        if isinstance(x.trigger, fireplace.actions.Draw):
+            iterateThroughActions(x.actions, conditionalEffect, card)
+        if isinstance(x.trigger, fireplace.actions.Heal):
+            iterateThroughActions(x.actions, conditionalEffect, card)
+        if isinstance(x.trigger, fireplace.actions.Play):
+            iterateThroughActions(x.actions, conditionalEffect, card)
+        if isinstance(x.trigger, fireplace.actions.Summon):
+            iterateThroughActions(x.actions, conditionalEffect, card)
+
     return conditionalEffect
     # TODO
 
