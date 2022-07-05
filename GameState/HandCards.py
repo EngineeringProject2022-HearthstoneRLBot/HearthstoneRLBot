@@ -497,8 +497,12 @@ def mapEndOfTurn(card):
 
 def mapConditional(card):
     conditionalEffect = {}
+    # loop for detecting what combo does
+    for x in card.data.scripts.combo:
+        # effect = card.get_actions("combo")[0].get_target_args(card, card)[0]
+        conditionalEffect["AlwaysGet"] = 0
+        getTargetedActionDetails(x, conditionalEffect, card)
     return conditionalEffect
-
     # TODO
 
 
@@ -514,19 +518,12 @@ def mapStartOfTurn(card):
 
 
 def mapOnAttack(card):
-    comboEffect = {}
-    inspireEffect = {}
     onAttackEffect = {}
 
     # snowchugger
     # cutpurse ale nie ma go chyba w kartach
     # alley armorsmith
     for x in card.data.scripts.enrage:
-        getTargetedActionDetails(x, onAttackEffect, card)
-    # loop for detecting what combo does
-    for x in card.data.scripts.combo:
-        # effect = card.get_actions("combo")[0].get_target_args(card, card)[0]
-        onAttackEffect["AlwaysGet"] = 0
         getTargetedActionDetails(x, onAttackEffect, card)
 
     for x in card.data.scripts.events:
@@ -544,5 +541,9 @@ def mapDeathrattle(card):
         found = True
         deathrattleEffect["AlwaysGet"] = 1
         getTargetedActionDetails(x, deathrattleEffect, card)
+    if not found:
+        for x in card.deathrattles:
+            deathrattleEffect["AlwaysGet"] = 1
+            getTargetedActionDetails(x, deathrattleEffect, card)
 
     return deathrattleEffect
