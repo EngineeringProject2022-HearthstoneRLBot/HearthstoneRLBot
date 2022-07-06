@@ -1,9 +1,9 @@
-from tensorflow.keras.models import Model
-from tensorflow.keras.layers import BatchNormalization
-from tensorflow.keras.layers import Conv2D
-from tensorflow.keras.layers import Dense
-from tensorflow.keras.layers import Flatten
-from tensorflow.keras.layers import Input
+from keras.models import Model
+from keras.layers import BatchNormalization
+from keras.layers import Conv2D
+from keras.layers import Dense
+from keras.layers import Flatten
+from keras.layers import Input
 import tensorflow as tf
 from tensorflow.python.keras.layers import ReLU, Add
 
