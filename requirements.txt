@@ -1,2 +1,6 @@
 fireplace2==1.0.0
 
+
+tensorflow~=2.9.1
+hearthstone~=5.56.0
+numpy~=1.22.3
