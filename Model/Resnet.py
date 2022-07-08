@@ -38,13 +38,12 @@ class Network:
         # return value
 
     def buildPolicyHead(self, inputs):
-        pass
-        # policy = Conv2D(filters=2, kernel_size=1, strides=1)(inputs)
-        # policy = self.bn_relu(policy)
-        # policy = Flatten()(policy)
-        # #initializer = tf.keras.initializers.RandomNormal(mean=0.05, stddev=0.001, seed=None)
-        # policy = Dense(256, activation='softmax')(policy)  # 32 x 8
-        # return policy
+        policy = Conv2D(filters=2, kernel_size=1, strides=1)(inputs)
+        policy = self.bn_relu(policy)
+        policy = Flatten()(policy)
+        #initializer = tf.keras.initializers.RandomNormal(mean=0.05, stddev=0.001, seed=None)
+        policy = Dense(260, activation='softmax')(policy)  # 32 x 8
+        return policy
 
     def buildConvLayer(self, inputs):
         conv = Conv2D(padding='same', filters=1024, strides=1, kernel_size=3)(inputs)
