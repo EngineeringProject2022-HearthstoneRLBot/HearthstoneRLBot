@@ -27,15 +27,14 @@ class Network:
         return model
 
     def buildValueHead(self, inputs):
-        pass
-        # value = Conv2D(filters=1, kernel_size=1, strides=1)(inputs)
-        # value = self.bn_relu(value)
-        # value = Flatten()(value)
-        # value = Dense(256)(value)
-        # value = ReLU()(value)
-        # #initializer = tf.keras.initializers.RandomNormal(mean=0.0, stddev=0.05, seed=None)
-        # value = Dense(1, activation='tanh')(value)
-        # return value
+        value = Conv2D(filters=1, kernel_size=1, strides=1)(inputs)
+        value = self.bn_relu(value)
+        value = Flatten()(value)
+        value = Dense(256)(value)
+        value = ReLU()(value)
+        #initializer = tf.keras.initializers.RandomNormal(mean=0.0, stddev=0.05, seed=None)
+        value = Dense(1, activation='tanh')(value)
+        return value
 
     def buildPolicyHead(self, inputs):
         policy = Conv2D(filters=2, kernel_size=1, strides=1)(inputs)

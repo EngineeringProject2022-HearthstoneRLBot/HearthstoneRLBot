@@ -352,7 +352,25 @@ def prepare_game(*args, **kwargs):
 
     return game
 
+def fireball_test():
+    game = prepare_game()
+    game.player1.health = 1
+    game.player2.health = 1
+    game.player1.discard_hand()
+    game.player2.discard_hand()
+    #fireball
+    game.player2.give("CS2_029")
+    for i in range(7):
+        #whisp
+        a = game.player1.give("CS2_231")
+        a.play()
+    game.end_turn()
+    for i in range(7):
+        #whisp
+        a = game.player2.give("CS2_231")
+        a.play()
 
+    return game
 
 def test_cogmaster():
     game = prepare_game()
@@ -593,9 +611,9 @@ def test_cogmaster():
 
 
 def main():
-
     gameStates = []
     cards.db.initialize()
+    fireball_test()
     test_cogmaster()
     play_game = input("Do you wish to play a full game? 1 - yes 0 - no")
     if play_game == 1:
