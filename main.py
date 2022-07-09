@@ -354,22 +354,30 @@ def prepare_game(*args, **kwargs):
 
 def fireball_test():
     game = prepare_game()
-    game.player1.health = 1
-    game.player2.health = 1
+
     game.player1.discard_hand()
     game.player2.discard_hand()
+    for i in range(29):
+        moon = game.player1.give("CS2_008")
+        moon.play(target = game.player1.hero)
     #fireball
-    game.player2.give("CS2_029")
+    fire = game.player2.give("CS2_029")
     for i in range(7):
         #whisp
         a = game.player1.give("CS2_231")
         a.play()
     game.end_turn()
+    for i in range(29):
+        moon = game.player2.give("CS2_008")
+        moon.play(target = game.player2.hero)
     for i in range(7):
         #whisp
         a = game.player2.give("CS2_231")
         a.play()
-
+    try:
+        fire.play(target=game.player1.hero)
+    except fireplace.exceptions.GameOver:
+        print("g")
     return game
 
 def test_cogmaster():
