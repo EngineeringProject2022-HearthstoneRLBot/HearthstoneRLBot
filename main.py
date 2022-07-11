@@ -675,64 +675,74 @@ def main():
 
     gameStates = []
     cards.db.initialize()
-    game = setup_game()
-    try:
-        for player in game.players:
-            current = GameState(game)
-            # Randomowy mulligan:
-            print("Can mulligan %r" % player.choice.cards)
-            mull_count = random.randint(0, len(player.choice.cards))
-            cards_to_mulligan = random.sample(player.choice.cards, mull_count)
-            player.choice.choose(*cards_to_mulligan)
-            gameStates.append(current)
+    fireball_test()
+    myNetwork = Resnet.Network()
+    model = myNetwork.getModel()
+    test_cogmaster()
 
-        while True:
-            player = game.current_player
-            current = GameState(game)
-            while True:
-                heropower = player.hero.power
-                if heropower.is_usable() and random.random() < 0.1:
-                    if heropower.requires_target():
-                        heropower.use(target=random.choice(heropower.targets))
-                    else:
-                        heropower.use()
-                    # 3. Tutaj do current wrzuć nowy stan gry (po użyciu umiejętności)
-                    continue
+    # play_game = input("Do you wish to play a full game? 1 - yes 0 - no")
+    # if play_game == 1:
+    #     game = setup_game()
+    #     try:
+    #         for player in game.players:
+    #             current = GameState(game)
+    #             # 1. Tutaj ustawić do current karty do wyboru
+    #             print("Can mulligan %r" % player.choice.cards)
+    #             mull_count = random.randint(0, len(player.choice.cards))
+    #             cards_to_mulligan = random.sample(player.choice.cards, mull_count)
+    #             player.choice.choose(*cards_to_mulligan)
+    #             gameStates.append(current)
+    #
+    #         while True:
+    #             player = game.current_player
+    #
+    #             current = GameState(game)
+    #             # 2. Tutaj do current wrzucić aktualny stan gry
+    #             while True:
+    #                 heropower = player.hero.power
+    #                 if heropower.is_usable() and random.random() < 0.1:
+    #                     if heropower.requires_target():
+    #                         heropower.use(target=random.choice(heropower.targets))
+    #                     else:
+    #                         heropower.use()
+    #                     # 3. Tutaj do current wrzuć nowy stan gry (po użyciu umiejętności)
+    #                     continue
+    #
+    #                 # iterate over our hand and play whatever is playable
+    #                 for card in player.hand:
+    #                     if card.is_playable() and random.random() < 0.5:
+    #                         target = None
+    #                         if card.must_choose_one:
+    #                             card = random.choice(card.choose_cards)
+    #                         if card.requires_target():
+    #                             target = random.choice(card.targets)
+    #                         print("Playing %r on %r" % (card, target))
+    #                         card.play(target=target)
+    #
+    #                         # 4. Tutaj do current wrzuć nowy stan gry (po użyciu karty)
+    #
+    #                         if player.choice:
+    #                             choice = random.choice(player.choice.cards)
+    #                             print("Choosing card %r" % (choice))
+    #                             player.choice.choose(choice)
+    #                         # 5. Tutaj do current wrzuć nowy stan gry (po użyciu karty i wyborze)
+    #                         continue
+    #
+    #                 # Randomly attack with whatever can attack
+    #                 for character in player.characters:
+    #                     if character.can_attack():
+    #                         character.attack(random.choice(character.targets))
+    #                         if character.buffs:
+    #                             print("gay")
+    #
+    #                     # 6. Tutaj do current wrzuć nowy stan gry (po ataku)
+    #
+    #                 break
+    #
+    #             game.end_turn()
+    #     except GameOver:
+    #         print("Game ended");
 
-                # iterate over our hand and play whatever is playable
-                for card in player.hand:
-                    if card.is_playable() and random.random() < 0.5:
-                        target = None
-                        if card.must_choose_one:
-                            card = random.choice(card.choose_cards)
-                        if card.requires_target():
-                            target = random.choice(card.targets)
-                        print("Playing %r on %r" % (card, target))
-                        card.play(target=target)
-
-                        # 4. Tutaj do current wrzuć nowy stan gry (po użyciu karty)
-
-                        if player.choice:
-                            choice = random.choice(player.choice.cards)
-                            print("Choosing card %r" % (choice))
-                            player.choice.choose(choice)
-                        # 5. Tutaj do current wrzuć nowy stan gry (po użyciu karty i wyborze)
-                        continue
-
-                # Randomly attack with whatever can attack
-                for character in player.characters:
-                    if character.can_attack():
-                        character.attack(random.choice(character.targets))
-                        if character.buffs:
-                            print("gay")
-
-                    # 6. Tutaj do current wrzuć nowy stan gry (po ataku)
-
-                break
-
-            game.end_turn()
-    except GameOver:
-        print("Game ended");
 
 
 # test1
