@@ -1,4 +1,5 @@
 import operator
+import types
 
 import fireplace
 from fireplace.actions import SetTag, Silence, Heal, Hit, Destroy, GainArmor, Draw, Discard, Summon, Bounce
@@ -82,7 +83,7 @@ class HandCard:
 
     # to serve as template for extracting more complex features
     def mapComplexFeatures(self, card):
-        if card.data.strings[GameTag.CARDNAME]['enUS'] == "Soulfire":
+        if card.data.strings[GameTag.CARDNAME]['enUS'] == "Arcane Missiles":
             # use as a breakpoint for catching a specific card in the list
             asda = 33
         battlecrySpellEffectPlane = mapBattlecrySpells(card)
@@ -280,8 +281,12 @@ def mapBattlecrySpells(card):
     #             currentBattlecryEffect["AlwaysGet"] = 0
     #             break
     try:
-        for x in card.data.scripts.play:
-            getTargetedActionDetails(x, currentBattlecryEffect, card)
+        if not isinstance(card.data.scripts.play, types.FunctionType):
+            for x in card.data.scripts.play:
+                getTargetedActionDetails(x, currentBattlecryEffect, card)
+        else:
+            for x in card.data.scripts.play(card):
+                getTargetedActionDetails(x, currentBattlecryEffect, card)
     except TypeError:
         print('exception')
     return currentBattlecryEffect
