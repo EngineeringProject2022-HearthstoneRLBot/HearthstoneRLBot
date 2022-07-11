@@ -560,7 +560,8 @@ def test_cogmaster():
         "NEW1_007",
         "EX1_571",
         "EX1_578",
-        "EX1_506"
+        "EX1_506",
+        "EX1_277"
     ]
     game.player1.discard_hand()
     cardList = []
