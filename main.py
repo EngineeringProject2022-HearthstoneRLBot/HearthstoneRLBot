@@ -628,6 +628,7 @@ def main():
     myNetwork = Resnet.Network()
     model = myNetwork.getModel()
     test_cogmaster()
+
     # play_game = input("Do you wish to play a full game? 1 - yes 0 - no")
     # if play_game == 1:
     #     game = setup_game()
