@@ -738,7 +738,8 @@ def mapStartOfTurn(card):
 
 def mapOnAttack(card):
     onAttackEffect = {}
-
+    if card.type == 5:
+        return onAttackEffect
     # snowchugger
     # cutpurse ale nie ma go chyba w kartach
     # alley armorsmith
@@ -755,6 +756,8 @@ def mapOnAttack(card):
 
 def mapDeathrattle(card):
     deathrattleEffect = {}
+    if card.type == 5:
+        return deathrattleEffect
     found = False
     for x in card.data.scripts.deathrattle:
         found = True
