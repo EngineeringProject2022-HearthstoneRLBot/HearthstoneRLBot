@@ -662,7 +662,7 @@ def decodeTarget(target):
         return 0
     if isinstance(target, fireplace.dsl.selector.BoardPositionSelector):
         return decodeBoardPosition(target.direction)
-    return " Unknown "  # wyjatek i dobrze
+    return 1 << 20 #20 pozycja to unknown target
 
 
 def decodeResultStr(result):
