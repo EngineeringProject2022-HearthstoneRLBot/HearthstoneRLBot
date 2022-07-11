@@ -539,7 +539,10 @@ def getBuffDetails(x, currEffect, card):
             currEffect["AddValue"] = 1
             currEffect["SetValue"] = 0
             currEffect["MultiplyValue"] = 0
-        currEffect["Permanent"] = 1 if int(buff.one_turn_effect) == 0 else 0
+        if hasattr(buff, "one_turn_effect"):
+            currEffect["Permanent"] = 1 if int(buff.one_turn_effect) == 0 else 0
+        else:
+            currEffect["Permanent"] = 1
     else:
         currEffect["Permanent"] = 1
         currEffect["AddValue"] = 1

@@ -285,10 +285,12 @@ def setup_game():
     from fireplace.game import Game
     from fireplace.player import Player
 
-    deck1 = random_draft(CardClass.MAGE)
-    deck2 = random_draft(CardClass.WARRIOR)
-    player1 = Player("Player1", deck1, CardClass.MAGE.default_hero)
-    player2 = Player("Player2", deck2, CardClass.WARRIOR.default_hero)
+    randomClassOne = random.randrange(2, 10)
+    randomClassTwo = random.randrange(2, 10)
+    deck1 = random_draft(CardClass(randomClassOne))
+    deck2 = random_draft(CardClass(randomClassTwo))
+    player1 = Player("Player1", deck1, CardClass(randomClassOne).default_hero)
+    player2 = Player("Player2", deck2, CardClass(randomClassTwo).default_hero)
 
     game = Game(players=(player1, player2))
     game.start()
@@ -675,6 +677,9 @@ def main():
 
     gameStates = []
     cards.db.initialize()
+
+    continousTesting()
+
     fireball_test()
     myNetwork = Resnet.Network()
     model = myNetwork.getModel()
