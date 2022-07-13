@@ -64,6 +64,19 @@ class HandCard:
         self.battlecrySpellEffectPlane, self.endOfTurnEffectPlane, self.startOfTurnEffectPlane, self.conditionalEffectPlane, self.onAttackPlane, self.deathrattleEffectPlane = self.mapComplexFeatures(
             card)
 
+    def convert_matrix(self, matrix):
+        matrix = np.reshape(matrix, (13,13))
+        #matrix = np.pad(matrix, 1, mode='constant')
+        return matrix
+
+    def createMegaMatrix(self, matrices):
+        row1 = np.hstack((matrices[0:3]))
+        row2 = np.hstack((matrices[3:6]))
+        row3 = np.hstack((matrices[6:9]))
+        full = np.concatenate((row1, row2, row3))
+        full = np.pad(full, 1, mode='constant')
+        return full
+
     def encode_state(self):
         basicFeatures = np.zeros(169)
         basicFeatures[0:6] = [x for x in self.handCardFeatures.values()]
@@ -78,7 +91,21 @@ class HandCard:
         Deathrattle = encode_complex_plane(self.deathrattleEffectPlane)
         OnAttack = encode_complex_plane(self.onAttackPlane)
         OtherConditional = encode_complex_plane(self.conditionalEffectPlane)
-        print("test")
+
+        basicFeatures = self.convert_matrix(basicFeatures)
+        BattlecrySpell = self.convert_matrix(BattlecrySpell)
+        EoT = self.convert_matrix(EoT)
+        SoT = self.convert_matrix(SoT)
+        Deathrattle = self.convert_matrix(Deathrattle)
+        OnAttack = self.convert_matrix(OnAttack)
+        OtherConditional = self.convert_matrix(OtherConditional)
+        filter1 = self.convert_matrix(np.zeros(169))
+        filter2 = self.convert_matrix(np.zeros(169))
+
+        matrices = [basicFeatures, BattlecrySpell, EoT, SoT, Deathrattle, OnAttack, OtherConditional, filter1, filter2]
+        matrix = self.createMegaMatrix(matrices)
+        return matrix
+
 
     # to serve as template for extracting more complex features
     def mapComplexFeatures(self, card):
@@ -747,7 +774,7 @@ def mapDeathrattle(card):
         found = True
         deathrattleEffect["AlwaysGet"] = 1
         getTargetedActionDetails(x, deathrattleEffect, card)
-    if not found:
+    if not found and hasattr(card, "deathrattles"):
         for x in card.deathrattles:
             deathrattleEffect["AlwaysGet"] = 1
             getTargetedActionDetails(x, deathrattleEffect, card)
