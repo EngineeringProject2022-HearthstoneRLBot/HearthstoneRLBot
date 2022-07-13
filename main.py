@@ -1,5 +1,6 @@
 import operator
 import sys
+from copy import deepcopy
 
 import fireplace
 from fireplace import cards
@@ -623,64 +624,70 @@ def test_cogmaster():
     # blessedchamp.play(target=cogmaster)
     # assert cogmaster.atk == 4
 
+def testGame(game):
+    try:
+        while True:
+            player = game.current_player
+            current = GameState(game)
+            while True:
+                heropower = player.hero.power
+                if heropower.is_usable() and random.random() < 0.1:
+                    if heropower.requires_target():
+                        heropower.use(target=random.choice(heropower.targets))
+                    else:
+                        heropower.use()
+                    continue
+
+                for card in player.hand:
+                    if card.is_playable() and random.random() < 0.5:
+                        target = None
+                        if card.must_choose_one:
+                            card = random.choice(card.choose_cards)
+                        if card.requires_target():
+                            target = random.choice(card.targets)
+                        card.play(target=target)
+
+                        if player.choice:
+                            choice = random.choice(player.choice.cards)
+                            print("Choosing card %r" % (choice))
+                            player.choice.choose(choice)
+                        continue
+                for character in player.characters:
+                    if character.can_attack():
+                        character.attack(random.choice(character.targets))
+                        if character.buffs:
+                            print("gay")
+                break
+            game.end_turn()
+    except fireplace.exceptions.InvalidAction:
+        print("INVALID ACTION")
+
+
 def continousTesting():
     gameStates = []
-    while True:
-
-        if 1==1:
-            game = setup_game()
-            try:
-                for player in game.players:
-                    current = GameState(game)
-                    mull_count = random.randint(0, len(player.choice.cards))
-                    cards_to_mulligan = random.sample(player.choice.cards, mull_count)
-                    player.choice.choose(*cards_to_mulligan)
-                    gameStates.append(current)
-
-                while True:
-                    player = game.current_player
-                    current = GameState(game)
-                    while True:
-                        heropower = player.hero.power
-                        if heropower.is_usable() and random.random() < 0.1:
-                            if heropower.requires_target():
-                                heropower.use(target=random.choice(heropower.targets))
-                            else:
-                                heropower.use()
-                            continue
-
-                        for card in player.hand:
-                            if card.is_playable() and random.random() < 0.5:
-                                target = None
-                                if card.must_choose_one:
-                                    card = random.choice(card.choose_cards)
-                                if card.requires_target():
-                                    target = random.choice(card.targets)
-                                card.play(target=target)
-
-                                if player.choice:
-                                    choice = random.choice(player.choice.cards)
-                                    print("Choosing card %r" % (choice))
-                                    player.choice.choose(choice)
-                                continue
-                        for character in player.characters:
-                            if character.can_attack():
-                                character.attack(random.choice(character.targets))
-                                if character.buffs:
-                                    print("gay")
-                        break
-                    game.end_turn()
-            except GameOver:
-                print("Game ended");
+    #while True:
+    try:
+        game = setup_game()
+        for player in game.players:
+            current = GameState(game)
+            mull_count = random.randint(0, len(player.choice.cards))
+            cards_to_mulligan = random.sample(player.choice.cards, mull_count)
+            player.choice.choose(*cards_to_mulligan)
+            gameStates.append(current)
+        game2 = deepcopy(game)
+        game3 = deepcopy(game)
+        testGame(game)
+        testGame(game2)
+        testGame(game3)
+    except GameOver:
+        print("Game ended");
 
 
 def main():
 
     gameStates = []
     cards.db.initialize()
-
     continousTesting()
-
     fireball_test()
     myNetwork = Resnet.Network()
     model = myNetwork.getModel()
