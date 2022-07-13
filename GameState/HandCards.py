@@ -120,12 +120,12 @@ class HandCard:
         onAttackPlane = mapOnAttack(card)
         deathrattleEffectPlane = mapDeathrattle(card)
 
-        print("BTC " + card.data.strings[GameTag.CARDNAME]['enUS'] + "  " + str(battlecrySpellEffectPlane))
-        print("EOT " + card.data.strings[GameTag.CARDNAME]['enUS'] + "  " + str(endOfTurnEffectPlane))
-        print("SOT " + card.data.strings[GameTag.CARDNAME]['enUS'] + "  " + str(startOfTurnEffectPlane))
-        print("CON " + card.data.strings[GameTag.CARDNAME]['enUS'] + "  " + str(conditionalEffectPlane))
-        print("ONA " + card.data.strings[GameTag.CARDNAME]['enUS'] + "  " + str(onAttackPlane))
-        print("DR " + card.data.strings[GameTag.CARDNAME]['enUS'] + "  " + str(deathrattleEffectPlane))
+        #print("BTC " + card.data.strings[GameTag.CARDNAME]['enUS'] + "  " + str(battlecrySpellEffectPlane))
+        #print("EOT " + card.data.strings[GameTag.CARDNAME]['enUS'] + "  " + str(endOfTurnEffectPlane))
+        #print("SOT " + card.data.strings[GameTag.CARDNAME]['enUS'] + "  " + str(startOfTurnEffectPlane))
+        #print("CON " + card.data.strings[GameTag.CARDNAME]['enUS'] + "  " + str(conditionalEffectPlane))
+        #print("ONA " + card.data.strings[GameTag.CARDNAME]['enUS'] + "  " + str(onAttackPlane))
+        #print("DR " + card.data.strings[GameTag.CARDNAME]['enUS'] + "  " + str(deathrattleEffectPlane))
         # buff.data.scripts.atk!!!
         return battlecrySpellEffectPlane, endOfTurnEffectPlane, startOfTurnEffectPlane, conditionalEffectPlane, onAttackPlane, deathrattleEffectPlane
 
@@ -315,7 +315,7 @@ def mapBattlecrySpells(card):
             for x in card.data.scripts.play(card):
                 getTargetedActionDetails(x, currentBattlecryEffect, card)
     except TypeError:
-        print('exception')
+        None
     return currentBattlecryEffect
 
     # TODO
@@ -466,8 +466,8 @@ def getTargetedActionDetails(x, currentBattlecryEffect, card):
     elif isinstance(x, Bounce):
         currentBattlecryEffect["BounceTargets"] = decodeTarget(selector)
         currentBattlecryEffect["BounceCards"] = 1
-    if selector is not None:
-        decodeResultStr(decodeWithRequirements(decodeTarget(selector), card.data.requirements))
+    #if selector is not None:
+        #decodeResultStr(decodeWithRequirements(decodeTarget(selector), card.data.requirements))
 
 
 def getSummonDetails(x, card, currentEffect):
@@ -509,7 +509,7 @@ def getSummonDetails(x, card, currentEffect):
 
 def getAmount(x, card, currEffect, key):
     if type(x.get_args(card)[-1]) is not int:
-        print("DEPENDANT SOMETHING FOUND!!!")
+        #print("DEPENDANT SOMETHING FOUND!!!")
         currEffect["SetAmount" + key] = 0
         try:
             return x.get_args(card)[-1].evaluate(card)

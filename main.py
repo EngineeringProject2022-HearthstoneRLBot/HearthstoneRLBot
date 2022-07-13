@@ -1,9 +1,12 @@
 import operator
 import sys
 from copy import deepcopy
+from logging import getLogger
+
+#from venv import logger
 
 import fireplace
-from fireplace import cards
+from fireplace import cards, logging
 from fireplace.exceptions import GameOver
 from fireplace.utils import play_full_game
 import os.path
@@ -649,14 +652,14 @@ def testGame(game):
 
                         if player.choice:
                             choice = random.choice(player.choice.cards)
-                            print("Choosing card %r" % (choice))
+                            #print("Choosing card %r" % (choice))
                             player.choice.choose(choice)
                         continue
                 for character in player.characters:
                     if character.can_attack():
                         character.attack(random.choice(character.targets))
-                        if character.buffs:
-                            print("gay")
+                        #if character.buffs:
+                            #print("gay")
                 break
             game.end_turn()
     except fireplace.exceptions.InvalidAction:
@@ -665,27 +668,30 @@ def testGame(game):
 
 def continousTesting():
     gameStates = []
-    #while True:
-    try:
-        game = setup_game()
-        for player in game.players:
-            current = GameState(game)
-            mull_count = random.randint(0, len(player.choice.cards))
-            cards_to_mulligan = random.sample(player.choice.cards, mull_count)
-            player.choice.choose(*cards_to_mulligan)
-            gameStates.append(current)
-        game2 = deepcopy(game)
-        game3 = deepcopy(game)
-        testGame(game)
-        testGame(game2)
-        testGame(game3)
-    except GameOver:
-        print("Game ended");
+    while True:
+        try:
+            game = setup_game()
+            for player in game.players:
+                current = GameState(game)
+                mull_count = random.randint(0, len(player.choice.cards))
+                cards_to_mulligan = random.sample(player.choice.cards, mull_count)
+                player.choice.choose(*cards_to_mulligan)
+                gameStates.append(current)
+            testGame(game)
+            #game2 = deepcopy(game)
+            #game3 = deepcopy(game)
+            #testGame(game)
+            #testGame(game2)
+            #testGame(game3)
+        except GameOver:
+            print("Game ended");
 
 
 def main():
-
     gameStates = []
+    logger = logging.log
+    logger.disabled = True
+    logger.propagate = False
     cards.db.initialize()
     continousTesting()
     fireball_test()
