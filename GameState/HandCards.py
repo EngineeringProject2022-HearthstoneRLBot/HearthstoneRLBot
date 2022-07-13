@@ -1,4 +1,5 @@
 import operator
+import types
 
 import fireplace
 from fireplace.actions import SetTag, Silence, Heal, Hit, Destroy, GainArmor, Draw, Discard, Summon, Bounce
@@ -109,7 +110,7 @@ class HandCard:
 
     # to serve as template for extracting more complex features
     def mapComplexFeatures(self, card):
-        if card.data.strings[GameTag.CARDNAME]['enUS'] == "Soulfire":
+        if card.data.strings[GameTag.CARDNAME]['enUS'] == "Arcane Missiles":
             # use as a breakpoint for catching a specific card in the list
             asda = 33
         battlecrySpellEffectPlane = mapBattlecrySpells(card)
@@ -294,8 +295,8 @@ def encode_targets(target, length=16):
             9] > 1  # jesli jest randomem i ileś razy z subsetu to bedzie differnt each time
         arr[10] = not ((target & 1 << 31) > 0) and not arr[6] and not arr[7] and not arr[
             0]  # jesli nie jest randomem i nie efektuje wszystkich z subsetu
-        print(arr)
-        decodeResultStr(target)
+        #print(arr)
+        #decodeResultStr(target)
         return arr
 
 
@@ -306,16 +307,15 @@ def mapBattlecrySpells(card):
     #         if type(x) is PlayReq and x is not PlayReq.REQ_TARGET_TO_PLAY:
     #             currentBattlecryEffect["AlwaysGet"] = 0
     #             break
-    for x in card.data.scripts.play:
-        # if isinstance(x, fireplace.actions.Buff) or (
-        #        isinstance(x, fireplace.dsl.evaluator.Find) and isinstance(x._if, fireplace.actions.Buff)):
-        #    getBuffDetails(x, currentBattlecryEffect, card)
-        # if isinstance(x, fireplace.actions.TargetedAction) or (
-        #         isinstance(x, fireplace.dsl.evaluator.Find) and isinstance(x._if, fireplace.actions.TargetedAction)):
-        getTargetedActionDetails(x, currentBattlecryEffect, card)
-        # if isinstance(x, fireplace.actions.TargetedAction) or (
-        #        isinstance(x, fireplace.dsl.evaluator.Find) and isinstance(x._if, fireplace.actions.TargetedAction)):
-        #    getTargetedActionDetails(x, currentBattlecryEffect, card)
+    try:
+        if not isinstance(card.data.scripts.play, types.FunctionType):
+            for x in card.data.scripts.play:
+                getTargetedActionDetails(x, currentBattlecryEffect, card)
+        else:
+            for x in card.data.scripts.play(card):
+                getTargetedActionDetails(x, currentBattlecryEffect, card)
+    except TypeError:
+        print('exception')
     return currentBattlecryEffect
 
     # TODO
@@ -342,7 +342,11 @@ def getTargetedActionDetails(x, currentBattlecryEffect, card):
         x = x[-1]
     if hasattr(x, "actions"):
         x = x.actions[-1]
-    selector = x.get_args(card)[0]
+
+    if hasattr(x, 'get_args') and len(x.get_args(card))!=0:
+        selector = x.get_args(card)[0]
+    else:
+        selector = None
 
     # targets = x.get_targets(card, selector)
     # if isinstance(selector, fireplace.dsl.selector.FuncSelector) and len(targets) == 1 and targets[0] == card:
@@ -567,7 +571,10 @@ def getBuffDetails(x, currEffect, card):
             currEffect["AddValue"] = 1
             currEffect["SetValue"] = 0
             currEffect["MultiplyValue"] = 0
-        currEffect["Permanent"] = 1 if int(buff.one_turn_effect) == 0 else 0
+        if hasattr(buff, "one_turn_effect"):
+            currEffect["Permanent"] = 1 if int(buff.one_turn_effect) == 0 else 0
+        else:
+            currEffect["Permanent"] = 1
     else:
         currEffect["Permanent"] = 1
         currEffect["AddValue"] = 1
@@ -690,7 +697,7 @@ def decodeTarget(target):
         return 0
     if isinstance(target, fireplace.dsl.selector.BoardPositionSelector):
         return decodeBoardPosition(target.direction)
-    return " Unknown "  # wyjatek i dobrze
+    return 1 << 20 #20 pozycja to unknown target
 
 
 def decodeResultStr(result):
@@ -727,16 +734,30 @@ def mapEndOfTurn(card):
 
     return endOfTurnEffect
 
-    # TODO
-
-
 def mapConditional(card):
+
     conditionalEffect = {}
+
     # loop for detecting what combo does
     for x in card.data.scripts.combo:
         # effect = card.get_actions("combo")[0].get_target_args(card, card)[0]
         conditionalEffect["AlwaysGet"] = 0
         getTargetedActionDetails(x, conditionalEffect, card)
+
+    for x in card.data.scripts.events:
+        if isinstance(x.trigger, fireplace.actions.Death):
+            getTargetedActionDetails(x.actions[0], conditionalEffect, card)
+        if isinstance(x.trigger, fireplace.actions.Hit):
+            getTargetedActionDetails(x.actions[0], conditionalEffect, card)
+        if isinstance(x.trigger, fireplace.actions.Draw):
+            getTargetedActionDetails(x.actions[0], conditionalEffect, card)
+        if isinstance(x.trigger, fireplace.actions.Heal):
+            getTargetedActionDetails(x.actions[0], conditionalEffect, card)
+        if isinstance(x.trigger, fireplace.actions.Play):
+            getTargetedActionDetails(x.actions[0], conditionalEffect, card)
+        if isinstance(x.trigger, fireplace.actions.Summon):
+            getTargetedActionDetails(x.actions[0], conditionalEffect, card)
+
     return conditionalEffect
     # TODO
 
@@ -752,7 +773,8 @@ def mapStartOfTurn(card):
 
 def mapOnAttack(card):
     onAttackEffect = {}
-
+    if card.type == 5:
+        return onAttackEffect
     # snowchugger
     # cutpurse ale nie ma go chyba w kartach
     # alley armorsmith
@@ -769,12 +791,16 @@ def mapOnAttack(card):
 
 def mapDeathrattle(card):
     deathrattleEffect = {}
+    if card.type == 5:
+        return deathrattleEffect
     found = False
     for x in card.data.scripts.deathrattle:
         found = True
         deathrattleEffect["AlwaysGet"] = 1
         getTargetedActionDetails(x, deathrattleEffect, card)
+
     if not found and hasattr(card, "deathrattles"):
+
         for x in card.deathrattles:
             deathrattleEffect["AlwaysGet"] = 1
             getTargetedActionDetails(x, deathrattleEffect, card)

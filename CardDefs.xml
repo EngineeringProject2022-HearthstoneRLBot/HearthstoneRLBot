@@ -40741,6 +40741,7 @@ until next turn.</enUS>
 		<Tag enumID="199" name="CLASS" type="Int" value="12"/>
 		<Tag enumID="202" name="CARDTYPE" type="Int" value="4"/>
 	</Entity>
+
 	<Entity CardID="LOE_092" ID="2964" version="2">
 		<Tag enumID="185" name="CARDNAME" type="LocString">
 			<enUS>Arch-Thief Rafaam</enUS>
@@ -40764,6 +40765,71 @@ until next turn.</enUS>
 		<Tag enumID="415" name="DISCOVER" type="Int" value="1"/>
 		<Tag enumID="1342" name="USE_DISCOVER_VISUALS" type="Int" value="1"/>
 	</Entity>
+    	<Entity CardID="LOEA16_3" ID="19614" version="2">
+		<Tag enumID="185" name="CARDNAME" type="LocString">
+			<enUS>Lantern of Power</enUS>
+		</Tag>
+		<Tag enumID="184" name="CARDTEXT" type="LocString">
+			<enUS>Give a minion +10/+10.</enUS>
+		</Tag>
+		<Tag enumID="48" name="COST" type="Int" value="10"/>
+		<Tag enumID="183" name="CARD_SET" type="Int" value="20"/>
+		<Tag enumID="199" name="CLASS" type="Int" value="12"/>
+		<Tag enumID="202" name="CARDTYPE" type="Int" value="5"/>
+		<Tag enumID="1107" name="HIDE_WATERMARK" type="Int" value="1"/>
+	</Entity>
+	<Entity CardID="LOEA16_3e" ID="36450" version="2">
+		<Tag enumID="185" name="CARDNAME" type="LocString">
+			<enUS>Lantern of Power</enUS>
+		</Tag>
+		<Tag enumID="184" name="CARDTEXT" type="LocString">
+			<enUS>+10/+10.</enUS>
+		</Tag>
+		<Tag enumID="183" name="CARD_SET" type="Int" value="20"/>
+		<Tag enumID="199" name="CLASS" type="Int" value="12"/>
+		<Tag enumID="202" name="CARDTYPE" type="Int" value="6"/>
+		<Tag enumID="1107" name="HIDE_WATERMARK" type="Int" value="1"/>
+	</Entity>
+	<Entity CardID="LOEA16_4" ID="19615" version="2">
+		<Tag enumID="185" name="CARDNAME" type="LocString">
+			<enUS>Timepiece of Horror</enUS>
+		</Tag>
+		<Tag enumID="184" name="CARDTEXT" type="LocString">
+			<enUS>Deal $10 damage randomly split among all enemies.</enUS>
+		</Tag>
+		<Tag enumID="48" name="COST" type="Int" value="10"/>
+		<Tag enumID="183" name="CARD_SET" type="Int" value="20"/>
+		<Tag enumID="199" name="CLASS" type="Int" value="12"/>
+		<Tag enumID="202" name="CARDTYPE" type="Int" value="5"/>
+		<Tag enumID="349" name="ImmuneToSpellpower" type="Int" value="1"/>
+		<Tag enumID="1107" name="HIDE_WATERMARK" type="Int" value="1"/>
+	</Entity>
+	<Entity CardID="LOEA16_5" ID="19616" version="2">
+		<Tag enumID="185" name="CARDNAME" type="LocString">
+			<enUS>Mirror of Doom</enUS>
+		</Tag>
+		<Tag enumID="184" name="CARDTEXT" type="LocString">
+			<enUS>Fill your board with 3/3 Mummy Zombies.</enUS>
+		</Tag>
+		<Tag enumID="48" name="COST" type="Int" value="10"/>
+		<Tag enumID="183" name="CARD_SET" type="Int" value="20"/>
+		<Tag enumID="199" name="CLASS" type="Int" value="12"/>
+		<Tag enumID="202" name="CARDTYPE" type="Int" value="5"/>
+		<Tag enumID="1107" name="HIDE_WATERMARK" type="Int" value="1"/>
+	</Entity>
+	<Entity CardID="LOEA16_5t" ID="36452" version="2">
+		<Tag enumID="185" name="CARDNAME" type="LocString">
+			<enUS>Mummy Zombie</enUS>
+		</Tag>
+		<Tag enumID="45" name="HEALTH" type="Int" value="3"/>
+		<Tag enumID="47" name="ATK" type="Int" value="3"/>
+		<Tag enumID="48" name="COST" type="Int" value="3"/>
+		<Tag enumID="183" name="CARD_SET" type="Int" value="20"/>
+		<Tag enumID="199" name="CLASS" type="Int" value="12"/>
+		<Tag enumID="202" name="CARDTYPE" type="Int" value="4"/>
+		<Tag enumID="1107" name="HIDE_WATERMARK" type="Int" value="1"/>
+	</Entity>
+
 	<Entity CardID="LOE_104" ID="3015" version="2">
 		<Tag enumID="185" name="CARDNAME" type="LocString">
 			<enUS>Entomb</enUS>
