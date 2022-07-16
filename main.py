@@ -6,6 +6,7 @@ from logging import getLogger
 #from venv import logger
 
 import fireplace
+import numpy as np
 from fireplace import cards, logging
 from fireplace.exceptions import GameOver
 from fireplace.utils import play_full_game
@@ -20,6 +21,7 @@ from xml.etree import ElementTree
 from hearthstone.enums import CardClass, CardType  # noqa
 
 # Autogenerate the list of cardset modules
+from GameCommunication import playTurn
 from GameState import HandCard
 from GameState import Hero
 from Model import Resnet
@@ -652,37 +654,39 @@ def testGame(game):
 
                         if player.choice:
                             choice = random.choice(player.choice.cards)
-                            #print("Choosing card %r" % (choice))
                             player.choice.choose(choice)
                         continue
                 for character in player.characters:
                     if character.can_attack():
                         character.attack(random.choice(character.targets))
-                        #if character.buffs:
-                            #print("gay")
                 break
             game.end_turn()
     except fireplace.exceptions.InvalidAction:
         print("INVALID ACTION")
 
+def mulliganRandomChoice(game):
+    for player in game.players:
+        current = GameState(game)
+        mull_count = random.randint(0, len(player.choice.cards))
+        cards_to_mulligan = random.sample(player.choice.cards, mull_count)
+        player.choice.choose(*cards_to_mulligan)
 
-def continousTesting():
-    gameStates = []
+def networkInputTesting():
     while True:
         try:
             game = setup_game()
-            for player in game.players:
-                current = GameState(game)
-                mull_count = random.randint(0, len(player.choice.cards))
-                cards_to_mulligan = random.sample(player.choice.cards, mull_count)
-                player.choice.choose(*cards_to_mulligan)
-                gameStates.append(current)
+            mulliganRandomChoice(game)
+            while True:
+                playTurn(game, np.random.rand(252))
+        except GameOver:
+            print("Game ended")
+
+def continousTesting():
+    while True:
+        try:
+            game = setup_game()
+            mulliganRandomChoice(game)
             testGame(game)
-            #game2 = deepcopy(game)
-            #game3 = deepcopy(game)
-            #testGame(game)
-            #testGame(game2)
-            #testGame(game3)
         except GameOver:
             print("Game ended");
 
@@ -693,74 +697,12 @@ def main():
     logger.disabled = True
     logger.propagate = False
     cards.db.initialize()
-    continousTesting()
+    networkInputTesting()
+    #continousTesting()
     fireball_test()
     myNetwork = Resnet.Network()
     model = myNetwork.getModel()
     test_cogmaster()
-
-    # play_game = input("Do you wish to play a full game? 1 - yes 0 - no")
-    # if play_game == 1:
-    #     game = setup_game()
-    #     try:
-    #         for player in game.players:
-    #             current = GameState(game)
-    #             # 1. Tutaj ustawić do current karty do wyboru
-    #             print("Can mulligan %r" % player.choice.cards)
-    #             mull_count = random.randint(0, len(player.choice.cards))
-    #             cards_to_mulligan = random.sample(player.choice.cards, mull_count)
-    #             player.choice.choose(*cards_to_mulligan)
-    #             gameStates.append(current)
-    #
-    #         while True:
-    #             player = game.current_player
-    #
-    #             current = GameState(game)
-    #             # 2. Tutaj do current wrzucić aktualny stan gry
-    #             while True:
-    #                 heropower = player.hero.power
-    #                 if heropower.is_usable() and random.random() < 0.1:
-    #                     if heropower.requires_target():
-    #                         heropower.use(target=random.choice(heropower.targets))
-    #                     else:
-    #                         heropower.use()
-    #                     # 3. Tutaj do current wrzuć nowy stan gry (po użyciu umiejętności)
-    #                     continue
-    #
-    #                 # iterate over our hand and play whatever is playable
-    #                 for card in player.hand:
-    #                     if card.is_playable() and random.random() < 0.5:
-    #                         target = None
-    #                         if card.must_choose_one:
-    #                             card = random.choice(card.choose_cards)
-    #                         if card.requires_target():
-    #                             target = random.choice(card.targets)
-    #                         print("Playing %r on %r" % (card, target))
-    #                         card.play(target=target)
-    #
-    #                         # 4. Tutaj do current wrzuć nowy stan gry (po użyciu karty)
-    #
-    #                         if player.choice:
-    #                             choice = random.choice(player.choice.cards)
-    #                             print("Choosing card %r" % (choice))
-    #                             player.choice.choose(choice)
-    #                         # 5. Tutaj do current wrzuć nowy stan gry (po użyciu karty i wyborze)
-    #                         continue
-    #
-    #                 # Randomly attack with whatever can attack
-    #                 for character in player.characters:
-    #                     if character.can_attack():
-    #                         character.attack(random.choice(character.targets))
-    #                         if character.buffs:
-    #                             print("gay")
-    #
-    #                     # 6. Tutaj do current wrzuć nowy stan gry (po ataku)
-    #
-    #                 break
-    #
-    #             game.end_turn()
-    #     except GameOver:
-    #         print("Game ended");
 
 
 
