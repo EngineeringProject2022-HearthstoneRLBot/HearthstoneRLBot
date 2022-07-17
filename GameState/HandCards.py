@@ -65,6 +65,19 @@ class HandCard:
         self.battlecrySpellEffectPlane, self.endOfTurnEffectPlane, self.startOfTurnEffectPlane, self.conditionalEffectPlane, self.onAttackPlane, self.deathrattleEffectPlane = self.mapComplexFeatures(
             card)
 
+    def convert_matrix(self, matrix):
+        matrix = np.reshape(matrix, (13,13))
+        #matrix = np.pad(matrix, 1, mode='constant')
+        return matrix
+
+    def createMegaMatrix(self, matrices):
+        row1 = np.hstack((matrices[0:3]))
+        row2 = np.hstack((matrices[3:6]))
+        row3 = np.hstack((matrices[6:9]))
+        full = np.concatenate((row1, row2, row3))
+        full = np.pad(full, 1, mode='constant')
+        return full
+
     def encode_state(self):
         basicFeatures = np.zeros(169)
         basicFeatures[0:6] = [x for x in self.handCardFeatures.values()]
@@ -80,7 +93,23 @@ class HandCard:
         OnAttack = encode_complex_plane(self.onAttackPlane)
         OtherConditional = encode_complex_plane(self.conditionalEffectPlane)
 
-        return [basicFeatures,BattlecrySpell,EoT,SoT,Deathrattle,OnAttack,OtherConditional]
+        DEBUG = True
+        if DEBUG:
+            return [basicFeatures,BattlecrySpell,EoT,SoT,Deathrattle,OnAttack,OtherConditional]
+
+        basicFeatures = self.convert_matrix(basicFeatures)
+        BattlecrySpell = self.convert_matrix(BattlecrySpell)
+        EoT = self.convert_matrix(EoT)
+        SoT = self.convert_matrix(SoT)
+        Deathrattle = self.convert_matrix(Deathrattle)
+        OnAttack = self.convert_matrix(OnAttack)
+        OtherConditional = self.convert_matrix(OtherConditional)
+        filter1 = self.convert_matrix(np.zeros(169))
+        filter2 = self.convert_matrix(np.zeros(169))
+
+        matrices = [basicFeatures, BattlecrySpell, EoT, SoT, Deathrattle, OnAttack, OtherConditional, filter1, filter2]
+        matrix = self.createMegaMatrix(matrices)
+        return matrix
 
 
     # to serve as template for extracting more complex features
@@ -95,12 +124,12 @@ class HandCard:
         onAttackPlane = mapOnAttack(card)
         deathrattleEffectPlane = mapDeathrattle(card)
 
-        print("BTC " + card.data.strings[GameTag.CARDNAME]['enUS'] + "  " + str(battlecrySpellEffectPlane))
-        print("EOT " + card.data.strings[GameTag.CARDNAME]['enUS'] + "  " + str(endOfTurnEffectPlane))
-        print("SOT " + card.data.strings[GameTag.CARDNAME]['enUS'] + "  " + str(startOfTurnEffectPlane))
-        print("CON " + card.data.strings[GameTag.CARDNAME]['enUS'] + "  " + str(conditionalEffectPlane))
-        print("ONA " + card.data.strings[GameTag.CARDNAME]['enUS'] + "  " + str(onAttackPlane))
-        print("DR " + card.data.strings[GameTag.CARDNAME]['enUS'] + "  " + str(deathrattleEffectPlane))
+        #print("BTC " + card.data.strings[GameTag.CARDNAME]['enUS'] + "  " + str(battlecrySpellEffectPlane))
+        #print("EOT " + card.data.strings[GameTag.CARDNAME]['enUS'] + "  " + str(endOfTurnEffectPlane))
+        #print("SOT " + card.data.strings[GameTag.CARDNAME]['enUS'] + "  " + str(startOfTurnEffectPlane))
+        #print("CON " + card.data.strings[GameTag.CARDNAME]['enUS'] + "  " + str(conditionalEffectPlane))
+        #print("ONA " + card.data.strings[GameTag.CARDNAME]['enUS'] + "  " + str(onAttackPlane))
+        #print("DR " + card.data.strings[GameTag.CARDNAME]['enUS'] + "  " + str(deathrattleEffectPlane))
         # buff.data.scripts.atk!!!
         return battlecrySpellEffectPlane, endOfTurnEffectPlane, startOfTurnEffectPlane, conditionalEffectPlane, onAttackPlane, deathrattleEffectPlane
 
@@ -289,7 +318,7 @@ def mapBattlecrySpells(card):
             for x in card.data.scripts.play(card):
                 getTargetedActionDetails(x, currentBattlecryEffect, card)
     except TypeError:
-        print('exception')
+        None
     return currentBattlecryEffect
 
     # TODO
@@ -440,8 +469,8 @@ def getTargetedActionDetails(x, currentBattlecryEffect, card):
     elif isinstance(x, Bounce):
         currentBattlecryEffect["BounceTargets"] = decodeTarget(selector)
         currentBattlecryEffect["BounceCards"] = 1
-    if selector is not None:
-        decodeResultStr(decodeWithRequirements(decodeTarget(selector), card.data.requirements))
+    #if selector is not None:
+        #decodeResultStr(decodeWithRequirements(decodeTarget(selector), card.data.requirements))
 
 
 def getSummonDetails(x, card, currentEffect):
@@ -483,7 +512,7 @@ def getSummonDetails(x, card, currentEffect):
 
 def getAmount(x, card, currEffect, key):
     if type(x.get_args(card)[-1]) is not int:
-        print("DEPENDANT SOMETHING FOUND!!!")
+        #print("DEPENDANT SOMETHING FOUND!!!")
         currEffect["SetAmount" + key] = 0
         try:
             return x.get_args(card)[-1].evaluate(card)
@@ -772,7 +801,9 @@ def mapDeathrattle(card):
         found = True
         deathrattleEffect["AlwaysGet"] = 1
         getTargetedActionDetails(x, deathrattleEffect, card)
-    if not found and hasattr(card, 'deathrattles'):
+
+    if not found and hasattr(card, "deathrattles"):
+
         for x in card.deathrattles:
             deathrattleEffect["AlwaysGet"] = 1
             getTargetedActionDetails(x, deathrattleEffect, card)
