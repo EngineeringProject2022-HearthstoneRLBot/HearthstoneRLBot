@@ -4,10 +4,13 @@ import numpy as np
 from fireplace.exceptions import InvalidAction
 from fireplace.targeting import is_valid_target
 
+MAX_BOARD = 15 # ustaw 8 aby nie było wyjątków
 
 def checkValidHandCard(allychars, enemychars, card):
     cardindexes = np.zeros(17)
 
+    if card.must_choose_one: # randomowe wybranie karty do walidowania...
+        card = card.choose_cards[0]
     if card.cant_play:
         return cardindexes
     if hasattr(card, 'is_playable') and not card.is_playable():
@@ -15,18 +18,15 @@ def checkValidHandCard(allychars, enemychars, card):
     elif hasattr(card, 'is_usable') and not card.is_usable():
         return cardindexes
 
-    if card.must_choose_one: # randomowe wybranie karty do walidowania...
-        card = random.choice(card.choose_cards)
-
     if not card.requires_target():
         cardindexes[16] = 1
         return cardindexes
 
     for i, character in enumerate(allychars):
-        if character and i < 8 and is_valid_target(card, character): # to i jest bo blad w symulatorze ktory pozwala miec wiecej niz 7 minionow
+        if character and i < MAX_BOARD and is_valid_target(card, character): # to i jest bo blad w symulatorze ktory pozwala miec wiecej niz 7 minionow
             cardindexes[i] = 1
     for i, character in enumerate(enemychars):
-        if character and i < 8 and is_valid_target(card, character): # to i jest bo blad w symulatorze ktory pozwala miec wiecej niz 7 minionow
+        if character and i < MAX_BOARD and is_valid_target(card, character): # to i jest bo blad w symulatorze ktory pozwala miec wiecej niz 7 minionow
             cardindexes[8+i] = 1
 
     return cardindexes
@@ -54,11 +54,11 @@ def checkValidActions(game):
     enemychars = enemy.characters
 
     for i, handcard in enumerate(player.hand):
-        if handcard and i < 8: # gra pozwala miec wiecej niz 8 characterow
+        if handcard and i < MAX_BOARD: # gra pozwala miec wiecej niz 8 characterow
             actionsindexes[(i * 17):((i + 1) * 17)] = checkValidHandCard(allychars, enemychars, handcard)
     actionsindexes[170:187] = checkValidHandCard(allychars, enemychars, player.hero.power)
     for i, character in enumerate(allychars):
-        if character and i < 8: # gra pozwala miec wiecej niz 8 characterow XD
+        if character and i < MAX_BOARD: # gra pozwala miec wiecej niz 8 characterow XD
             actionsindexes[(187+i*8):(187+(i+1)*8)] = checkValidCharacter(enemychars, character)
     actionsindexes[251] = 1
 
@@ -76,14 +76,7 @@ def useCard(player, enemy, action):
     card = player.hand[int(action / 17)]
 
     if card.must_choose_one: # jesli jest i choose one to biore randomowo
-        while True:
-            try:
-                playRandomChooseOne(card)
-                card.cant_play = True # inaczej w nieskonczonosc gram ta sama karte...
-                return
-            except InvalidAction as e:
-                print(e)
-        return
+        card = card.choose_cards[0]
 
     cardtarget = action % 17
     targetchar = None
@@ -92,6 +85,7 @@ def useCard(player, enemy, action):
     elif cardtarget < 16:
         targetchar = enemy.characters[cardtarget-8]
     card.play(target=targetchar)
+    card.cant_play = True # inaczej w nieskonczonosc gram ta sama karte...
 
 
 def usePower(player, enemy, action):
