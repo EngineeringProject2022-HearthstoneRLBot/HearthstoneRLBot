@@ -4,7 +4,7 @@ from fireplace.card import Card
 from fireplace.dsl import LazyValue, RandomEntourage
 from hearthstone.enums import Race, GameTag, PlayReq
 
-from GameState.HandCards import getTargetedActionDetails
+from HearthstoneRLBot.GameState.HandCards import getTargetedActionDetails
 
 
 class Hero:

@@ -2,6 +2,7 @@ import operator
 import sys
 
 import fireplace
+import numpy as np
 from fireplace import cards
 from fireplace.exceptions import GameOver
 from fireplace.utils import play_full_game
@@ -12,9 +13,9 @@ from importlib import import_module
 from pkgutil import iter_modules
 from typing import List
 from xml.etree import ElementTree
-
+import Test
 from hearthstone.enums import CardClass, CardType  # noqa
-
+from collections.abc import Callable
 # Autogenerate the list of cardset modules
 from GameState import HandCard
 from GameState import Hero
@@ -506,9 +507,9 @@ def test_cogmaster():
     # dummy.play()
 
     card_list = [
-        "CS2_106",
-        "EX1_308",
-        "NEW1_031",
+        "CS2_106", # Fiery war axe
+        "EX1_308", # Soulfire
+        "NEW1_031", # Animal Companion
         "EX1_613",
         "AT_028",
         "NEW1_037"
@@ -572,7 +573,6 @@ def test_cogmaster():
             cardList.append(HandCard(card))
             test = HandCard(card)
             test.encode_state()
-
         except KeyError:
             print('NIE MA')
 
@@ -671,19 +671,170 @@ def continousTesting():
                         break
                     game.end_turn()
             except GameOver:
-                print("Game ended");
+                print("Game ended")
+
+def testSpecificCards(item,BattlecrySpell,EoT,SoT,Deathrattle,OnAttack,OtherConditional):
+    # "CS2_106", # Fiery war axe
+    # "EX1_308", # Soulfire
+    # "NEW1_031", # Animal Companion
+    # "EX1_613",
+    # "AT_028",
+    # "NEW1_037"
+    # "GVG_099",
+    # "GVG_104",
+    # "FP1_001",
+    # "FP1_029",
+    # "AT_122",
+    # "AT_040",
+    # "AT_026",
+    # "BRM_020",
+    # "BRM_005",
+    # "LOE_073",
+    # "EX1_004",
+    # "EX1_597",
+    # "BT_493",
+    # "BT_761",
+    # "EX1_575",
+    # "GVG_089",
+    # "GVG_039",
+    # "CFM_639",
+    # "GVG_020",
+    # "OG_286",
+    # "CFM_654",
+    # "OG_173",
+    # "FP1_003",
+    # "CS2_059",
+    # "BRM_028",
+    # "KAR_044",
+    # "OG_200",
+    # "FP1_005",
+    # "FP1_027",
+    # "CFM_609",
+    # "GVG_111",
+    # "EX1_006",
+    # "EX1_341",
+    # "LOE_007t",
+    # "EX1_102",
+    # "AT_073",
+    # "GVG_103",
+    # "GVG_077",
+    # "FP1_013",
+    # "GVG_076",
+    # "LOE_115",
+    # "LOOT_170",
+    # "EX1_573",
+    # "CS2_008",
+    # "EX1_160",
+    # "NEW1_007",
+    # "EX1_571",
+    # "EX1_578",
+    # "EX1_506",
+    # "EX1_277"
+    if item == "CS2_106":
+        #pass
+        test_fiery_war_axe(BattlecrySpell,EoT,SoT,Deathrattle,OnAttack,OtherConditional)
+    if item == "EX1_308":
+        pass
+        #test_soulfire(BattlecrySpell,EoT,SoT,Deathrattle,OnAttack,OtherConditional)
+
+def check_basic_features_weapon(item, basicFeatures, cost,powerUp,isMinion,isSpell,
+                      isWeapon,discount,currentDurability,
+                      currentAttack,baseDurability):
+
+    ## basicFeatures expected values
+
+    if basicFeatures[0] != cost:# cost
+        print(f"{item} COST NOT EQUAL")
+    if basicFeatures[1] != powerUp: # power up
+        print(f"{item} IS POWERED UP NOT EQUAL")
+    if basicFeatures[2] != isMinion: # is minion
+        print(f"{item} IS MINION NOT EQUAL")
+    if basicFeatures[3] != isSpell: # is spell
+        print(f"{item} IS SPELL NOT EQUAL")
+    if basicFeatures[4] != isWeapon: # is weapon
+        print(f"{item} IS WEAPON NOT EQUAL")
+    if basicFeatures[5] != discount :# discount
+        print(f"{item} DISCOUNT NOT EQUAL")
+    if basicFeatures[51] != currentDurability: # current durability
+        print(f"{item} CURRENT DURABILITY NOT EQUAL")
+    if basicFeatures[52] != currentAttack: # current attack
+        print(f"{item} CURRENT ATTACK NOT EQUAL")
+    if basicFeatures[53] != baseDurability: # base durability ( for sure )
+        print(f"{item} BASE DURABILITY NOT EQUAL")
+
+def check_basic_features_minion(item, basicFeatures, cost,powerUp,isMinion,isSpell,
+                                isWeapon,discount,currentDurability,
+                                currentAttack,baseDurability):
+
+    ## basicFeatures expected values
+    if basicFeatures[0] != cost:# cost
+        print(f" {item} COST NOT EQUAL")
+    if basicFeatures[1] != powerUp: # power up
+        print(f" {item} IS POWERED UP NOT EQUAL")
+    if basicFeatures[2] != isMinion: # is minion
+        print(f" {item} IS MINION NOT EQUAL")
+    if basicFeatures[3] != isSpell: # is spell
+        print(f" {item} IS SPELL NOT EQUAL")
+    if basicFeatures[4] != isWeapon: # is weapon
+        print(f" {item} IS WEAPON NOT EQUAL")
+    if basicFeatures[5] != discount :# discount
+        print(f" {item} DISCOUNT NOT EQUAL")
+
+
+    if basicFeatures[51] != currentDurability: # current durability
+        print(f" {item} CURRENT DURABILITY NOT EQUAL")
+    if basicFeatures[52] != currentAttack: # current attack
+        print(f" {item} CURRENT ATTACK NOT EQUAL")
+    if basicFeatures[53] != baseDurability: # base durability ( for sure )
+        print(f" {item} BASE DURABILITY NOT EQUAL")
+
+
+def checkForNumpyZeros(item, plane):
+    if not np.array_equal(plane, np.zeros(169)):
+        print(f" {item} The plane should be filled with zeros since it has not have that effect assigned")
+
+def check_battlecry_plane()
+
+
+def test_fiery_war_axe():
+    #### BASIC FEATURES ####
+    game = setup_game()
+    game.player1.discard_hand()
+    game.player2.discard_hand()
+    #######
+    card = game.player1.give("CS2_106")
+    test = HandCard(card)
+    planes = test.encode_state()
+
+    ###### CHECK FUNCTION FOR WEAPON ( TAKES EXPECTED OUTPUT VALUES )
+    check_basic_features_weapon("CS2_106",planes[0],
+                                cost=3, powerUp=0 , isMinion=0,isSpell=0,
+                                isWeapon=1,discount=0,currentDurability=2,
+                                currentAttack=3,baseDurability=2)
+
+    #### Initial other null planes check
+    for plane in planes[1:]:
+        checkForNumpyZeros("CS2_106", plane)
+
+    cardToDecreaseCost = game.player1.give("CS3_008")
+    cardToDecreaseCost.play()
+    card.play()
+
+
+    x = 1
+
 
 
 def main():
 
     gameStates = []
     cards.db.initialize()
-
+    test_fiery_war_axe()
     continousTesting()
 
     fireball_test()
-    myNetwork = Resnet.Network()
-    model = myNetwork.getModel()
+    #myNetwork = Resnet.Network()
+    #model = myNetwork.getModel()
     test_cogmaster()
 
     # play_game = input("Do you wish to play a full game? 1 - yes 0 - no")
