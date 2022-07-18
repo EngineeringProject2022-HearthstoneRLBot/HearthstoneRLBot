@@ -1,3 +1,4 @@
+import copy
 import operator
 import sys
 from copy import deepcopy
@@ -13,7 +14,6 @@ from fireplace import cards
 from fireplace import cards, logging
 
 from fireplace.exceptions import GameOver
-from fireplace.utils import play_full_game
 import os.path
 import random
 from bisect import bisect
@@ -21,7 +21,6 @@ from importlib import import_module
 from pkgutil import iter_modules
 from typing import List
 from xml.etree import ElementTree
-import Test
 from hearthstone.enums import CardClass, CardType  # noqa
 from collections.abc import Callable
 # Autogenerate the list of cardset modules
@@ -619,70 +618,6 @@ def networkInputTesting():
                     game.end_turn()
 
 
-def testSpecificCards(item,BattlecrySpell,EoT,SoT,Deathrattle,OnAttack,OtherConditional):
-    # "CS2_106", # Fiery war axe
-    # "EX1_308", # Soulfire
-    # "NEW1_031", # Animal Companion
-    # "EX1_613",
-    # "AT_028",
-    # "NEW1_037"
-    # "GVG_099",
-    # "GVG_104",
-    # "FP1_001",
-    # "FP1_029",
-    # "AT_122",
-    # "AT_040",
-    # "AT_026",
-    # "BRM_020",
-    # "BRM_005",
-    # "LOE_073",
-    # "EX1_004",
-    # "EX1_597",
-    # "BT_493",
-    # "BT_761",
-    # "EX1_575",
-    # "GVG_089",
-    # "GVG_039",
-    # "CFM_639",
-    # "GVG_020",
-    # "OG_286",
-    # "CFM_654",
-    # "OG_173",
-    # "FP1_003",
-    # "CS2_059",
-    # "BRM_028",
-    # "KAR_044",
-    # "OG_200",
-    # "FP1_005",
-    # "FP1_027",
-    # "CFM_609",
-    # "GVG_111",
-    # "EX1_006",
-    # "EX1_341",
-    # "LOE_007t",
-    # "EX1_102",
-    # "AT_073",
-    # "GVG_103",
-    # "GVG_077",
-    # "FP1_013",
-    # "GVG_076",
-    # "LOE_115",
-    # "LOOT_170",
-    # "EX1_573",
-    # "CS2_008",
-    # "EX1_160",
-    # "NEW1_007",
-    # "EX1_571",
-    # "EX1_578",
-    # "EX1_506",
-    # "EX1_277"
-    if item == "CS2_106":
-        #pass
-        test_fiery_war_axe(BattlecrySpell,EoT,SoT,Deathrattle,OnAttack,OtherConditional)
-    if item == "EX1_308":
-        pass
-        #test_soulfire(BattlecrySpell,EoT,SoT,Deathrattle,OnAttack,OtherConditional)
-
 def check_basic_features_weapon(item, basicFeatures, cost,powerUp,isMinion,isSpell,
                       isWeapon,discount,currentDurability,
                       currentAttack,baseDurability):
@@ -708,9 +643,11 @@ def check_basic_features_weapon(item, basicFeatures, cost,powerUp,isMinion,isSpe
     if basicFeatures[53] != baseDurability: # base durability ( for sure )
         print(f"{item} BASE DURABILITY NOT EQUAL")
 
-def check_basic_features_minion(item, basicFeatures, cost,powerUp,isMinion,isSpell,
-                                isWeapon,discount,currentDurability,
-                                currentAttack,baseDurability):
+def check_basic_features_minion(item, basicFeatures,
+                                cost, powerUp,
+                                isMinion,isSpell,
+                                isWeapon,discount,
+                                expectedFeatures):
 
     ## basicFeatures expected values
     if basicFeatures[0] != cost:# cost
@@ -726,31 +663,34 @@ def check_basic_features_minion(item, basicFeatures, cost,powerUp,isMinion,isSpe
     if basicFeatures[5] != discount :# discount
         print(f" {item} DISCOUNT NOT EQUAL")
 
-
-    if basicFeatures[51] != currentDurability: # current durability
-        print(f" {item} CURRENT DURABILITY NOT EQUAL")
-    if basicFeatures[52] != currentAttack: # current attack
-        print(f" {item} CURRENT ATTACK NOT EQUAL")
-    if basicFeatures[53] != baseDurability: # base durability ( for sure )
-        print(f" {item} BASE DURABILITY NOT EQUAL")
+    for i in range(51, 83):
+        if basicFeatures[i] != expectedFeatures[i]: # is weapon
+            print(f" {item} basic feature at index {i} is invalid ")
 
 
 def checkForNumpyZeros(item, plane):
     if not np.array_equal(plane, np.zeros(169)):
         print(f" {item} The plane should be filled with zeros since it has not have that effect assigned")
 
-#def check_battlecry_plane()
+def check_battlecry_plane(item, battlecryFeatures, expectedFeatures):
+    for i in range(len(expectedFeatures)):
+        if battlecryFeatures[i] != expectedFeatures[i]:
+            print(f"Index {i} of battlecrySpell feature is not valid for CHECKED item: {item}")
 
 
 def test_fiery_war_axe():
     #### BASIC FEATURES ####
     game = setup_game()
+    mulliganRandomChoice(game)
     game.player1.discard_hand()
     game.player2.discard_hand()
+
+    game._end_turn()
     #######
-    card = game.player1.give("CS2_106")
+    card = game.player2.give("CS2_106")
     test = HandCard(card)
     planes = test.encode_state()
+    game.player2.max_mana = 10
 
     ###### CHECK FUNCTION FOR WEAPON ( TAKES EXPECTED OUTPUT VALUES )
     check_basic_features_weapon("CS2_106",planes[0],
@@ -762,12 +702,103 @@ def test_fiery_war_axe():
     for plane in planes[1:]:
         checkForNumpyZeros("CS2_106", plane)
 
-    cardToDecreaseCost = game.player1.give("CS3_008")
+
+    #### problemy z discountem
+    cardToDecreaseCost = game.player2.give("CS3_008")
+
     cardToDecreaseCost.play()
+
+    game.end_turn()
+    game.end_turn()
+
+
+    game.player2.max_mana = 10
     card.play()
 
+    testAfterPlay = HandCard(card)
+    planes = testAfterPlay.encode_state()
+    check_basic_features_weapon("CS2_106",planes[0],
+                                cost=2, powerUp=0 , isMinion=0,isSpell=0,
+                                isWeapon=1,discount=0,currentDurability=2,
+                                currentAttack=3,baseDurability=2)
 
-    x = 1
+    ### check for attack buff and durability buff +1/+1
+
+    game.end_turn()
+    game.end_turn()
+    bloodsailCultist = game.player2.give("OG_315")
+    bloodsailCultist.play()
+
+    test = HandCard(card)
+    planes = test.encode_state()
+    ### Base Durability to w sumie max durability
+    check_basic_features_weapon("CS2_106",
+                                planes[0],
+                                cost=3, powerUp=0 , isMinion=0,isSpell=0,
+                                isWeapon=1,discount=0,currentDurability=3,
+                                currentAttack=4,baseDurability=2)
+
+
+
+def test_frostwolf_warlord():
+    game = setup_game()
+    game.player1.discard_hand()
+    game.player2.discard_hand()
+    mulliganRandomChoice(game)
+    game.end_turn()
+    #######
+
+    game.current_player.max_mana = 10
+    card0 = game.current_player.give("BRM_028")
+    card1 = game.current_player.give("EX1_506")
+    card0.play()
+
+    game.end_turn()
+    game.end_turn()
+
+
+    card1.play()
+    # card2 = game.current_player.give("EX1_506")
+    # card2.play()
+    frostwolf = game.current_player.give("CS2_226")
+    frostwolf.play()
+
+    test = HandCard(frostwolf)
+    planes = test.encode_state()
+
+    expectedPlaneValue = copy.deepcopy(planes[0])
+    expectedPlaneValue[51] = 8
+    expectedPlaneValue[52] = 8
+    check_basic_features_minion("CS2_226",basicFeatures= planes[0],
+                                cost=5,powerUp=0,isMinion=1,
+                                isSpell=0,isWeapon=0,discount=0,expectedFeatures=expectedPlaneValue)
+
+    battlecryFeatures = copy.deepcopy(planes[1])
+    battlecryFeatures[0] = 2 # 4 miniony na boardzie = +4 health
+    battlecryFeatures[1] = 2 # 4 miniony na boardzie = +4 attack
+    check_battlecry_plane("CS2_226",battlecryFeatures=planes[1],expectedFeatures=battlecryFeatures)
+    ## zczekować jeszcze battlecry effect
+
+def test_sludge_belcher():
+    game = setup_game()
+    game.player1.discard_hand()
+    game.player2.discard_hand()
+    mulliganRandomChoice(game)
+    game.end_turn()
+
+    ######
+    game.current_player.max_mana = 10
+    sludge = game.current_player.give("FP1_012")
+    sludge.play()
+
+    test = HandCard(sludge)
+
+    planes = test.encode_state()
+
+
+
+
+
 
 def continousTesting():
     while True:
@@ -776,7 +807,7 @@ def continousTesting():
             mulliganRandomChoice(game)
             testGame(game)
         except GameOver:
-            print("Game ended");
+            print("Game ended")
 
 
 def main():
@@ -786,6 +817,7 @@ def main():
     logger.propagate = False
     cards.db.initialize()
     test_fiery_war_axe()
+    test_frostwolf_warlord()
     continousTesting()
 
     networkInputTesting()
