@@ -58,8 +58,8 @@ class MonteCarlo:
 
             self.expand(current_node, currentPlayer)
 
-    def expand(self, node, currentPlayer):
-        self.child_finder(node, self, currentPlayer)
+    def expand(self, node):
+        self.child_finder(node, self)
         if len(node.children):
             node.expanded = True
 
