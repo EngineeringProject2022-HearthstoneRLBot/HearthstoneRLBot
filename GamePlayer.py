@@ -1,15 +1,18 @@
 import pickle
+from copy import deepcopy
 from random import random
 
 from fireplace.exceptions import GameOver
 from fireplace.utils import random_draft
 from hearthstone.enums import CardClass, PlayState
 
+from GameCommunication import checkValidActionsSparse, playTurnSparse
 from montecarlo.montecarlo import MonteCarlo
 from montecarlo.node import Node
 
 
 def setup_game():
+    # we setup our game here
     from fireplace.game import Game
     from fireplace.player import Player
 
@@ -55,7 +58,7 @@ def selfplay(numbgame, model, simulations):
                 if montecarlo.root_node.visits[montecarlo.root_node.original_player - 1] != 0:
                     montecarlo.root_node.visits[montecarlo.root_node.original_player - 1] -= 1
 
-                game.move(montecarlo.root_node.state.moves[-1])
+                #game.move(montecarlo.root_node.state.moves[-1])
                 #gameData.append((currInput, probabilities, 0, currPlayer))
 
                 # if len(game.moves) >= 120:  # game too long, auto-draw
@@ -81,4 +84,17 @@ def selfplay(numbgame, model, simulations):
 
 
 def child_finder(node, self):
-    pass
+    x = None
+    #x = encode state
+    #node.original_player = game.current_player
+    expert_policy_values, win_value = self.model(x)
+    for action in checkValidActionsSparse(node.state):
+        child = Node(deepcopy(node.state))
+        playTurnSparse(child.state, action)
+        child.player_number = child.state.current_player
+        child.policy_value = expert_policy_values[action]
+        node.add_child(child)
+    # if node.parent is not None:
+    #     if node.original_player != node.player_number:
+    #         win_value *= -1
+    #     node.update_win_value(float(win_value), callingPlayer)
