@@ -3,7 +3,7 @@ import sys
 from copy import deepcopy
 from logging import getLogger
 
-#from venv import logger
+# from venv import logger
 
 import fireplace
 import numpy as np
@@ -32,6 +32,7 @@ CARD_SETS = [cs for _, cs, ispkg in iter_modules([_cards_module]) if ispkg]
 from GameState.GameState import GameState
 
 sys.path.append("..")
+
 
 class CardList(list):
     def __contains__(self, x):
@@ -584,7 +585,47 @@ def hellfire_test():
     #     print("g")
     return game
 
+def mirror_entity_test():
+    game = prepare_game()
+    mirror = game.player1.give("EX1_294")
+    mirror.play()
+    for i in range(6):
+        a = game.player1.give("CS2_231")
+        a.play()
+    game.end_turn()
+    a = game.player2.give("CS2_231")
+    a.play()
 
+
+def eight_minion_test():
+    game = prepare_game()
+    for i in range(6):
+        a = game.player1.give("CS2_231")
+        a.play()
+    game.end_turn()
+    leeroy = game.player2.give("EX1_116")
+    leeroy.play()
+    for i in range(5):
+        a = game.player2.give("ICC_023")
+        a.play()
+    # creeper = game.player2.give("FP1_002")
+    # creeper.play()
+    # # sylvanas = game.player2.give("EX1_016")
+    # # sylvanas.play()
+    # game.end_turn()
+    # count = 0
+    # for character in game.player1.characters:
+    #     if character.can_attack():
+    #         character.attack(creeper)
+    #         count += 1
+    #         if count == 2:
+    #             break
+    mctech = game.player2.give("EX1_085")
+    mctech.play()
+    game.player1.discard_hand()
+    game.player2.discard_hand()
+
+    return game
 
 def test_cogmaster():
     game = prepare_game()
@@ -841,6 +882,7 @@ def test_cogmaster():
     # blessedchamp.play(target=cogmaster)
     # assert cogmaster.atk == 4
 
+
 def testGame(game):
     try:
         while True:
@@ -876,12 +918,13 @@ def testGame(game):
     except fireplace.exceptions.InvalidAction:
         print("INVALID ACTION")
 
+
 def mulliganRandomChoice(game):
     for player in game.players:
-        current = GameState(game)
         mull_count = random.randint(0, len(player.choice.cards))
         cards_to_mulligan = random.sample(player.choice.cards, mull_count)
         player.choice.choose(*cards_to_mulligan)
+
 
 def networkInputTesting():
     while True:
@@ -893,6 +936,7 @@ def networkInputTesting():
         except GameOver:
             print("Game ended")
 
+
 def continousTesting():
     while True:
         try:
@@ -900,7 +944,7 @@ def continousTesting():
             mulliganRandomChoice(game)
             testGame(game)
         except GameOver:
-            print("Game ended");
+            print("Game ended")
 
 
 def main():
@@ -909,9 +953,10 @@ def main():
     logger.disabled = True
     logger.propagate = False
     cards.db.initialize()
-
+    #eight_minion_test()
+    mirror_entity_test()
     networkInputTesting()
-    #continousTesting()
+    # continousTesting()
     fireball_test()
     trade_or_win_test()
     flamestrike_test()
@@ -928,7 +973,6 @@ def main():
     #myNetwork = Resnet.Network()
     #model = myNetwork.getModel()
     #test_cogmaster()
-
 
 
 # test1
