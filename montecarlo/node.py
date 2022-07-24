@@ -5,8 +5,9 @@ from math import log, sqrt
 
 class Node:
 
-    def __init__(self, state):
-        self.state = state
+    def __init__(self, game):
+        self.state = None
+        self.game = game
         self.win_value = 0
         self.policy_value = None
         self.visits = [0]*2
