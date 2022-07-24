@@ -1,7 +1,7 @@
 import random
 from copy import deepcopy
 from montecarlo.node import Node
-
+import numpy as np
 
 class MonteCarlo:
 
@@ -31,9 +31,12 @@ class MonteCarlo:
 
     ###Below Function is created entirely by us
     def get_probabilities(self, callingPlayer):
-        children_visits = map(lambda child: child.visits[callingPlayer-1], self.root_node.children)
-        children_visit_probabilities = [visit / self.root_node.visits[callingPlayer-1] for visit in children_visits]
-        return children_visit_probabilities
+        moves = np.zeros(252)
+        for child in self.root_node.children:
+            moves[child.state] = child.visits[callingPlayer-1] / self.root_node.visits[callingPlayer-1]
+        # children_visits = map(lambda child:  child.visits[callingPlayer-1], self.root_node.children)
+        # children_visit_probabilities = [visit / self.root_node.visits[callingPlayer-1] for visit in children_visits]
+        return moves
     ###
 
     def make_exploratory_choice(self, callingPlayer):

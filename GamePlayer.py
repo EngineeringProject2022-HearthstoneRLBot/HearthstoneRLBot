@@ -45,9 +45,9 @@ def selfplay(numbgame, model, simulations):
             try:
                 currPlayer = game.current_player.entity_id - 1
 
-                # currInput = encodestate
+                currInput = None
                 montecarlo.simulate(simulations, currPlayer)  # number of simulations per turn. do not put less than 2
-                probabilities_value = montecarlo.get_probabilities(currPlayer)
+                probabilities = montecarlo.get_probabilities(currPlayer)
 
                 # probabilities = fill in probabilities for the moves, 0 for the rest
 
@@ -58,8 +58,8 @@ def selfplay(numbgame, model, simulations):
                 if montecarlo.root_node.visits[montecarlo.root_node.original_player - 1] != 0:
                     montecarlo.root_node.visits[montecarlo.root_node.original_player - 1] -= 1
 
-                #game.move(montecarlo.root_node.state.moves[-1])
-                #gameData.append((currInput, probabilities, 0, currPlayer))
+                playTurnSparse(montecarlo.root_node.parent.game, montecarlo.root_node.state)
+                gameData.append((currInput, probabilities, currPlayer))
 
                 # if len(game.moves) >= 120:  # game too long, auto-draw
                 #     break
