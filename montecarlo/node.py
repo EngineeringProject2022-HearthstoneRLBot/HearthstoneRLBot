@@ -32,9 +32,9 @@ class Node:
         self.win_value = newValue
         self.visits[callingPlayer-1] += 1
         if self.parent:
-                if self.parent.original_player != self.original_player:
-                    value *= -1
-                self.parent.update_win_value(value, callingPlayer)
+            if self.parent.original_player != self.original_player:
+                value *= -1
+            self.parent.update_win_value(value, callingPlayer)
         ###
     def update_policy_value(self, value):
         self.policy_value = value

@@ -49,8 +49,6 @@ def selfplay(numbgame, model, simulations):
                 montecarlo.simulate(simulations, currPlayer)  # number of simulations per turn. do not put less than 2
                 probabilities = montecarlo.get_probabilities(currPlayer)
 
-                # probabilities = fill in probabilities for the moves, 0 for the rest
-
                 montecarlo.root_node = montecarlo.make_exploratory_choice(currPlayer)
                 # else:
                 #    montecarlo.root_node = montecarlo.make_choice(currPlayer) #rest of moves are the network playing "optimally"
@@ -88,10 +86,11 @@ def child_finder(node, self):
     #x = encode state
     #node.original_player = game.current_player
     expert_policy_values, win_value = self.model(x)
-    for action in checkValidActionsSparse(node.state):
-        child = Node(deepcopy(node.state))
-        playTurnSparse(child.state, action)
-        child.player_number = child.state.current_player
+    for action in checkValidActionsSparse(node.game):
+        child = Node(deepcopy(node.game))
+        child.state = action
+        playTurnSparse(child.game, action)
+        child.player_number = child.game.current_player.entity_id - 1
         child.policy_value = expert_policy_values[action]
         node.add_child(child)
     # if node.parent is not None:
