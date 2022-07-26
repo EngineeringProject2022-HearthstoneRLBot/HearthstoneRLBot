@@ -83,7 +83,7 @@ def selfplay(numbgame, model, simulations):
 
 
 def child_finder(node, self):
-    # Shuffle opp cards
+
     x = GameState.convToInput(node.game, node.original_player)
     #x = encode state
     #node.original_player = game.current_player
