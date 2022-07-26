@@ -7,7 +7,7 @@ from fireplace.card import Card
 from fireplace.dsl import LazyValue, RandomEntourage
 from hearthstone.enums import Race, GameTag, PlayReq
 import numpy as np
-
+from collections.abc import Collection
 
 class HandCard:
 
@@ -94,6 +94,10 @@ class HandCard:
         OnAttack = encode_complex_plane(self.onAttackPlane)
         OtherConditional = encode_complex_plane(self.conditionalEffectPlane)
 
+        DEBUG = True
+        if DEBUG:
+            return [basicFeatures,BattlecrySpell,EoT,SoT,Deathrattle,OnAttack,OtherConditional]
+
         basicFeatures = self.convert_matrix(basicFeatures)
         BattlecrySpell = self.convert_matrix(BattlecrySpell)
         EoT = self.convert_matrix(EoT)
@@ -108,6 +112,23 @@ class HandCard:
         matrix = self.createMegaMatrix(matrices)
         return matrix
 
+
+    def encode_state_DEBUG(self):
+        basicFeatures = np.zeros(169)
+        basicFeatures[0:6] = [x for x in self.handCardFeatures.values()]
+        if self.handCardFeatures["isMinion"] == 1:
+            basicFeatures[51:83] = [x for x in self.minionFeatures.values()]
+        elif self.handCardFeatures["isWeapon"] == 1:
+            basicFeatures[51:54] = [x for x in self.weaponFeatures.values()]
+
+        BattlecrySpell = encode_complex_plane(self.battlecrySpellEffectPlane)
+        EoT = encode_complex_plane(self.endOfTurnEffectPlane)
+        SoT = encode_complex_plane(self.startOfTurnEffectPlane)
+        Deathrattle = encode_complex_plane(self.deathrattleEffectPlane)
+        OnAttack = encode_complex_plane(self.onAttackPlane)
+        OtherConditional = encode_complex_plane(self.conditionalEffectPlane)
+
+        return [basicFeatures,BattlecrySpell,EoT,SoT,Deathrattle,OnAttack,OtherConditional]
 
     # to serve as template for extracting more complex features
     def mapComplexFeatures(self, card):
@@ -294,8 +315,7 @@ def encode_targets(target, length=16):
         arr[9] = target & 0b1111  # ile razy
         arr[8] = (target & 1 << 31) > 0 and arr[
             9] > 1  # jesli jest randomem i ileś razy z subsetu to bedzie differnt each time
-        arr[10] = not ((target & 1 << 31) > 0) and not arr[6] and not arr[7] and not arr[
-            0]  # jesli nie jest randomem i nie efektuje wszystkich z subsetu
+        arr[10] = not ((target & 1 << 31) > 0) and not arr[6] and not arr[7] and not arr[0]  # jesli nie jest randomem i nie efektuje wszystkich z subsetu
         #print(arr)
         #decodeResultStr(target)
         return arr

@@ -1,3 +1,4 @@
+import copy
 import operator
 import sys
 from copy import deepcopy
@@ -7,9 +8,12 @@ from logging import getLogger
 
 import fireplace
 import numpy as np
+
+from fireplace import cards
+
 from fireplace import cards, logging
+
 from fireplace.exceptions import GameOver
-from fireplace.utils import play_full_game
 import os.path
 import random
 from bisect import bisect
@@ -17,13 +21,14 @@ from importlib import import_module
 from pkgutil import iter_modules
 from typing import List
 from xml.etree import ElementTree
-
 from hearthstone.enums import CardClass, CardType  # noqa
-
+from collections.abc import Callable
 # Autogenerate the list of cardset modules
 from GameCommunication import playTurn
 from GameState import HandCard
 from GameState import Hero
+import HearthstoneRLBot.Tests.InputTests
+from HearthstoneRLBot.Tests import InputTests
 from Model import Resnet
 
 _cards_module = os.path.join(os.path.dirname(__file__), "cards")
@@ -831,7 +836,6 @@ def test_cogmaster():
             test = HandCard(card)
             RES = test.encode_state()
             print("")
-
         except KeyError:
             print('NIE MA')
 
@@ -935,8 +939,7 @@ def networkInputTesting():
                 playTurn(game, np.random.rand(252))
         except GameOver:
             print("Game ended")
-
-
+            
 def continousTesting():
     while True:
         try:
@@ -953,6 +956,22 @@ def main():
     logger.disabled = True
     logger.propagate = False
     cards.db.initialize()
+
+    continousTesting()
+
+    networkInputTesting()
+    #continousTesting()
+
+    fireball_test()
+    #myNetwork = Resnet.Network()
+    #model = myNetwork.getModel()
+    test_cogmaster()
+
+    InputTests.test_sludge_belcher()
+    InputTests.test_fiery_war_axe()
+    InputTests.test_frostwolf_warlord()
+    InputTests.test_blood_imp()
+    
     #eight_minion_test()
     mirror_entity_test()
     networkInputTesting()
