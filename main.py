@@ -4,7 +4,7 @@ import sys
 from copy import deepcopy
 from logging import getLogger
 
-#from venv import logger
+# from venv import logger
 
 import fireplace
 import numpy as np
@@ -37,6 +37,7 @@ CARD_SETS = [cs for _, cs, ispkg in iter_modules([_cards_module]) if ispkg]
 from GameState.GameState import GameState
 
 sys.path.append("..")
+
 
 class CardList(list):
     def __contains__(self, x):
@@ -266,6 +267,12 @@ def prepare_game(*args, **kwargs):
 
     return game
 
+def createMegaMatrix(matrices):
+    row1 = np.hstack((matrices[0:3]))
+    row2 = np.hstack((matrices[3:6]))
+    row3 = np.hstack((matrices[6:9]))
+    full = np.concatenate((row1, row2, row3))
+    return full
 
 def fireball_test():
     game = prepare_game()
@@ -295,9 +302,353 @@ def fireball_test():
     #     print("g")
     return game
 
+def trade_or_win_test(): #7 vs 7 whisp and 7 hp of hero, if you do not trade anything you will win (basic finding of lethal)
+    game = prepare_game()  #Player 1 powinien tu wygrac uderzajac 7 razy w twarz playera 2
+    game.player1.discard_hand()
+    game.player2.discard_hand()
+    for i in range(23):
+        moon = game.player1.give("CS2_008")
+        moon.play(target=game.player1.hero)
+    for i in range(7):
+        # whisp
+        a = game.player1.give("CS2_231")
+        a.play()
+    game.end_turn()
+    for i in range(23):
+        moon = game.player2.give("CS2_008")
+        moon.play(target=game.player2.hero)
+    for i in range(7):
+        # whisp
+        a = game.player2.give("CS2_231")
+        a.play()
+    # try:
+    #     fire.play(target=game.player1.hero)
+    # except fireplace.exceptions.GameOver:
+    #     print("g")
+    return game
+
+def flamestrike_test(): #3x 1/2 taunts and flamestrike
+    game = prepare_game()
+    game.player1.discard_hand()
+    game.player2.discard_hand()
+
+    #CS2_032 - flamestrike!
+    for i in range(28):
+        moon = game.player1.give("CS2_008")
+        moon.play(target=game.player1.hero)
+    # flamestrike
+    flame = game.player2.give("CS2_032")
+    for i in range(3):
+        # Goldshire footman (1/2 taunt)
+        a = game.player1.give("CS1_042")
+        a.play()
+    game.end_turn()
+    for i in range(28):
+        moon = game.player2.give("CS2_008")
+        moon.play(target=game.player2.hero)
+    for i in range(3):
+        # Goldshire footman (1/2 taunt)
+        a = game.player2.give("CS1_042")
+        a.play()
+    # try:
+    #     fire.play(target=game.player1.hero)
+    # except fireplace.exceptions.GameOver:
+    #     print("g")
+    return game
+
+
+def healing_test(): #Baron Geddon, both players at 2 HP, one has flash heal
+    game = prepare_game()
+    game.player1.discard_hand()
+    game.player2.discard_hand()
+
+    #CS2_032 - flamestrike!
+    for i in range(26):
+        moon = game.player1.give("CS2_008")
+        moon.play(target=game.player1.hero)
+    # Flash Heal - dostaje ale musi sam wymyslic zeby zagrac
+    fheal = game.player2.give("AT_055")
+    for i in range(1):
+        # Baron Geddon
+        geddon = game.player1.give("EX1_249")
+        geddon.play()
+        for i in range(4):
+            game.player1.give("CS2_008").play(target=geddon) #Obijanie Geddona z moonfire
+        game.player1.give("CS1_129").play(target=geddon) #INNER FIRE
+    game.end_turn() #Both players on 2HP
+    for i in range(26):
+        moon = game.player2.give("CS2_008")
+        moon.play(target=game.player2.hero)
+    # try:
+    #     fire.play(target=game.player1.hero)
+    # except fireplace.exceptions.GameOver:
+    #     print("g")
+    return game
+
+def mage_heropower_test(): #Two mages with 1 HP and nothing else
+    game = prepare_game(CardClass.MAGE, CardClass.MAGE)
+    game.player1.discard_hand()
+    game.player2.discard_hand()
+
+    for i in range(29):
+        moon = game.player1.give("CS2_008")
+        moon.play(target=game.player1.hero)
+    game.end_turn() #Both players on 1HP
+    for i in range(29):
+        moon = game.player2.give("CS2_008")
+        moon.play(target=game.player2.hero)
+    # try:
+    #     fire.play(target=game.player1.hero)
+    # except fireplace.exceptions.GameOver:
+    #     print("g")
+    return game
+
+def warlock_heropower_test(): #Two warlocks with 2 HP and nothing else, nie wiem czy to ma sens bo ogarna ze trzeba bedzie passowac ciagle
+    game = prepare_game(CardClass.WARLOCK, CardClass.WARLOCK)
+    game.player1.discard_hand()
+    game.player2.discard_hand()
+
+    for i in range(28):
+        moon = game.player1.give("CS2_008")
+        moon.play(target=game.player1.hero)
+    game.end_turn() #Both players on 2HP
+    for i in range(28):
+        moon = game.player2.give("CS2_008")
+        moon.play(target=game.player2.hero)
+    # try:
+    #     fire.play(target=game.player1.hero)
+    # except fireplace.exceptions.GameOver:
+    #     print("g")
+    return game
+
+def hunter_heropower_test(): #Both hunters on 2hp
+    game = prepare_game(CardClass.HUNTER, CardClass.HUNTER)
+    game.player1.discard_hand()
+    game.player2.discard_hand()
+
+    for i in range(28):
+        moon = game.player1.give("CS2_008")
+        moon.play(target=game.player1.hero)
+    game.end_turn() #Both players on 2HP
+    for i in range(28):
+        moon = game.player2.give("CS2_008")
+        moon.play(target=game.player2.hero)
+    # try:
+    #     fire.play(target=game.player1.hero)
+    # except fireplace.exceptions.GameOver:
+    #     print("g")
+    return game
+
+def combo_hit_test():
+    game = prepare_game()
+
+    game.player1.discard_hand()
+    game.player2.discard_hand()
+    for i in range(28):
+        moon = game.player1.give("CS2_008")
+        moon.play(target=game.player1.hero)
+    # whisp and SI:7 Agent
+    whis = game.player2.give("CS2_231")
+    siAgent = game.player2.give("EX1_134")
+    for i in range(7):
+        # whisp
+        a = game.player1.give("CS2_231")
+        a.play()
+    game.end_turn()
+    for i in range(28):
+        moon = game.player2.give("CS2_008")
+        moon.play(target=game.player2.hero)
+    # try:
+    #     fire.play(target=game.player1.hero)
+    # except fireplace.exceptions.GameOver:
+    #     print("g")
+    return game
+
+def arcane_missles_without_randomness_test():
+    game = prepare_game()
+
+    game.player1.discard_hand()
+    game.player2.discard_hand()
+    for i in range(27):
+        moon = game.player1.give("CS2_008")
+        moon.play(target=game.player1.hero)
+    # arcane miss
+    arcane = game.player2.give("EX1_277")
+    game.end_turn()
+    for i in range(27):
+        moon = game.player2.give("CS2_008")
+        moon.play(target=game.player2.hero)
+    # try:
+    #     fire.play(target=game.player1.hero)
+    # except fireplace.exceptions.GameOver:
+    #     print("g")
+    return game
+
+def weapon_test(): #1 with 1hp and 3/2 weapon other with 3hp and board full of whisps
+    game = prepare_game()
+
+    game.player1.discard_hand()
+    game.player2.discard_hand()
+    for i in range(27):
+        moon = game.player1.give("CS2_008")
+        moon.play(target=game.player1.hero)
+    for i in range(7):
+        # whisp
+        a = game.player1.give("CS2_231")
+        a.play()
+    game.end_turn()
+    for i in range(29):
+        moon = game.player2.give("CS2_008")
+        moon.play(target=game.player2.hero)
+    for i in range(1):
+        # fiery war axe
+        a = game.player2.give("CS2_106")
+        a.play()
+    # try:
+    #     fire.play(target=game.player1.hero)
+    # except fireplace.exceptions.GameOver:
+    #     print("g")
+    return game
+
+def taunt_test(): #CS2_179 3/5 taunt
+    game = prepare_game()
+
+    game.player1.discard_hand()
+    game.player2.discard_hand()
+    for i in range(27):
+        moon = game.player1.give("CS2_008")
+        moon.play(target=game.player1.hero)
+    # 3/5 taunt
+    taunt = game.player2.give("CS2_179")
+    for i in range(1):
+        # War axe
+        a = game.player1.give("CS2_106")
+        a.play()
+    game.end_turn()
+    for i in range(27):
+        moon = game.player2.give("CS2_008")
+        moon.play(target=game.player2.hero)
+    # try:
+    #     fire.play(target=game.player1.hero)
+    # except fireplace.exceptions.GameOver:
+    #     print("g")
+    return game
+
+def hyena_test(): #Hyena beast buff test ###Player 1 nie moze zadawac damage swoik hero power!
+    game = prepare_game()
+
+    game.player1.discard_hand()
+    game.player2.discard_hand()
+    for i in range(26):
+        moon = game.player1.give("CS2_008")
+        moon.play(target=game.player1.hero)
+    for i in range(1):
+        # whisp
+        a = game.player1.give("CS2_231")
+        a.play()
+    game.end_turn()
+    for i in range(29):
+        moon = game.player2.give("CS2_008")
+        moon.play(target=game.player2.hero)
+    for i in range(1):
+        # Hyena and boar
+        a = game.player2.give("EX1_531")
+        b = game.player2.give("CS2_171")
+        a.play()
+        b.play()
+    # try:
+    #     fire.play(target=game.player1.hero)
+    # except fireplace.exceptions.GameOver:
+    #     print("g")
+    return game
+
+def hellfire_test():
+    game = prepare_game()
+
+    game.player1.discard_hand()
+    game.player2.discard_hand()
+    for i in range(27):
+        moon = game.player1.give("CS2_008")
+        moon.play(target=game.player1.hero)
+    # hellfire
+    hell = game.player2.give("CS2_062")
+    for i in range(7):
+        # Goldshire footman 1/2 taunt
+        a = game.player1.give("CS1_042")
+        a.play()
+    game.end_turn()
+    for i in range(26):
+        moon = game.player2.give("CS2_008")
+        moon.play(target=game.player2.hero)
+    for i in range(7):
+        # whisp
+        a = game.player2.give("CS2_231")
+        a.play()
+    # try:
+    #     fire.play(target=game.player1.hero)
+    # except fireplace.exceptions.GameOver:
+    #     print("g")
+    return game
+
+def mirror_entity_test():
+    game = prepare_game()
+    mirror = game.player1.give("EX1_294")
+    mirror.play()
+    for i in range(6):
+        a = game.player1.give("CS2_231")
+        a.play()
+    game.end_turn()
+    a = game.player2.give("CS2_231")
+    a.play()
+
+
+def eight_minion_test():
+    game = prepare_game()
+    for i in range(6):
+        a = game.player1.give("CS2_231")
+        a.play()
+    game.end_turn()
+    leeroy = game.player2.give("EX1_116")
+    leeroy.play()
+    for i in range(5):
+        a = game.player2.give("ICC_023")
+        a.play()
+    # creeper = game.player2.give("FP1_002")
+    # creeper.play()
+    # # sylvanas = game.player2.give("EX1_016")
+    # # sylvanas.play()
+    # game.end_turn()
+    # count = 0
+    # for character in game.player1.characters:
+    #     if character.can_attack():
+    #         character.attack(creeper)
+    #         count += 1
+    #         if count == 2:
+    #             break
+    mctech = game.player2.give("EX1_085")
+    mctech.play()
+    game.player1.discard_hand()
+    game.player2.discard_hand()
+
+    return game
 
 def test_cogmaster():
     game = prepare_game()
+
+    tmp1 = Hero()
+    tmp2 = Hero()
+    hero1 = game.player1.hero
+    hero2 = game.player2.hero
+    weapon = game.player1.give("CS2_106")
+    weapon.play()
+    #doomhammer = game.player1.give("EX1_567")
+    #doomhammer.play()
+    hero1st = tmp1.HeroDecode(hero1)
+    hero2nd = tmp2.HeroDecode(hero2)
+
+
+    res1 = tmp1.encode_state(hero1st)
+    res2 = tmp2.encode_state(hero2nd)
 
     # frostwolf = game.player1.give("CS2_226")
     # HandCard(frostwolf)
@@ -417,9 +768,10 @@ def test_cogmaster():
     # dummy.play()
 
     card_list = [
-        "CS2_106", # Fiery war axe
-        "EX1_308", # Soulfire
-        "NEW1_031", # Animal Companion
+        "NEW1_031",
+        "CS2_106",
+        "EX1_308",
+        "NEW1_031",
         "EX1_613",
         "AT_028",
         "NEW1_037"
@@ -482,7 +834,8 @@ def test_cogmaster():
             card = game.player1.give(item)
             cardList.append(HandCard(card))
             test = HandCard(card)
-            test.encode_state()
+            RES = test.encode_state()
+            print("")
         except KeyError:
             print('NIE MA')
 
@@ -533,6 +886,7 @@ def test_cogmaster():
     # blessedchamp.play(target=cogmaster)
     # assert cogmaster.atk == 4
 
+
 def testGame(game):
     try:
         while True:
@@ -568,12 +922,13 @@ def testGame(game):
     except fireplace.exceptions.InvalidAction:
         print("INVALID ACTION")
 
+
 def mulliganRandomChoice(game):
     for player in game.players:
-        current = GameState(game)
         mull_count = random.randint(0, len(player.choice.cards))
         cards_to_mulligan = random.sample(player.choice.cards, mull_count)
         player.choice.choose(*cards_to_mulligan)
+
 
 def networkInputTesting():
     while True:
@@ -584,42 +939,7 @@ def networkInputTesting():
                 playTurn(game, np.random.rand(252))
         except GameOver:
             print("Game ended")
-
-            while True:
-                player = game.current_player
-                current = GameState(game)
-                while True:
-                    heropower = player.hero.power
-                    if heropower.is_usable() and random.random() < 0.1:
-                        if heropower.requires_target():
-                            heropower.use(target=random.choice(heropower.targets))
-                        else:
-                            heropower.use()
-                        continue
-
-                    for card in player.hand:
-                        if card.is_playable() and random.random() < 0.5:
-                            target = None
-                            if card.must_choose_one:
-                                card = random.choice(card.choose_cards)
-                            if card.requires_target():
-                                target = random.choice(card.targets)
-                            card.play(target=target)
-
-                            if player.choice:
-                                choice = random.choice(player.choice.cards)
-                                print("Choosing card %r" % (choice))
-                                player.choice.choose(choice)
-                            continue
-                    for character in player.characters:
-                        if character.can_attack():
-                            character.attack(random.choice(character.targets))
-                            if character.buffs:
-                                print("gay")
-                    break
-                    game.end_turn()
-
-
+            
 def continousTesting():
     while True:
         try:
@@ -636,10 +956,7 @@ def main():
     logger.disabled = True
     logger.propagate = False
     cards.db.initialize()
-    InputTests.test_sludge_belcher()
-    InputTests.test_fiery_war_axe()
-    InputTests.test_frostwolf_warlord()
-    InputTests.test_blood_imp()
+
     continousTesting()
 
     networkInputTesting()
@@ -650,6 +967,31 @@ def main():
     #model = myNetwork.getModel()
     test_cogmaster()
 
+    InputTests.test_sludge_belcher()
+    InputTests.test_fiery_war_axe()
+    InputTests.test_frostwolf_warlord()
+    InputTests.test_blood_imp()
+    
+    #eight_minion_test()
+    mirror_entity_test()
+    networkInputTesting()
+    # continousTesting()
+    fireball_test()
+    trade_or_win_test()
+    flamestrike_test()
+    healing_test()
+    mage_heropower_test()
+    warlock_heropower_test()
+    hunter_heropower_test()
+    combo_hit_test()
+    weapon_test()
+    arcane_missles_without_randomness_test() #do przemyslenia i do dodania test z losowoscia!
+    taunt_test()
+    hyena_test()
+    hellfire_test()
+    #myNetwork = Resnet.Network()
+    #model = myNetwork.getModel()
+    #test_cogmaster()
 
 
 # test1
