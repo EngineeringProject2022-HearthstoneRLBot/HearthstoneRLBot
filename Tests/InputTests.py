@@ -80,7 +80,7 @@ def test_fiery_war_axe():
     #######
     card = game.player2.give("CS2_106")
     test = HandCard(card)
-    planes = test.encode_state()
+    planes = test.encode_state_DEBUG()
     game.player2.max_mana = 10
 
     ###### CHECK FUNCTION FOR WEAPON ( TAKES EXPECTED OUTPUT VALUES )
@@ -107,7 +107,7 @@ def test_fiery_war_axe():
     card.play()
 
     testAfterPlay = HandCard(card)
-    planes = testAfterPlay.encode_state()
+    planes = testAfterPlay.encode_state_DEBUG()
     check_basic_features_weapon("CS2_106",planes[0],
                                 cost=2, powerUp=0 , isMinion=0,isSpell=0,
                                 isWeapon=1,discount=0,currentDurability=2,
@@ -121,7 +121,7 @@ def test_fiery_war_axe():
     bloodsailCultist.play()
 
     test = HandCard(card)
-    planes = test.encode_state()
+    planes = test.encode_state_DEBUG()
     ### Base Durability to w sumie max durability
     check_basic_features_weapon("CS2_106",
                                 planes[0],
@@ -155,7 +155,7 @@ def test_frostwolf_warlord():
     frostwolf.play()
 
     test = HandCard(frostwolf)
-    planes = test.encode_state()
+    planes = test.encode_state_DEBUG()
 
     expectedPlaneValue = copy.deepcopy(planes[0])
     expectedPlaneValue[51] = 8
@@ -183,11 +183,32 @@ def test_sludge_belcher():
     sludge.play()
 
     test = HandCard(sludge)
-    planes = test.encode_state()
+    planes = test.encode_state_DEBUG()
 
     deathrattleFeatures = copy.deepcopy(planes[4])
     deathrattleFeatures[113] = 1
     deathrattleFeatures[114] = 0
-    #deathrattleFeatures[115] =
+
     check_plane("FP1_012",planes[4],deathrattleFeatures)
 
+
+def test_blood_imp():
+
+    game = setup_game()
+    game.player1.discard_hand()
+    game.player2.discard_hand()
+    mulliganRandomChoice(game)
+    game.end_turn()
+
+    ######
+    game.current_player.max_mana = 10
+    bloodimp = game.current_player.give("CS2_059")
+    bloodimp.play()
+
+    test = HandCard(bloodimp)
+    planes = test.encode_state_DEBUG()
+
+    eot = copy.deepcopy(planes[2])
+    eot[0] = 1
+    eot[6] = 1
+    check_plane("CS2_059",planes[2],eot)

@@ -112,6 +112,23 @@ class HandCard:
         return matrix
 
 
+    def encode_state_DEBUG(self):
+        basicFeatures = np.zeros(169)
+        basicFeatures[0:6] = [x for x in self.handCardFeatures.values()]
+        if self.handCardFeatures["isMinion"] == 1:
+            basicFeatures[51:83] = [x for x in self.minionFeatures.values()]
+        elif self.handCardFeatures["isWeapon"] == 1:
+            basicFeatures[51:54] = [x for x in self.weaponFeatures.values()]
+
+        BattlecrySpell = encode_complex_plane(self.battlecrySpellEffectPlane)
+        EoT = encode_complex_plane(self.endOfTurnEffectPlane)
+        SoT = encode_complex_plane(self.startOfTurnEffectPlane)
+        Deathrattle = encode_complex_plane(self.deathrattleEffectPlane)
+        OnAttack = encode_complex_plane(self.onAttackPlane)
+        OtherConditional = encode_complex_plane(self.conditionalEffectPlane)
+
+        return [basicFeatures,BattlecrySpell,EoT,SoT,Deathrattle,OnAttack,OtherConditional]
+
     # to serve as template for extracting more complex features
     def mapComplexFeatures(self, card):
         if card.data.strings[GameTag.CARDNAME]['enUS'] == "Arcane Missiles":
