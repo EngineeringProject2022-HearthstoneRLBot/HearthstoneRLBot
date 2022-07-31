@@ -27,8 +27,8 @@ from collections.abc import Callable
 from GameCommunication import playTurn
 from GameState import HandCard
 from GameState import Hero
-import HearthstoneRLBot.Tests.InputTests
-from HearthstoneRLBot.Tests import InputTests
+import Tests.InputTests
+from Tests import InputTests
 from Model import Resnet
 
 _cards_module = os.path.join(os.path.dirname(__file__), "cards")
@@ -936,7 +936,7 @@ def networkInputTesting():
             game = setup_game()
             mulliganRandomChoice(game)
             while True:
-                playTurn(game, np.random.rand(252))
+                print(playTurn(game, np.random.rand(252)))
         except GameOver:
             print("Game ended")
             
@@ -953,11 +953,11 @@ def continousTesting():
 def main():
     gameStates = []
     logger = logging.log
-    logger.disabled = True
-    logger.propagate = False
+    #logger.disabled = True
+    #logger.propagate = False
     cards.db.initialize()
 
-    continousTesting()
+    #continousTesting()
 
     networkInputTesting()
     #continousTesting()

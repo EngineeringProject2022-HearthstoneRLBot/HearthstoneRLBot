@@ -1,8 +1,8 @@
 import copy
 
 import numpy as np
-from HearthstoneRLBot.GameState.HandCards import HandCard
-from HearthstoneRLBot.main import mulliganRandomChoice, setup_game
+from GameState.HandCards import HandCard
+from main import mulliganRandomChoice, setup_game
 
 
 

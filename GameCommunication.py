@@ -108,7 +108,7 @@ def playTurn(game, output):
 
     filteredoutput = np.multiply(output, checkValidActions(game))
     action = filteredoutput.argmax() # tu można by brać randomowego maxa, a nie pierwszego
-    playTurnSparse(game, action)
+    return playTurnSparse(game, action)
 
 
 def checkValidActionsSparse(game):
@@ -116,6 +116,7 @@ def checkValidActionsSparse(game):
 
 
 def playTurnSparse(game, action):
+    game.randomOccured = False
     player = game.current_player
     enemy = player.opponent
     if action == 251:
@@ -131,3 +132,8 @@ def playTurnSparse(game, action):
 
     while player.choice:
         player.choice.choose(random.choice(player.choice.cards))
+
+    if game.randomOccured:
+        return 1
+    else:
+        return 0
