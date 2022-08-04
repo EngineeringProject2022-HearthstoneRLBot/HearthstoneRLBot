@@ -12,7 +12,7 @@ from montecarlo.montecarlo import MonteCarlo
 from montecarlo.node import Node
 
 
-def setup_game():
+def _setup_game():
     # we setup our game here
     from fireplace.game import Game
     from fireplace.player import Player
@@ -33,7 +33,7 @@ def selfplay(numbgame, model, simulations):
     doPrints = False  # set to True to see console
     totalData = []
     for i in range(numbgame):
-        game = setup_game()
+        game = _setup_game()
         montecarlo = MonteCarlo(Node(game), model)
         gameData = []
         montecarlo.child_finder = child_finder

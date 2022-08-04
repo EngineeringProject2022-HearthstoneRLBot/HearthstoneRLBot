@@ -1,9 +1,10 @@
 import copy
 
 import numpy as np
-from GameState.HandCards import HandCard
-from main import mulliganRandomChoice, setup_game
+from fireplace.utils import setup_game
 
+from GameState.HandCards import HandCard
+from GameSetupUtils import mulliganRandomChoice
 
 
 def check_basic_features_weapon(item, basicFeatures, cost,powerUp,isMinion,isSpell,
@@ -80,7 +81,7 @@ def test_fiery_war_axe():
     #######
     card = game.player2.give("CS2_106")
     test = HandCard(card)
-    planes = test.encode_state_DEBUG()
+    planes = test.encode_state(debug=True)
     game.player2.max_mana = 10
 
     ###### CHECK FUNCTION FOR WEAPON ( TAKES EXPECTED OUTPUT VALUES )
@@ -107,7 +108,7 @@ def test_fiery_war_axe():
     card.play()
 
     testAfterPlay = HandCard(card)
-    planes = testAfterPlay.encode_state_DEBUG()
+    planes = testAfterPlay.encode_state(debug=True)
     check_basic_features_weapon("CS2_106",planes[0],
                                 cost=2, powerUp=0 , isMinion=0,isSpell=0,
                                 isWeapon=1,discount=0,currentDurability=2,
@@ -121,7 +122,7 @@ def test_fiery_war_axe():
     bloodsailCultist.play()
 
     test = HandCard(card)
-    planes = test.encode_state_DEBUG()
+    planes = test.encode_state(debug=True)
     ### Base Durability to w sumie max durability
     check_basic_features_weapon("CS2_106",
                                 planes[0],
@@ -155,11 +156,11 @@ def test_frostwolf_warlord():
     frostwolf.play()
 
     test = HandCard(frostwolf)
-    planes = test.encode_state_DEBUG()
+    planes = test.encode_state(debug=True)
 
     expectedPlaneValue = copy.deepcopy(planes[0])
-    expectedPlaneValue[51] = 8
-    expectedPlaneValue[52] = 8
+    expectedPlaneValue[51] = 7
+    expectedPlaneValue[52] = 7
     check_basic_features_minion("CS2_226",basicFeatures= planes[0],
                                 cost=5,powerUp=0,isMinion=1,
                                 isSpell=0,isWeapon=0,discount=0,expectedFeatures=expectedPlaneValue)
@@ -183,7 +184,7 @@ def test_sludge_belcher():
     sludge.play()
 
     test = HandCard(sludge)
-    planes = test.encode_state_DEBUG()
+    planes = test.encode_state(debug=True)
 
     deathrattleFeatures = copy.deepcopy(planes[4])
     deathrattleFeatures[113] = 1
@@ -206,7 +207,7 @@ def test_blood_imp():
     bloodimp.play()
 
     test = HandCard(bloodimp)
-    planes = test.encode_state_DEBUG()
+    planes = test.encode_state(debug=True)
 
     eot = copy.deepcopy(planes[2])
     eot[0] = 1
