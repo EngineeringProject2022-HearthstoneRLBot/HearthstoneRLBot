@@ -7,7 +7,7 @@ from fireplace.utils import random_draft
 from hearthstone.enums import CardClass, PlayState
 
 from GameCommunication import checkValidActionsSparse, playTurnSparse
-from GameState import GameState
+from GameState import InputBuilder
 from montecarlo.montecarlo import MonteCarlo
 from montecarlo.node import Node
 
@@ -46,7 +46,7 @@ def selfplay(numbgame, model, simulations):
             try:
                 currPlayer = game.current_player.entity_id - 1
 
-                currInput = GameState.convToInput(game, currPlayer)
+                currInput = InputBuilder.convToInput(game, currPlayer)
                 montecarlo.simulate(simulations, currPlayer)  # number of simulations per turn. do not put less than 2
                 probabilities = montecarlo.get_probabilities(currPlayer)
 
@@ -84,7 +84,7 @@ def selfplay(numbgame, model, simulations):
 
 def child_finder(node, self):
 
-    x = GameState.convToInput(node.game, node.original_player)
+    x = InputBuilder.convToInput(node.game, node.original_player)
     #x = encode state
     #node.original_player = game.current_player
     expert_policy_values, win_value = self.model(x)

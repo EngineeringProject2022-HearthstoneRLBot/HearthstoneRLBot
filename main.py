@@ -34,7 +34,7 @@ from Model import Resnet
 _cards_module = os.path.join(os.path.dirname(__file__), "cards")
 CARD_SETS = [cs for _, cs, ispkg in iter_modules([_cards_module]) if ispkg]
 
-from GameState.GameState import GameState
+from GameState.InputBuilder import InputBuilder
 
 sys.path.append("..")
 
@@ -300,6 +300,7 @@ def fireball_test():
     #     fire.play(target=game.player1.hero)
     # except fireplace.exceptions.GameOver:
     #     print("g")
+    matrix = InputBuilder.convToInput(game, 1)
     return game
 
 def trade_or_win_test(): #7 vs 7 whisp and 7 hp of hero, if you do not trade anything you will win (basic finding of lethal)
@@ -645,11 +646,15 @@ def test_cogmaster():
     #doomhammer.play()
     hero1st = tmp1.HeroDecode(hero1)
     hero2nd = tmp2.HeroDecode(hero2)
-
-
+    nourish = game.player1.give("EX1_164")
+    wildgrowth = game.player1.give("CS2_013")
+    coin = game.player1.give("GAME_005")
     res1 = tmp1.encode_state(hero1st)
     res2 = tmp2.encode_state(hero2nd)
-
+    a = HandCard(coin)
+    b = HandCard(nourish)
+    c = HandCard(wildgrowth)
+    print("a")
     # frostwolf = game.player1.give("CS2_226")
     # HandCard(frostwolf)
     # crab = game.player1.give("NEW1_017")
@@ -891,7 +896,7 @@ def testGame(game):
     try:
         while True:
             player = game.current_player
-            current = GameState(game)
+            current = InputBuilder(game)
             while True:
                 heropower = player.hero.power
                 if heropower.is_usable() and random.random() < 0.1:
@@ -953,19 +958,19 @@ def continousTesting():
 def main():
     gameStates = []
     logger = logging.log
-    #logger.disabled = True
-    #logger.propagate = False
+    logger.disabled = True
+    logger.propagate = False
     cards.db.initialize()
-
+    #test_cogmaster()
     #continousTesting()
 
-    networkInputTesting()
+    #networkInputTesting()
     #continousTesting()
 
     fireball_test()
     #myNetwork = Resnet.Network()
     #model = myNetwork.getModel()
-    test_cogmaster()
+
 
     InputTests.test_sludge_belcher()
     InputTests.test_fiery_war_axe()

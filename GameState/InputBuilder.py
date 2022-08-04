@@ -1,20 +1,9 @@
 from GameState import HandCards
 from GameState import Hero
-from .Player import Player
 import numpy as np
 from numpy import array
 
-class GameState:
-    def __init__(self, state):
-        self.players = []
-        for i in range(2):
-            self.players.append(Player(state, i+1))
-
-       #for player in self.players:
-
-    def mapToInput(self):
-        for i in self.players:
-            i.mapToInput()
+class InputBuilder:
 
     def HandFunction(listOfCardsOnHand):
         counter = 0
@@ -72,11 +61,11 @@ class GameState:
         res1 = tmp1.encode_state(hero1st)
         res2 = tmp2.encode_state(hero2nd)
 
-        FP1Hand = GameState.HandFunction(player1Hand) #Player 1 ktorym powinen byc rexxar jest Guldan czyli player2 w sumie!!!
-        FP2Hand = GameState.HandFunction(player2Hand)
+        FP1Hand = InputBuilder.HandFunction(player1Hand) #Player 1 ktorym powinen byc rexxar jest Guldan czyli player2 w sumie!!!
+        FP2Hand = InputBuilder.HandFunction(player2Hand)
 
-        FP1Board = GameState.BoardFunction(boardPlayer1, res1)
-        FP2Board = GameState.BoardFunction(boardPlayer2, res2)
+        FP1Board = InputBuilder.BoardFunction(boardPlayer1, res1)
+        FP2Board = InputBuilder.BoardFunction(boardPlayer2, res2)
 
         if(str(currPlayer) == 'Player1'):
             playerArr = np.zeros((41,401))

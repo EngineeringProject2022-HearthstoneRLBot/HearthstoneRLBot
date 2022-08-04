@@ -84,10 +84,10 @@ def test_fiery_war_axe():
     game.player2.max_mana = 10
 
     ###### CHECK FUNCTION FOR WEAPON ( TAKES EXPECTED OUTPUT VALUES )
-    check_basic_features_weapon("CS2_106",planes[0],
-                                cost=3, powerUp=0 , isMinion=0,isSpell=0,
-                                isWeapon=1,discount=0,currentDurability=2,
-                                currentAttack=3,baseDurability=2)
+    check_basic_features_weapon("CS2_106", planes[0],
+                                cost=3, powerUp=0, isMinion=0, isSpell=0,
+                                isWeapon=1, discount=0, currentDurability=2,
+                                currentAttack=3, baseDurability=2)
 
     #### Initial other null planes check
     for plane in planes[1:]:
