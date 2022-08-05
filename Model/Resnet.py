@@ -15,7 +15,7 @@ class Network:
         return self.theModel
 
     def build(self):
-        inputShape = (401, 41, 5)
+        inputShape = (401, 41, 4)
         inputs = Input(shape=inputShape)
         network = self.buildConvLayer(inputs)
         for i in range(10):
@@ -41,7 +41,7 @@ class Network:
         policy = self.bn_relu(policy)
         policy = Flatten()(policy)
         #initializer = tf.keras.initializers.RandomNormal(mean=0.05, stddev=0.001, seed=None)
-        policy = Dense(260, activation='softmax')(policy)  # 32 x 8
+        policy = Dense(252, activation='softmax')(policy)
         return policy
 
     def buildConvLayer(self, inputs):

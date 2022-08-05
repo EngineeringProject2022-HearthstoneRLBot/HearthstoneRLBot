@@ -62,7 +62,7 @@ class InputBuilder:
         res2 = tmp2.encode_state(hero2nd)
 
         FP1Hand = InputBuilder.HandFunction(player1Hand) #Player 1 ktorym powinen byc rexxar jest Guldan czyli player2 w sumie!!!
-        FP2Hand = InputBuilder.HandFunction(player2Hand)
+        #FP2Hand = InputBuilder.HandFunction(player2Hand)
 
         FP1Board = InputBuilder.BoardFunction(boardPlayer1, res1)
         FP2Board = InputBuilder.BoardFunction(boardPlayer2, res2)
@@ -71,8 +71,10 @@ class InputBuilder:
             playerArr = np.zeros((41,401))
         elif(str(currPlayer) == 'Player2'):
             playerArr = np.ones((41,401))
-
-        MegaFinalMatrix = array([FP1Hand, FP1Board, FP2Board, FP2Hand, playerArr])
+        # remove opp hand
+        MegaFinalMatrix = array([FP1Hand, FP1Board, FP2Board,
+        #                         FP2Hand,
+                                 playerArr])
         a = 1
         return MegaFinalMatrix
 
