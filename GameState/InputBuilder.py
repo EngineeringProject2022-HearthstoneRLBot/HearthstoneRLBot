@@ -75,7 +75,10 @@ class InputBuilder:
         MegaFinalMatrix = array([FP1Hand, FP1Board, FP2Board,
         #                         FP2Hand,
                                  playerArr])
-        a = 1
+        # x y z order
+        MegaFinalMatrix = np.moveaxis(MegaFinalMatrix,[1,2],[1,0])
+        # dummy dimension needed for model
+        MegaFinalMatrix = MegaFinalMatrix[None, :]
         return MegaFinalMatrix
 
 #Symulujacy to 0 i 1 to on, dalej 2 3 przeciwnik i potem currentPlayer Matrix

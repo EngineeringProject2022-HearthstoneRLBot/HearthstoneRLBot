@@ -45,13 +45,13 @@ class Network:
         return policy
 
     def buildConvLayer(self, inputs):
-        conv = Conv2D(padding='same', filters=1024, strides=1, kernel_size=3)(inputs)
+        conv = Conv2D(padding='same', filters=1, strides=1, kernel_size=3)(inputs)
         conv = self.bn_relu(conv)
         return conv
 
     def buildResLayer(self, inputs):
         block = self.buildConvLayer(inputs)
-        block = Conv2D(padding='same', filters=1024, strides=1, kernel_size=3)(inputs)
+        block = Conv2D(padding='same', filters=1, strides=1, kernel_size=3)(inputs)
         block = BatchNormalization()(block)
         skip = Add()([inputs, block])
         skip = ReLU()(skip)
