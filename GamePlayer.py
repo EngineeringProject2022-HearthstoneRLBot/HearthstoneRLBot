@@ -86,7 +86,7 @@ def selfplay(numbgame, model, simulations):
 def child_finder(node, montecarlo, simulatingPlayer):
 
     node.original_player = simulatingPlayer
-    x = InputBuilder.convToInput(node.game, node.original_player)
+    x = InputBuilder.convToInput(node.game, node.player_number)
 
     expert_policy_values, win_value = montecarlo.model(x)
     for action in checkValidActionsSparse(node.game):
@@ -96,7 +96,7 @@ def child_finder(node, montecarlo, simulatingPlayer):
         child.player_number = child.game.current_player.entity_id - 1
         child.policy_value = expert_policy_values[0, action]
         node.add_child(child)
-    # if node.parent is not None:
-    #     if node.original_player != node.player_number:
-    #         win_value *= -1
-    #     node.update_win_value(float(win_value), callingPlayer)
+    if node.parent is not None:
+        if node.original_player != node.player_number:
+            win_value *= -1
+        node.update_win_value(float(win_value), simulatingPlayer)

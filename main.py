@@ -17,7 +17,14 @@ def main():
 
     myNetwork = Resnet.Network()
     model = myNetwork.getModel()
-    selfplay(1, model, 5)
+
+    import time
+    t0 = time.time()
+    selfplay(3, model, 20)
+    t1 = time.time()
+
+    total = t1 - t0
+    print(total)
     InputTests.test_sludge_belcher()
     InputTests.test_fiery_war_axe()
     InputTests.test_frostwolf_warlord()

@@ -48,7 +48,7 @@ class MonteCarlo:
 
         for i, probability in enumerate(children_visit_probabilities):
             if probabilities_already_counted + probability >= random_probability:
-                self.root_node.children[i].parent = None
+                # self.root_node.children[i].parent = None
                 return self.root_node.children[i]
 
             probabilities_already_counted += probability
