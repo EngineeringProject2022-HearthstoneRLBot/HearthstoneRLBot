@@ -1,4 +1,5 @@
 import math
+import pickle
 import random
 from math import log, sqrt
 
@@ -58,7 +59,13 @@ class Node:
                 best_children = [child]
             elif score == best_score:
                 best_children.append(child)
-        return random.choice(best_children)
+        try:
+            return random.choice(best_children)
+        except IndexError as e:
+            print(self.state)
+            with open("debugdata.txt", "wb") as fp:
+                pickle.dump(self.game, fp)
+            raise e
 
     def get_score(self, callingPlayer):
         ###Below code is modified by us
