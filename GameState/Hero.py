@@ -12,6 +12,7 @@ from GameState.StateEncoder import encode_complex_plane, getTargetedActionDetail
 
 class Hero:
     def __init__(self):
+        self.additionalBasicFeatures = {}
         self.currentHeroState = {}
         self.heroWeapon = {}
         self.heroPower = {}
@@ -32,6 +33,7 @@ class Hero:
     def encode_state(self, dictionaries):
         basicFeatures = np.zeros(169)
         weaponFeatures = np.zeros(169)
+        basicFeatures[6:12] = [x for x in dictionaries[3].values()]
         basicFeatures[52:88] = [x for x in dictionaries[0].values()]
         weaponFeatures[88:91] = [x for x in dictionaries[1].values()]
         heroPowerFeatures = encode_complex_plane(dictionaries[2])
@@ -54,14 +56,21 @@ class Hero:
                      filter2]
         WeaponPlain = [weaponFeatures, Battlecry_spell, EoT, SoT, Deathrattle, OnAttack, OtherConditional, filter1,
                        filter2]
-        HERO_POWER = self.createMegaMatrix(HeroPowerPlain)
-        HERO = self.createMegaMatrix(HeroPlain)
-        WEAPON = self.createMegaMatrix(WeaponPlain)
+        HeroPower = self.createMegaMatrix(HeroPowerPlain)
+        Hero = self.createMegaMatrix(HeroPlain)
+        Weapon = self.createMegaMatrix(WeaponPlain)
 
-        return HERO_POWER, HERO, WEAPON
+        return HeroPower, Hero, Weapon
 
     def HeroDecode(self, hero):
         #Basic hero features
+        self.additionalBasicFeatures["cardsInHand"] = len(hero.controller.hand)
+        self.additionalBasicFeatures["cardsInDeck"] = len(hero.controller.deck)
+        self.additionalBasicFeatures["totalManaCrystals"] = hero.controller.max_mana
+        self.additionalBasicFeatures["overloadedManaCrystals"] = hero.controller.overload_locked
+        self.additionalBasicFeatures["availableManaCrystals"] = hero.controller.mana
+        self.additionalBasicFeatures["turnNumber"] = hero.controller.game.turn
+
         self.currentHeroState["health"] = hero.health
         self.currentHeroState["attack"] = hero.atk
         self.currentHeroState["base_health"] = 30
@@ -115,7 +124,7 @@ class Hero:
 
 
         #Hero Power features
-        if str(hero) != "Thrall":
+        if str(hero.power) != "Totemic Call":
             for x in hero.power.data.scripts.activate:
                 self.heroPower["AlwaysGet"] = 1
                 getTargetedActionDetails(x, self.heroPower, hero)
@@ -140,4 +149,4 @@ class Hero:
             self.heroPower["SummonedAvgCost"] = sum_cost / len(hero.power.data.scripts.entourage)
             self.heroPower["SummonedCalculatedValue"] = 1
             self.heroPower["AlwaysGetSummmon"] = 1
-        return self.currentHeroState, self.heroWeapon, self.heroPower
+        return self.currentHeroState, self.heroWeapon, self.heroPower, self.additionalBasicFeatures
