@@ -10,13 +10,13 @@ class InputBuilder:
         playerHandDecode = []
         for i in range(0,10):
             counter = len(listOfCardsOnHand)
-            RES = np.zeros((41,40))
+            Res = np.zeros((41,40))
             if(i < counter):
                 test = HandCards.HandCard(listOfCardsOnHand[i])
-                RES = test.encode_state()
-            playerHandDecode.append(RES)
+                Res = test.encode_state()
+            playerHandDecode.append(Res)
         finalPlayerHand = np.hstack((playerHandDecode[0:]))
-        finalPlayerHand =  np.c_[np.zeros(41), finalPlayerHand]
+        finalPlayerHand = np.c_[np.zeros(41), finalPlayerHand]
         return finalPlayerHand
 
     def BoardFunction(listOfCardsOnBoard, listOfHeroFeatures):
@@ -24,11 +24,11 @@ class InputBuilder:
         playerBoardDecode = []
         for i in range(0,7):
             counter = len(listOfCardsOnBoard)
-            RES = np.zeros((41,40))
+            Res = np.zeros((41,40))
             if(i < counter):
                 test = HandCards.HandCard(listOfCardsOnBoard[i])
-                RES = test.encode_state()
-            playerBoardDecode.append(RES)
+                Res = test.encode_state()
+            playerBoardDecode.append(Res)
         #APPEND HERO FEATURES
 
         for elem in listOfHeroFeatures:
@@ -54,14 +54,14 @@ class InputBuilder:
         
         tmp1 = Hero.Hero()
         tmp2 = Hero.Hero()
-        hero1 = p1.hero #player 1 i player 2 sa pozamieniane chyba####
+        hero1 = p1.hero
         hero2 = p2.hero
         hero1st = tmp1.HeroDecode(hero1)
         hero2nd = tmp2.HeroDecode(hero2)
         res1 = tmp1.encode_state(hero1st)
         res2 = tmp2.encode_state(hero2nd)
 
-        FP1Hand = InputBuilder.HandFunction(player1Hand) #Player 1 ktorym powinen byc rexxar jest Guldan czyli player2 w sumie!!!
+        FP1Hand = InputBuilder.HandFunction(player1Hand)
         #FP2Hand = InputBuilder.HandFunction(player2Hand)
 
         FP1Board = InputBuilder.BoardFunction(boardPlayer1, res1)
