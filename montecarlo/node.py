@@ -19,6 +19,7 @@ class Node:
         self.discovery_factor = 1
         ### below code is added by us
         self.original_player = None
+        self.finished = False
         ###
 
     def update_win_value(self, value, callingPlayer):
@@ -64,6 +65,8 @@ class Node:
 
     def get_score(self, callingPlayer):
         ###Below code is modified by us
+        if self.finished:
+            return 1
         if self.original_player is None:
                 #or self.visits[callingPlayer -1] < 6:
             discovery_operand = float('inf')
