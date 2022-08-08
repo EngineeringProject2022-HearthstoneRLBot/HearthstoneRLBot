@@ -13,6 +13,8 @@ from montecarlo.montecarlo import MonteCarlo
 from montecarlo.node import Node
 
 
+RANDOM_MOVE_SAMPLES = 5
+
 def _setup_game():
     # we setup our game here
     from fireplace.game import Game
@@ -84,8 +86,8 @@ def selfplay(numbgame, model, simulations):
 
 
 def child_finder(node, montecarlo, simulatingPlayer):
-
     node.original_player = simulatingPlayer
+
     x = InputBuilder.convToInput(node.game, node.player_number)
 
     expert_policy_values, win_value = montecarlo.model(x)
@@ -93,11 +95,19 @@ def child_finder(node, montecarlo, simulatingPlayer):
         child = Node(deepcopy(node.game))
         child.state = action
         is_random = playTurnSparse(child.game, action)
-        if is_random:
-            pass
         child.player_number = child.game.current_player.entity_id - 1
         child.policy_value = expert_policy_values[0, action]
+        if is_random:
+            child.policy_value /= RANDOM_MOVE_SAMPLES
         node.add_child(child)
+        if is_random:
+            for i in range(RANDOM_MOVE_SAMPLES - 1):
+                child = Node(deepcopy(node.game))
+                child.state = action
+                playTurnSparse(child.game, action)
+                child.player_number = child.game.current_player.entity_id - 1
+                child.policy_value = expert_policy_values[0, action] / RANDOM_MOVE_SAMPLES
+                node.add_child(child)
     if node.parent is not None:
         if node.original_player != node.player_number:
             win_value *= -1
