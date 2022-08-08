@@ -18,6 +18,8 @@ def main():
     myNetwork = Resnet.Network()
     model = myNetwork.getModel()
 
+
+
     import time
     t0 = time.time()
     selfplay(3, model, 20)
