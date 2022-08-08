@@ -48,7 +48,7 @@ class MonteCarlo:
 
         for i, probability in enumerate(children_visit_probabilities):
             if probabilities_already_counted + probability >= random_probability:
-                self.root_node.children[i].parent = None
+                # self.root_node.children[i].parent = None
                 return self.root_node.children[i]
 
             probabilities_already_counted += probability
@@ -61,8 +61,8 @@ class MonteCarlo:
 
             self.expand(current_node, currentPlayer)
 
-    def expand(self, node):
-        self.child_finder(node, self)
+    def expand(self, node, currentPlayer):
+        self.child_finder(node, self, currentPlayer)
         if len(node.children):
             node.expanded = True
 

@@ -153,7 +153,7 @@ def encode_complex_plane(dictionary):
             arr[133] = 1
     if dictionary.get("BounceCards", 0):
         arr[135] = 1
-        arr[136:152] = encode_targets(dictionary.get("BounceTargets"), 0)
+        arr[136:152] = encode_targets(dictionary.get("BounceTargets"))
         arr[152] = dictionary.get("UnknownAmountBounce", 0)
         arr[153] = dictionary.get("GainManaCrystal", 0)
         arr[154:156] = encode_targets(dictionary.get("GainManaCrystalTargets"))[3:5]
