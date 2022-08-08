@@ -92,7 +92,9 @@ def child_finder(node, montecarlo, simulatingPlayer):
     for action in checkValidActionsSparse(node.game):
         child = Node(deepcopy(node.game))
         child.state = action
-        playTurnSparse(child.game, action)
+        is_random = playTurnSparse(child.game, action)
+        if is_random:
+            pass
         child.player_number = child.game.current_player.entity_id - 1
         child.policy_value = expert_policy_values[0, action]
         node.add_child(child)

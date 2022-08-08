@@ -59,13 +59,8 @@ class Node:
                 best_children = [child]
             elif score == best_score:
                 best_children.append(child)
-        try:
-            return random.choice(best_children)
-        except IndexError as e:
-            print(self.state)
-            with open("debugdata.txt", "wb") as fp:
-                pickle.dump(self.game, fp)
-            raise e
+        return random.choice(best_children)
+
 
     def get_score(self, callingPlayer):
         ###Below code is modified by us
