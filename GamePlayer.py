@@ -36,7 +36,7 @@ def _setup_game(gameData):
 
 def selfplay(numbgame, model, simulations):
     doPrints = False  # set to True to see console
-    totalData = []
+    # totalData = []
     for i in range(numbgame):
         #gamedata 1 <-> tuple(seed)
         #gamedata 2 <-> tuple(class1, deck1, class2, deck2)
@@ -47,7 +47,7 @@ def selfplay(numbgame, model, simulations):
         gameSeed = random.randrange(sys.maxsize)
         rng = random.Random(gameSeed)
 
-        random.seed(gameSeed)
+        random.seed(7216423666563530922)
         gameData = []
         gameData.append((gameSeed))
         game = _setup_game(gameData)
@@ -66,6 +66,7 @@ def selfplay(numbgame, model, simulations):
                 probabilities = montecarlo.get_probabilities(currPlayer)
 
                 montecarlo.root_node = montecarlo.make_exploratory_choice(currPlayer)
+
                 # else:
                 #    montecarlo.root_node = montecarlo.make_choice(currPlayer) #rest of moves are the network playing "optimally"
 
@@ -74,11 +75,12 @@ def selfplay(numbgame, model, simulations):
 
                 # zamieniłem bo chcemy appendować co zrobiliśmy i dopiero wtedy zagrać turę - ten ostatni ruch
                 # spowodował naszą wygraną (co nie byłoby zapisane do pliku, bo exception)
-                print("Turn: " + str(montecarlo.root_node.parent.game.turn))
+                print("Turn: " + str(montecarlo.root_node.parent.game.turn)+ ", Action:" + str(montecarlo.root_node.state))
+
                 gameData.append(((currInput[:, :, :, 0:3], currInput[0, 0, 0, 3]), probabilities, currPlayer,
                                  montecarlo.root_node.state))
                 playTurnSparse(montecarlo.root_node.parent.game, montecarlo.root_node.state)
-
+                montecarlo.root_node.parent = None
                 # if len(game.moves) >= 120:  # game too long, auto-draw
                 #     break
         except GameOver as e:
@@ -92,10 +94,10 @@ def selfplay(numbgame, model, simulations):
             winner = 4
             gameData.append((traceback.format_exc()))
             print(traceback.format_exc())
-        totalData.append((gameData, winner))
-        with open("TrainingData.txt", "wb") as fp:
-            pickle.dump(totalData, fp)
-    return totalData
+        # totalData.append((gameData, winner))
+        with open("TrainingData.txt", "ab") as fp:
+            pickle.dump((gameData, winner), fp)
+    # return totalData
 
 
 def child_finder(node, montecarlo, simulatingPlayer):
@@ -113,7 +115,6 @@ def child_finder(node, montecarlo, simulatingPlayer):
                 is_random = playTurnSparse(child.game, action)
             except GameOver:
                 child.finished = True
-                return
             child.player_number = child.game.current_player.entity_id - 1
             child.policy_value = expert_policy_values[0, action]
             if is_random:

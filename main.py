@@ -19,7 +19,8 @@ def main():
 
     # data = None
     # with open("TrainingData.txt", "rb") as rb:
-    #    data = pickle.load(rb)
+    #     while True:
+    #         data = pickle.load(rb)
 
     myNetwork = Resnet.Network()
     model = myNetwork.getModel()
