@@ -33,7 +33,10 @@ class MonteCarlo:
     def get_probabilities(self, callingPlayer):
         moves = np.zeros(252)
         for child in self.root_node.children:
-            moves[child.state] = child.visits[callingPlayer-1] / self.root_node.visits[callingPlayer-1]
+            if self.root_node.visits[callingPlayer-1] == 0:
+                moves[child.state] = 1
+            else:
+                moves[child.state] = child.visits[callingPlayer-1] / self.root_node.visits[callingPlayer-1]
         # children_visits = map(lambda child:  child.visits[callingPlayer-1], self.root_node.children)
         # children_visit_probabilities = [visit / self.root_node.visits[callingPlayer-1] for visit in children_visits]
         return moves

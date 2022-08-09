@@ -17,16 +17,18 @@ def main():
     # networkInputTesting()
     # continousTesting()
 
-    # data=None
-    # with open("TrainingData.txt", "rb") as rb:
-    #    data = pickle.load(rb)
+    data = None
+    with open("TrainingData.txt", "rb") as rb:
+        data = pickle.load(rb)
 
     myNetwork = Resnet.Network()
     model = myNetwork.getModel()
 
+
+
     import time
     t0 = time.time()
-    selfplay(1, model, 20)
+    selfplay(1, model, 4)
     t1 = time.time()
 
     total = t1 - t0

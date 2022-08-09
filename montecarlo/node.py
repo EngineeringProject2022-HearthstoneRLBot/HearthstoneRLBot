@@ -38,6 +38,7 @@ class Node:
                 value *= -1
             self.parent.update_win_value(value, callingPlayer)
         ###
+
     def update_policy_value(self, value):
         self.policy_value = value
 
@@ -52,9 +53,16 @@ class Node:
     def get_preferred_child(self, callingPlayer):
         best_children = []
         best_score = float('-inf')
-        for child in self.children:
-            score = child.get_score(callingPlayer)
 
+        for child in self.children:
+            score = 0
+            numbers = 0
+            for child_2 in self.children:
+                if child_2.state == child.state:
+                    score += child.get_score(callingPlayer)
+                    numbers += 1
+            # score = child.get_score(callingPlayer)
+            score = score / numbers
             if score > best_score:
                 best_score = score
                 best_children = [child]
