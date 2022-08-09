@@ -38,12 +38,11 @@ def checkValidCharacter(enemychars, character):
     if not character.can_attack():
         return charindexes
 
-    for i, character in enumerate(enemychars):
-        if character and is_valid_target(character, character):
+    for i, enemycharacter in enumerate(enemychars):
+        if enemycharacter and is_valid_target(character, enemycharacter):
             charindexes[i] = 1
 
     return charindexes
-
 
 
 def checkValidActions(game):
