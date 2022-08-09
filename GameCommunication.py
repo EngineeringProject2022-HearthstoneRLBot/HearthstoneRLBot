@@ -125,7 +125,7 @@ def playTurnSparse(game, action):
     elif action < 187:
         usePower(player, enemy, action)
     else:
-        minion = player.characters[int(action-187)/8]
+        minion = player.characters[int(action-187/8)]
         miniontarget = (action-187) % 8
         minion.attack(enemy.characters[miniontarget])
 
