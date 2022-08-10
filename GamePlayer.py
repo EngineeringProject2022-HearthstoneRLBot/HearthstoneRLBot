@@ -1,5 +1,3 @@
-import pickle
-import sys
 import traceback
 from copy import deepcopy
 import random
@@ -81,15 +79,6 @@ def playGame(model, simulations, seedObject = None):
         data.append(traceback.format_exc())
         print(traceback.format_exc())
     return winner, data
-
-def selfplay(model, numbgame, simulations, fileName):
-    for i in range(numbgame):
-        print("GAME " + str(i+1))
-        state = random.getstate()
-        winner, data = playGame(model, simulations)
-        with open("data/" + fileName + ".txt", "ab") as fp:
-            pickle.dump((data, winner, state), fp)
-
 
 def child_finder(node, montecarlo, simulatingPlayer):
     node.original_player = simulatingPlayer
