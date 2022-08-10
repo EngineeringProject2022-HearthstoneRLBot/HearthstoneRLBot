@@ -15,7 +15,7 @@ import glob
 def mostRecentFile():
     mostRecent = None
     for filepath in glob.iglob('data/*'):
-        if not mostRecent #or filepath is younger than mostRecent?? TODO
+        if not mostRecent: #or filepath is younger than mostRecent?? TODO
             mostRecent = filepath
     return mostRecent
 
