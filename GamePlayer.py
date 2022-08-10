@@ -3,6 +3,7 @@ import sys
 import traceback
 from copy import deepcopy
 import random
+from datetime import datetime
 
 from fireplace.exceptions import GameOver
 from fireplace.utils import random_draft
@@ -34,70 +35,74 @@ def _setup_game(gameData):
     mulliganRandomChoice(game)
     return game
 
+def playGame(model, simulations, fileName, seedObject = None):
+    # gamedata 1 <-> tuple(seed)
+    # gamedata 2 <-> tuple(class1, deck1, class2, deck2)
+    # gamedata 3 <-> n tuple(input,probabilities,player,movement)
+    # gamedata n
+
+    # generowanie seeda (z neta) aby był losowy oraz dało się go zapisać
+    if seedObject != None:
+        random.setstate(seedObject)
+    #else:
+    #    random.setstate(random.getstate())
+
+    gameSeed = random.getstate()
+
+    gameData = []
+    gameData.append((gameSeed))
+    game = _setup_game(gameData)
+    montecarlo = MonteCarlo(Node(game), model)
+    montecarlo.child_finder = child_finder
+    montecarlo.root_node.player_number = 1
+    winner = 0
+    try:
+        while True:
+            currPlayer = game.current_player.entity_id - 1
+
+            currInput = InputBuilder.convToInput(game, currPlayer)
+            montecarlo.simulate(simulations, currPlayer)  # number of simulations per turn. do not put less than 2
+            probabilities = montecarlo.get_probabilities(currPlayer)
+
+            montecarlo.root_node = montecarlo.make_exploratory_choice(currPlayer)
+
+            # else:
+            #    montecarlo.root_node = montecarlo.make_choice(currPlayer) #rest of moves are the network playing "optimally"
+
+            if montecarlo.root_node.visits[montecarlo.root_node.original_player - 1] != 0:
+                montecarlo.root_node.visits[montecarlo.root_node.original_player - 1] -= 1
+
+            # zamieniłem bo chcemy appendować co zrobiliśmy i dopiero wtedy zagrać turę - ten ostatni ruch
+            # spowodował naszą wygraną (co nie byłoby zapisane do pliku, bo exception)
+            print("Turn: " + str(montecarlo.root_node.parent.game.turn) + ", Action:" + str(montecarlo.root_node.state))
+
+            gameData.append(((currInput[:, :, :, 0:3], currInput[0, 0, 0, 3]), probabilities, currPlayer,
+                             montecarlo.root_node.state))
+            playTurnSparse(montecarlo.root_node.parent.game, montecarlo.root_node.state)
+            montecarlo.root_node.parent = None
+            # if len(game.moves) >= 120:  # game too long, auto-draw
+            #     break
+    except GameOver as e:
+        if montecarlo.root_node.game.player1.playstate is PlayState.WON:
+            winner = 1
+        elif montecarlo.root_node.game.player2.playstate is PlayState.WON:
+            winner = 2
+        else:
+            winner = 3
+    except Exception as e:
+        winner = 4
+        gameData.append((traceback.format_exc()))
+        print(traceback.format_exc())
+    if fileName == "":
+        return
+    with open("data/" + fileName + ".txt", "ab") as fp:
+        pickle.dump((gameData, winner), fp)
+
 def selfplay(numbgame, model, simulations):
     doPrints = False  # set to True to see console
-    # totalData = []
+    fileName = datetime.now().strftime("%d-%m-%YT%H%M%S")
     for i in range(numbgame):
-        #gamedata 1 <-> tuple(seed)
-        #gamedata 2 <-> tuple(class1, deck1, class2, deck2)
-        #gamedata 3 <-> n tuple(input,probabilities,player,movement)
-        #gamedata n
-
-        # generowanie seeda (z neta) aby był losowy oraz dało się go zapisać
-        gameSeed = random.randrange(sys.maxsize)
-        rng = random.Random(gameSeed)
-
-        random.seed(7216423666563530922)
-        gameData = []
-        gameData.append((gameSeed))
-        game = _setup_game(gameData)
-        montecarlo = MonteCarlo(Node(game), model)
-        montecarlo.child_finder = child_finder
-        # if doPrints:
-        print("game " + str(i))
-        montecarlo.root_node.player_number = 1
-        winner = 0
-        try:
-            while True:
-                currPlayer = game.current_player.entity_id - 1
-
-                currInput = InputBuilder.convToInput(game, currPlayer)
-                montecarlo.simulate(simulations, currPlayer)  # number of simulations per turn. do not put less than 2
-                probabilities = montecarlo.get_probabilities(currPlayer)
-
-                montecarlo.root_node = montecarlo.make_exploratory_choice(currPlayer)
-
-                # else:
-                #    montecarlo.root_node = montecarlo.make_choice(currPlayer) #rest of moves are the network playing "optimally"
-
-                if montecarlo.root_node.visits[montecarlo.root_node.original_player - 1] != 0:
-                    montecarlo.root_node.visits[montecarlo.root_node.original_player - 1] -= 1
-
-                # zamieniłem bo chcemy appendować co zrobiliśmy i dopiero wtedy zagrać turę - ten ostatni ruch
-                # spowodował naszą wygraną (co nie byłoby zapisane do pliku, bo exception)
-                print("Turn: " + str(montecarlo.root_node.parent.game.turn)+ ", Action:" + str(montecarlo.root_node.state))
-
-                gameData.append(((currInput[:, :, :, 0:3], currInput[0, 0, 0, 3]), probabilities, currPlayer,
-                                 montecarlo.root_node.state))
-                playTurnSparse(montecarlo.root_node.parent.game, montecarlo.root_node.state)
-                montecarlo.root_node.parent = None
-                # if len(game.moves) >= 120:  # game too long, auto-draw
-                #     break
-        except GameOver as e:
-            if montecarlo.root_node.game.player1.playstate is PlayState.WON:
-                winner = 1
-            elif montecarlo.root_node.game.player2.playstate is PlayState.WON:
-                winner = 2
-            else:
-                winner = 3
-        except Exception as e:
-            winner = 4
-            gameData.append((traceback.format_exc()))
-            print(traceback.format_exc())
-        # totalData.append((gameData, winner))
-        with open("TrainingData.txt", "ab") as fp:
-            pickle.dump((gameData, winner), fp)
-    # return totalData
+        playGame(model, simulations, fileName)
 
 
 def child_finder(node, montecarlo, simulatingPlayer):

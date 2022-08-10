@@ -23,11 +23,19 @@ def checkValidHandCard(allychars, enemychars, card):
         return cardindexes
 
     for i, character in enumerate(allychars):
-        if character and i < MAX_BOARD and is_valid_target(card, character): # to i jest bo blad w symulatorze ktory pozwala miec wiecej niz 7 minionow
+        if character \
+                and i < MAX_BOARD \
+                and is_valid_target(card, character):
             cardindexes[i] = 1
     for i, character in enumerate(enemychars):
-        if character and i < MAX_BOARD and is_valid_target(card, character): # to i jest bo blad w symulatorze ktory pozwala miec wiecej niz 7 minionow
-            cardindexes[8+i] = 1
+        if character \
+                and i < MAX_BOARD \
+                and is_valid_target(card, character):
+            if hasattr(card, 'attack_targets'):
+                if character in card.attack_targets:
+                    cardindexes[8 + i] = 1
+            else:
+                cardindexes[8+i] = 1
 
     return cardindexes
 
@@ -39,9 +47,8 @@ def checkValidCharacter(enemychars, character):
         return charindexes
 
     for i, enemycharacter in enumerate(enemychars):
-        if enemycharacter and is_valid_target(character, enemycharacter):
+        if enemycharacter and character.can_attack(enemycharacter):
             charindexes[i] = 1
-
     return charindexes
 
 
@@ -127,10 +134,7 @@ def playTurnSparse(game, action):
     else:
         minion = player.characters[int((action-187)/8)]
         miniontarget = (action-187) % 8
-        try:
-            minion.attack(enemy.characters[miniontarget])
-        except Exception as e:
-            x = 0
+        minion.attack(enemy.characters[miniontarget])
 
     while player.choice:
         player.choice.choose(random.choice(player.choice.cards))
