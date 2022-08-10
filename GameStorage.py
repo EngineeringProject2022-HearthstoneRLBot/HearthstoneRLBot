@@ -7,6 +7,18 @@ from Model import Resnet
 from GamePlayer import playGame
 import glob
 
+
+# ta funkcja sie przyda we wszystkim - granie najswiezszego pliku, podsumowanie najswiezszego pliku itd itd
+# jak ktos sie chce podjac obstawiam ze to mega latwe będzie, taki format mamy aktualnie nazwy pliku:
+# "data/"+ datetime.now().strftime("%d-%m-%YT%H%M%S") +".txt"
+# więc wystarczy z tego wyciągnąć datetime.now() robiąc przeciwną operację i porównywać
+def mostRecentFile():
+    mostRecent = None
+    for filepath in glob.iglob('data/*'):
+        if not mostRecent #or filepath is younger than mostRecent?? TODO
+            mostRecent = filepath
+    return mostRecent
+
 def translateClassId(id):
     #TODO
     return str(id)
