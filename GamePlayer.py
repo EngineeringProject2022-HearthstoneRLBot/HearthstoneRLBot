@@ -54,7 +54,7 @@ def playGame(model, simulations, seedObject = None):
             currPlayer = montecarlo[0].root_node.game.current_player.entity_id - 1
 
             (currTree, otherTree) = (montecarlo[0], montecarlo[1]) if currPlayer == 1 else (montecarlo[1], montecarlo[0])
-            currInput = InputBuilder.convToInput(game, currPlayer)
+            currInput = InputBuilder.convToInput(currTree.root_node.game, currPlayer)
             currTree.simulate(simulations)  # number of simulations per turn. do not put less than 2
             probabilities = currTree.get_probabilities()
 
