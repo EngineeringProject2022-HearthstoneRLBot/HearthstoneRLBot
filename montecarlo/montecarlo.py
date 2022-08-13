@@ -1,5 +1,7 @@
 import random
 from copy import deepcopy
+
+from GameState import InputBuilder
 from montecarlo.node import Node
 import numpy as np
 
@@ -14,38 +16,38 @@ class MonteCarlo:
         self.model = model
         ###
 
-    def make_choice(self, callingPlayer):
+    def make_choice(self):
         self.root_node.active = False
         best_children = []
         most_visits = float('-inf')
 
         for child in self.root_node.children:
-            if child.visits[callingPlayer-1] > most_visits:
-                most_visits = child.visits[callingPlayer-1]
+            if child.visits > most_visits:
+                most_visits = child.visits
                 best_children = [child]
-            elif child.visits[callingPlayer-1] == most_visits:
+            elif child.visits == most_visits:
                 best_children.append(child)
         theChoice = random.choice(best_children)
         theChoice.parent = None
         return theChoice
 
     ###Below Function is created entirely by us
-    def get_probabilities(self, callingPlayer):
+    def get_probabilities(self):
         moves = np.zeros(252)
         for child in self.root_node.children:
-            if self.root_node.visits[callingPlayer-1] == 0:
+            if self.root_node.visits == 0:
                 moves[child.state] = 1
             else:
-                moves[child.state] = child.visits[callingPlayer-1] / self.root_node.visits[callingPlayer-1]
+                moves[child.state] = child.visits / self.root_node.visits
         # children_visits = map(lambda child:  child.visits[callingPlayer-1], self.root_node.children)
         # children_visit_probabilities = [visit / self.root_node.visits[callingPlayer-1] for visit in children_visits]
         return moves
     ###
 
-    def make_exploratory_choice(self, callingPlayer):
+    def make_exploratory_choice(self):
         self.root_node.active = False
-        children_visits = map(lambda child: child.visits[callingPlayer-1], self.root_node.children)
-        children_visit_probabilities = [visit / self.root_node.visits[callingPlayer-1] for visit in children_visits]
+        children_visits = map(lambda child: child.visits, self.root_node.children)
+        children_visit_probabilities = [visit / self.root_node.visits for visit in children_visits]
         random_probability = random.uniform(0, 1)
         probabilities_already_counted = 0.
 
@@ -56,18 +58,40 @@ class MonteCarlo:
 
             probabilities_already_counted += probability
 
-    def simulate(self, expansion_count=1, currentPlayer=None):
+    def simulate(self, expansion_count=1):
         for i in range(expansion_count):
             current_node = self.root_node
             while current_node.expanded:
-                current_node = current_node.get_preferred_child(currentPlayer)
+                current_node = current_node.get_preferred_child()
 
-            self.expand(current_node, currentPlayer)
+            self.expand(current_node)
 
-    def expand(self, node, currentPlayer):
-        self.child_finder(node, self, currentPlayer)
+    def expand(self, node):
+        self.child_finder(node, self)
         if len(node.children):
             node.expanded = True
+
+    def move_opponent(self, game, move, is_random: int):
+        found = False
+        # orientation doesn't matter as long as its the same for both here, as we are only going to look at the board, not hands
+        currInput = InputBuilder.convToInput(game, 1)
+        for x in self.root_node.children:
+            if x.state == move:
+                # we found a child with the same move, but it could be a different random state if is_random, so we gta compare boards
+                if is_random == 0 or (is_random == 1 and (currInput[:, :, :, 1:3] == InputBuilder.convToInput(x.game, 1)[:, :, :, 1:3]).all()):
+                    self.root_node = x
+                    if self.root_node.expanded and self.root_node.visits != 0:
+                        self.root_node.visits -= 1
+                    found = True
+                    break
+        if not found:
+            child = Node(deepcopy(game))
+            child.state = move
+            child.player_number = child.game.current_player.entity_id - 1
+            self.root_node.add_child(child)
+            self.root_node = child
+
+
 
     # ### Below Function is created entirely by us
     # def non_user_expand(self, move, callingPlayer):
