@@ -65,7 +65,7 @@ def playGame(model, simulations, seedObject=None):
 
             probabilities = currTree.get_probabilities()
 
-            action = currTree.make_exploratory_choice()
+            action = currTree.make_exploratory_choice().state
 
             # else:
             #    montecarlo.root_node = montecarlo.make_choice(currPlayer)
