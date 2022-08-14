@@ -51,7 +51,7 @@ class Network:
 
     def buildResLayer(self, inputs):
         block = self.buildConvLayer(inputs)
-        block = Conv2D(padding='same', filters=1, strides=1, kernel_size=3)(inputs)
+        block = Conv2D(padding='same', filters=1, strides=1, kernel_size=3)(block)
         block = BatchNormalization()(block)
         skip = Add()([inputs, block])
         skip = ReLU()(skip)

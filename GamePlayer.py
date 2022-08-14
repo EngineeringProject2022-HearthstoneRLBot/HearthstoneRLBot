@@ -37,40 +37,52 @@ def playGame(model, simulations, seedObject = None):
         random.setstate(seedObject)
     data = []
     game = _setup_game(data)
-    montecarlo = MonteCarlo(Node(game), model)
-    montecarlo.child_finder = child_finder
-    montecarlo.root_node.player_number = 1
+    montecarlo = []
+    for i in range(2):
+        tmp = MonteCarlo(Node(game), model)
+        tmp.child_finder = child_finder
+        tmp.root_node.player_number = game.current_player.entity_id - 1
+        montecarlo.append(tmp)
+    # montecarlo = MonteCarlo(Node(game), model)
+    # montecarlo.child_finder = child_finder
+    # montecarlo.root_node.player_number = game.current_player.entity_id - 1
     winner = 0
+
     try:
         while True:
-            currPlayer = game.current_player.entity_id - 1
+            # states should be sync'd, doesnt matter whose tree we use here
+            currPlayer = montecarlo[0].root_node.game.current_player.entity_id - 1
 
-            currInput = InputBuilder.convToInput(game, currPlayer)
-            montecarlo.simulate(simulations, currPlayer)  # number of simulations per turn. do not put less than 2
-            probabilities = montecarlo.get_probabilities(currPlayer)
+            (currTree, otherTree) = (montecarlo[0], montecarlo[1]) if currPlayer == 1 else (montecarlo[1], montecarlo[0])
+            currInput = InputBuilder.convToInput(currTree.root_node.game, currPlayer)
+            currTree.simulate(simulations)  # number of simulations per turn. do not put less than 2
+            probabilities = currTree.get_probabilities()
 
-            montecarlo.root_node = montecarlo.make_exploratory_choice(currPlayer)
+            currTree.root_node = currTree.make_exploratory_choice()
 
             # else:
-            #    montecarlo.root_node = montecarlo.make_choice(currPlayer) #rest of moves are the network playing "optimally"
+            #    montecarlo.root_node = montecarlo.make_choice(currPlayer)
+            #    #rest of moves are the network playing "optimally"
 
-            if montecarlo.root_node.visits[montecarlo.root_node.original_player - 1] != 0:
-                montecarlo.root_node.visits[montecarlo.root_node.original_player - 1] -= 1
+            if currTree.root_node.visits != 0:
+                currTree.root_node.visits -= 1
 
             # zamieniłem bo chcemy appendować co zrobiliśmy i dopiero wtedy zagrać turę - ten ostatni ruch
             # spowodował naszą wygraną (co nie byłoby zapisane do pliku, bo exception)
-            print("Turn: " + str(montecarlo.root_node.parent.game.turn) + ", Action:" + str(montecarlo.root_node.state))
+            print("Turn: " + str(currTree.root_node.parent.game.turn) + ", Action:" + str(currTree.root_node.state))
 
             data.append(((currInput[:, :, :, 0:3], currInput[0, 0, 0, 3]), probabilities, currPlayer,
-                             montecarlo.root_node.state))
-            playTurnSparse(montecarlo.root_node.parent.game, montecarlo.root_node.state)
-            montecarlo.root_node.parent = None
+                        currTree.root_node.state))
+            is_random = playTurnSparse(currTree.root_node.parent.game, currTree.root_node.state)
+            otherTree.move_opponent(currTree.root_node.game, currTree.root_node.state, is_random)
+            currTree.root_node.parent = None
+            otherTree.root_node.parent = None
             # if len(game.moves) >= 120:  # game too long, auto-draw
             #     break
     except GameOver as e:
-        if montecarlo.root_node.game.player1.playstate is PlayState.WON:
+        if currTree.root_node.game.player1.playstate is PlayState.WON:
             winner = 1
-        elif montecarlo.root_node.game.player2.playstate is PlayState.WON:
+        elif currTree.root_node.game.player2.playstate is PlayState.WON:
             winner = 2
         else:
             winner = 3
@@ -80,8 +92,8 @@ def playGame(model, simulations, seedObject = None):
         print(traceback.format_exc())
     return winner, data
 
-def child_finder(node, montecarlo, simulatingPlayer):
-    node.original_player = simulatingPlayer
+def child_finder(node, montecarlo):
+
     if node.finished:
         win_value = 1
     else:
@@ -112,6 +124,4 @@ def child_finder(node, montecarlo, simulatingPlayer):
                     child.policy_value = expert_policy_values[0, action] / RANDOM_MOVE_SAMPLES
                     node.add_child(child)
     if node.parent is not None:
-        if node.original_player != node.player_number:
-            win_value *= -1
-        node.update_win_value(float(win_value), simulatingPlayer)
+        node.update_win_value(float(win_value))
