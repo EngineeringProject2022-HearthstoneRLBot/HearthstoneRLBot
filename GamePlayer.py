@@ -91,7 +91,9 @@ def playGame(model, simulations, seedObject=None):
         else:
             winner = 3
     except NoChildException as e:
-        pass
+        winner = 4
+        data.append(traceback.format_exc())
+        print(traceback.format_exc())
         # handle this issue, record it into the data
     except Exception as e:
         winner = 4

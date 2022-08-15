@@ -40,7 +40,7 @@ def summarizeFile(filePath, comprehensive):
                 print('\tGame {} winner is {}'.format(i, data[1]))
                 print('\t\tPlayer 1 class is: {} deck is: {}'.format(translateClassId(data[0][0][0]), data[0][0][1]))
                 print('\t\tPlayer 2 class is: {} deck is: {}'.format(translateClassId(data[0][0][2]), data[0][0][3]))
-                if len(data[0][-1]) != 1:
+                if not isinstance(data[0][-1], str): #bardzo brzydko
                     print('\t\tNo exception occured')
                 else:
                     print('\t\tException occured:\n\t\t\t{}'.format(data[0][-1]))
