@@ -14,10 +14,20 @@ import glob
 # więc wystarczy z tego wyciągnąć datetime.now() robiąc przeciwną operację i porównywać
 def mostRecentFile():
     mostRecent = None
+
     for filepath in glob.iglob('data/*'):
-        if not mostRecent: #or filepath is younger than mostRecent?? TODO
-            mostRecent = filepath
-    return mostRecent
+        x = filepath\
+            .replace("data\\","")\
+            .replace(".txt","")
+        if not mostRecent:
+            mostRecent = datetime.strptime(x,"%d-%m-%YT%H%M%S")
+            continue
+        tmp = datetime.strptime(x,"%d-%m-%YT%H%M%S")
+        if mostRecent < tmp:
+            mostRecent = tmp
+
+
+    return f"data\\{mostRecent}.txt"
 
 def translateClassId(id):
     #TODO
