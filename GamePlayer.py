@@ -57,11 +57,8 @@ def playGame(model, simulations, seedObject=None):
             (currTree, otherTree) = (montecarlo[0], montecarlo[1]) if currPlayer == 1 else (
                 montecarlo[1], montecarlo[0])
             currInput = InputBuilder.convToInput(currTree.root_node.game, currPlayer)
-            try:
-                currTree.simulate(simulations)  # number of simulations per turn. do not put less than 2
-            except NoChildException as e:
-                # handle this issue, record it into the data
-                raise GameOver
+            currTree.simulate(simulations)  # number of simulations per turn. do not put less than 2
+
 
             probabilities = currTree.get_probabilities()
 
@@ -93,6 +90,9 @@ def playGame(model, simulations, seedObject=None):
             winner = 2
         else:
             winner = 3
+    except NoChildException as e:
+        pass
+        # handle this issue, record it into the data
     except Exception as e:
         winner = 4
         data.append(traceback.format_exc())
