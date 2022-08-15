@@ -4,6 +4,10 @@ import random
 from math import log, sqrt
 
 
+class NoChildException(Exception):
+    pass
+
+
 class Node:
 
     def __init__(self, game):
@@ -23,7 +27,7 @@ class Node:
 
     def update_win_value(self, value):
         ### below code is modified by us
-        newValue=value
+        newValue = value
         multiplier = 1
         if self.visits != 0:
             sum = self.win_value * self.visits
@@ -67,23 +71,26 @@ class Node:
                 best_children.append(child)
         try:
             return random.choice(best_children)
-        except Exception:
-            pass
-
+        except IndexError:
+            raise NoChildException
 
     def get_score(self):
         ###Below code is modified by us
-        if self.finished:
-            return 1
+        # if self.finished:
+        #     # who won?
+        #     if self.game.current_player.playstate is PlayState.WON:
+        #         self.win_value = 1
+        #     else:
+        #         self.win_value = -1
         if not self.expanded:
-                #or self.visits[callingPlayer -1] < 6:
+            # or self.visits[callingPlayer -1] < 6:
             discovery_operand = float('inf')
             win_operand = 0
         else:
-            discovery_operand = self.discovery_factor * (self.policy_value or 1) * ((sqrt(self.parent.visits))/(1 + self.visits))
+            discovery_operand = self.discovery_factor * (self.policy_value or 1) * (
+                        (sqrt(self.parent.visits)) / (1 + self.visits))
             win_multiplier = 1
             win_operand = win_multiplier * self.win_value
         self.score = win_operand + discovery_operand
         return self.score
         ###
-

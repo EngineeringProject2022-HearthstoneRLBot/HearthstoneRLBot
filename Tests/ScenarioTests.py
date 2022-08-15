@@ -224,7 +224,7 @@ def arcane_missles_without_randomness_test():
 
 
 def weapon_test(): #1 with 1hp and 3/2 weapon other with 3hp and board full of whisps
-    game = prepare_game()
+    game = prepare_game(CardClass.WARLOCK, CardClass.WARLOCK)
 
     game.player1.discard_hand()
     game.player2.discard_hand()

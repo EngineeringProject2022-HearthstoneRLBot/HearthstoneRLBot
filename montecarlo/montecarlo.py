@@ -71,7 +71,7 @@ class MonteCarlo:
         if len(node.children):
             node.expanded = True
 
-    def move_opponent(self, game, move, is_random: int):
+    def sync_tree(self, game, move, is_random: int):
         found = False
         # orientation doesn't matter as long as its the same for both here, as we are only going to look at the board, not hands
         currInput = InputBuilder.convToInput(game, 1)

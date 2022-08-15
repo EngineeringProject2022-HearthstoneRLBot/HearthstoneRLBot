@@ -121,7 +121,7 @@ def loadGame(fileName, gameNumber=-1): # bez argumentu to ostatnia
             i += 1
             try:
                 gameData = pickle.load(rb)
-            except Exception:
+            except EOFError as e:
                 break
 
         playGame(model, metadata[1], gameData[2])
