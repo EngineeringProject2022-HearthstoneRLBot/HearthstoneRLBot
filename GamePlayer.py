@@ -9,6 +9,7 @@ from hearthstone.enums import CardClass, PlayState
 from GameCommunication import checkValidActionsSparse, playTurnSparse
 from GameSetupUtils import mulliganRandomChoice
 from GameState import InputBuilder
+from Tests.ScenarioTests import weapon_test
 from montecarlo.montecarlo import MonteCarlo
 from montecarlo.node import Node, NoChildException
 
@@ -38,7 +39,8 @@ def playGame(model, simulations, seedObject=None):
     if seedObject != None:
         random.setstate(seedObject)
     data = []
-    game = _setup_game(data)
+    #game = _setup_game(data)
+    game = weapon_test()
     montecarlo = []
     for i in range(2):
         tmp = MonteCarlo(Node(game), model)

@@ -3,10 +3,9 @@ from fireplace import cards, logging
 # import os
 # os.environ['PYTHONHASHSEED'] = '0' # niby mi działa z zakomentowanymi tymi liniami, ale zostawiam na później
 # os.environ['CUDA_VISIBLE_DEVICES'] = '' #czy to nie zepsuje procesowania z CUDA?
-from GameStorage import dumpGames, loadGame, summarizeData
+from GameStorage import dumpGames
+from constants import GAME_NUM, SIMULATION_NUM
 
-GAME_NUM = 1000
-SIMULATION_NUM = 20
 
 def main():
     logger = logging.log
@@ -16,7 +15,7 @@ def main():
 
 #zróbcie sobie folder 'data'
     dumpGames(GAME_NUM, SIMULATION_NUM)
-    #loadGame("11-08-2022T002609")
+    # loadGame("15-08-2022T134702", 1)
     #summarizeData(False)
 
     #... patrz niżej co tu wg mnie fajnie byłoby zrobić
