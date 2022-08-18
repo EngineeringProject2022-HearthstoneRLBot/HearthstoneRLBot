@@ -14,6 +14,12 @@ def main():
     cards.db.initialize()
 
 #zróbcie sobie folder 'data'
+# teraz tez poporosze training/training_data
+# i Models/models
+    # mozemy podac argument model_name
+    # wystarczy same imie nie trzeba sciezki
+    # default(nie trzeba wpisywac) = Model-INIT
+    # tak samo dla loadgame
     dumpGames(GAME_NUM, SIMULATION_NUM)
     # loadGame("15-08-2022T134702", 1)
     #summarizeData(False)

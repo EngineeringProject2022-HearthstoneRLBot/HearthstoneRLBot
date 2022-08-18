@@ -11,3 +11,7 @@ def trainNetwork(model, trainingData):
     yValue = [i[2] for i in trainingData]
     yValue = np.asarray(yValue)
     model.fit(x=x, y=[yPolicy, yValue], batch_size=64, epochs=15, verbose=1)
+
+
+def parseGames(games):
+    pass
