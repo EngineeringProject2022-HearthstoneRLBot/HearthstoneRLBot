@@ -1,6 +1,6 @@
 from fireplace import cards, logging
 
-# import os
+
 # os.environ['PYTHONHASHSEED'] = '0' # niby mi działa z zakomentowanymi tymi liniami, ale zostawiam na później
 # os.environ['CUDA_VISIBLE_DEVICES'] = '' #czy to nie zepsuje procesowania z CUDA?
 from GameStorage import dumpGames
@@ -13,8 +13,7 @@ def main():
     logger.propagate = False
     cards.db.initialize()
 
-#zróbcie sobie folder 'data'
-# teraz tez poporosze training/training_data
+
 # i Models/models
     # mozemy podac argument model_name
     # wystarczy same imie nie trzeba sciezki
@@ -36,10 +35,7 @@ def main():
 # później dojdzie trenowanie i granie(pewnie o czymś jeszcze zapomniałem), więc taki mam pomysł aby po prostu każda z tych akcji miała
 # coś w stylu metody 'start'
 # czyli np Tests.runTests() odpalałoby te 5 linii na dole i wszystkie inne testy które nie są czasochłonne
-    #InputTests.test_sludge_belcher()
-    #InputTests.test_fiery_war_axe()
-    #InputTests.test_frostwolf_warlord()
-    #InputTests.test_blood_imp()
+
 
 
 if __name__ == "__main__":

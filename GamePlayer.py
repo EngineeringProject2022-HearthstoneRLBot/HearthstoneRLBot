@@ -39,8 +39,8 @@ def playGame(model, simulations, seedObject=None):
     if seedObject != None:
         random.setstate(seedObject)
     data = []
-    #game = _setup_game(data)
-    game = weapon_test()
+    game = _setup_game(data)
+    # game = weapon_test()
     montecarlo = []
     for i in range(2):
         tmp = MonteCarlo(Node(game), model)
