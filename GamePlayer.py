@@ -9,6 +9,7 @@ from hearthstone.enums import CardClass, PlayState
 from GameCommunication import checkValidActionsSparse, playTurnSparse
 from GameSetupUtils import mulliganRandomChoice
 from GameState import InputBuilder
+from Tests.ScenarioTests import weapon_test
 from montecarlo.montecarlo import MonteCarlo
 from montecarlo.node import Node, NoChildException
 
@@ -39,11 +40,12 @@ def playGame(model, simulations, seedObject=None):
         random.setstate(seedObject)
     data = []
     game = _setup_game(data)
+    # game = weapon_test()
     montecarlo = []
     for i in range(2):
         tmp = MonteCarlo(Node(game), model)
         tmp.child_finder = child_finder
-        tmp.root_node.player_number = game.current_player.entity_id - 1
+        tmp.root_node.player_number = 1 if game.current_player is game.player1 else 2
         montecarlo.append(tmp)
     # montecarlo = MonteCarlo(Node(game), model)
     # montecarlo.child_finder = child_finder
@@ -52,7 +54,7 @@ def playGame(model, simulations, seedObject=None):
 
     try:
         while True:
-            currPlayer = game.current_player.entity_id - 1
+            currPlayer = 1 if game.current_player is game.player1 else 2
 
             (currTree, otherTree) = (montecarlo[0], montecarlo[1]) if currPlayer == 1 else (
                 montecarlo[1], montecarlo[0])
@@ -72,8 +74,7 @@ def playGame(model, simulations, seedObject=None):
             # spowodował naszą wygraną (co nie byłoby zapisane do pliku, bo exception)
             print("Turn: " + str(game.turn) + ", Action:" + str(action))
 
-            data.append(((currInput[:, :, :, 0:3], currInput[0, 0, 0, 3]), probabilities, currPlayer,
-                         action))
+            data.append((currInput, probabilities, currPlayer, action))
             # to wywolanie bedzie wrapperowane w jakas funkcje playturn czy cos podobnego
             is_random = playTurnSparse(game, action)
 

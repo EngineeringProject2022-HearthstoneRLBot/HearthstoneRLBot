@@ -1,3 +1,4 @@
+import os
 import pickle
 import random
 import numpy as np
@@ -7,31 +8,34 @@ from Model import Resnet
 from GamePlayer import playGame
 import glob
 
-
 # ta funkcja sie przyda we wszystkim - granie najswiezszego pliku, podsumowanie najswiezszego pliku itd itd
 # jak ktos sie chce podjac obstawiam ze to mega latwe będzie, taki format mamy aktualnie nazwy pliku:
 # "data/"+ datetime.now().strftime("%d-%m-%YT%H%M%S") +".txt"
 # więc wystarczy z tego wyciągnąć datetime.now() robiąc przeciwną operację i porównywać
+from constants import INIT_MODEL_NAME
+
+
 def mostRecentFile():
     mostRecent = None
 
     for filepath in glob.iglob('data/*'):
-        x = filepath\
-            .replace("data\\","")\
-            .replace(".txt","")
+        x = filepath \
+            .replace("data\\", "") \
+            .replace(".txt", "")
         if not mostRecent:
-            mostRecent = datetime.strptime(x,"%d-%m-%YT%H%M%S")
+            mostRecent = datetime.strptime(x, "%d-%m-%YT%H%M%S")
             continue
-        tmp = datetime.strptime(x,"%d-%m-%YT%H%M%S")
+        tmp = datetime.strptime(x, "%d-%m-%YT%H%M%S")
         if mostRecent < tmp:
             mostRecent = tmp
 
-
     return f"data\\{mostRecent}.txt"
 
+
 def translateClassId(id):
-    #TODO
+    # TODO
     return str(id)
+
 
 def summarizeFile(filePath, comprehensive):
     if not comprehensive:
@@ -50,19 +54,21 @@ def summarizeFile(filePath, comprehensive):
                 print('\tGame {} winner is {}'.format(i, data[1]))
                 print('\t\tPlayer 1 class is: {} deck is: {}'.format(translateClassId(data[0][0][0]), data[0][0][1]))
                 print('\t\tPlayer 2 class is: {} deck is: {}'.format(translateClassId(data[0][0][2]), data[0][0][3]))
-                if not isinstance(data[0][-1], str): #bardzo brzydko
+                if not isinstance(data[0][-1], str):  # bardzo brzydko
                     print('\t\tNo exception occured')
                 else:
                     print('\t\tException occured:\n\t\t\t{}'.format(data[0][-1]))
             except Exception:
                 break
 
-def summarizeData(comprehensive, file = None):
+
+def summarizeData(comprehensive, file=None):
     if file is not None:
         summarizeFile(file, comprehensive)
     else:
         for filepath in glob.iglob('data/*'):
             summarizeFile(filepath, comprehensive)
+
 
 def fileStatistics(filePath):
     games = 0
@@ -89,41 +95,53 @@ def fileStatistics(filePath):
     return games, firstWins, secondWins, draws, exceptions
 
 
-def selfPlay(model, numbgame, simulations, fileName):
+def selfPlay(model, numbgame, simulations, fileName, model_name):
     for i in range(numbgame):
-        print("GAME " + str(i+1))
+        print("GAME " + str(i + 1))
         state = random.getstate()
         winner, data = playGame(model, simulations)
-        with open("data/" + fileName + ".txt", "ab") as fp:
+        with open(f"data/{model_name}/{fileName}.txt", "ab") as fp:
             pickle.dump((data, winner, state), fp)
 
-def dumpGames(numGames, numSims):
+
+def dumpGames(numGames, numSims, model_name=None):
+    if not model_name:
+        model_name = INIT_MODEL_NAME
+
+    model = tf.keras.models.load_model(f"Model/models/{model_name}")
+    path = f"data/{model_name}"
+    isExist = os.path.exists(path)
+    if not isExist:
+        os.makedirs(path)
     fileName = datetime.now().strftime("%d-%m-%YT%H%M%S")
-    with open("data/" + fileName + ".txt", "wb") as fp:  # dumpuję aktualny(pierwszy) stan randoma jako pierwszy obiekt przed zrobieniem czegokolwiek
+
+    with open(f"data/{model_name}/{fileName}.txt", "wb") as fp:  # dumpuję aktualny(pierwszy) stan randoma jako pierwszy obiekt przed zrobieniem czegokolwiek
         pickle.dump((random.getstate(), numSims), fp)
         np.random.seed(random.randrange(999999999))
         tf.random.set_seed(random.randrange(999999999))
 
-    myNetwork = Resnet.Network()
-    model = myNetwork.getModel()
+
 
     import time
     t0 = time.time()
 
-    selfPlay(model, numGames, numSims, fileName)
+    selfPlay(model, numGames, numSims, fileName, model_name)
 
     t1 = time.time()
     total = t1 - t0
     print(total)
 
-def loadGame(fileName, gameNumber=-1): # bez argumentu to ostatnia
-    with open("data/" + fileName + ".txt", "rb") as rb:
+
+def loadGame(fileName, gameNumber=-1, model_name=None):  # bez argumentu to ostatnia
+    if not model_name:
+        model_name = INIT_MODEL_NAME
+    model = tf.keras.models.load_model(model_name)
+
+    with open(f"data/{model_name}/{fileName}.txt", "rb") as rb:
         metadata = pickle.load(rb)
         random.setstate(metadata[0])
         np.random.seed(random.randrange(999999999))
         tf.random.set_seed(random.randrange(999999999))
-        myNetwork = Resnet.Network()
-        model = myNetwork.getModel()
 
         i = 0
         gameData = None
@@ -135,3 +153,7 @@ def loadGame(fileName, gameNumber=-1): # bez argumentu to ostatnia
                 break
 
         playGame(model, metadata[1], gameData[2])
+
+
+def loadParseDataForTraining():
+    pass

@@ -1,12 +1,11 @@
 from fireplace import cards, logging
 
-# import os
+
 # os.environ['PYTHONHASHSEED'] = '0' # niby mi działa z zakomentowanymi tymi liniami, ale zostawiam na później
 # os.environ['CUDA_VISIBLE_DEVICES'] = '' #czy to nie zepsuje procesowania z CUDA?
-from GameStorage import dumpGames, loadGame, summarizeData
+from GameStorage import dumpGames
+from constants import GAME_NUM, SIMULATION_NUM
 
-GAME_NUM = 1000
-SIMULATION_NUM = 20
 
 def main():
     logger = logging.log
@@ -14,9 +13,14 @@ def main():
     logger.propagate = False
     cards.db.initialize()
 
-#zróbcie sobie folder 'data'
+
+# i Models/models
+    # mozemy podac argument model_name
+    # wystarczy same imie nie trzeba sciezki
+    # default(nie trzeba wpisywac) = Model-INIT
+    # tak samo dla loadgame
     dumpGames(GAME_NUM, SIMULATION_NUM)
-    #loadGame("11-08-2022T002609")
+    # loadGame("15-08-2022T134702", 1)
     #summarizeData(False)
 
     #... patrz niżej co tu wg mnie fajnie byłoby zrobić
@@ -31,10 +35,7 @@ def main():
 # później dojdzie trenowanie i granie(pewnie o czymś jeszcze zapomniałem), więc taki mam pomysł aby po prostu każda z tych akcji miała
 # coś w stylu metody 'start'
 # czyli np Tests.runTests() odpalałoby te 5 linii na dole i wszystkie inne testy które nie są czasochłonne
-    #InputTests.test_sludge_belcher()
-    #InputTests.test_fiery_war_axe()
-    #InputTests.test_frostwolf_warlord()
-    #InputTests.test_blood_imp()
+
 
 
 if __name__ == "__main__":

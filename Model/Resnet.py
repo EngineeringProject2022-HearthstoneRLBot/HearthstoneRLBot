@@ -15,7 +15,7 @@ class Network:
         return self.theModel
 
     def build(self):
-        inputShape = (401, 41, 4)
+        inputShape = (401, 41, 3)
         inputs = Input(shape=inputShape)
         network = self.buildConvLayer(inputs)
         for i in range(10):

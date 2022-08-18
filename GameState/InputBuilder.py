@@ -74,7 +74,8 @@ class InputBuilder:
         # remove opp hand
         MegaFinalMatrix = array([FP1Hand, FP1Board, FP2Board,
         #                         FP2Hand,
-                                 playerArr])
+        #                         playerArr
+                                 ])
         # x y z order
         MegaFinalMatrix = np.moveaxis(MegaFinalMatrix,[1,2],[1,0])
         # dummy dimension needed for model
