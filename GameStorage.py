@@ -1,3 +1,4 @@
+from GameConvinience import translateClassId
 import pickle
 import random
 import numpy as np
@@ -18,10 +19,6 @@ def mostRecentFile():
         if not mostRecent: #or filepath is younger than mostRecent?? TODO
             mostRecent = filepath
     return mostRecent
-
-def translateClassId(id):
-    #TODO
-    return str(id)
 
 def summarizeFile(filePath, comprehensive):
     if not comprehensive:
