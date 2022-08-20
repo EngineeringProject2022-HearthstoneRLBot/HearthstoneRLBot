@@ -80,7 +80,7 @@ def playGame(model, simulations, seedObject=None):
 
             for x in montecarlo:
                 x.sync_tree(game, action, is_random)
-                currTree.root_node.parent = None
+                x.root_node.parent = None
 
             # if len(game.moves) >= 120:  # game too long, auto-draw
             #     break

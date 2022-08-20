@@ -48,6 +48,9 @@ class MonteCarlo:
         self.root_node.active = False
         children_visits = map(lambda child: child.visits, self.root_node.children)
         children_visit_probabilities = [visit / self.root_node.visits for visit in children_visits]
+        sum_probs = sum(children_visit_probabilities)
+        if sum_probs != 1.0:
+            children_visit_probabilities[-1] += (1.0 - sum_probs)
         random_probability = random.uniform(0, 1)
         probabilities_already_counted = 0.
 
