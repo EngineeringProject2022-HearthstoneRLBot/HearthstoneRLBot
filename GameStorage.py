@@ -1,3 +1,4 @@
+from GameConvinience import translateClassId
 import os
 import pickle
 import random
@@ -30,12 +31,6 @@ def mostRecentFile():
             mostRecent = tmp
 
     return f"data\\{mostRecent}.txt"
-
-
-def translateClassId(id):
-    # TODO
-    return str(id)
-
 
 def summarizeFile(filePath, comprehensive):
     if not comprehensive:
