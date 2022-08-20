@@ -135,7 +135,7 @@ def dumpGames(numGames, numSims, model_name=None):
 def loadGame(fileName, gameNumber=-1, model_name=None):  # bez argumentu to ostatnia
     if not model_name:
         model_name = INIT_MODEL_NAME
-    model = tf.keras.models.load_model(model_name)
+    model = tf.keras.models.load_model(f"Model/models/{model_name}")
 
     with open(f"data/{model_name}/{fileName}.txt", "rb") as rb:
         metadata = pickle.load(rb)
