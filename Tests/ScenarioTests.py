@@ -229,20 +229,22 @@ def weapon_test(): #1 with 1hp and 3/2 weapon other with 3hp and board full of w
     game.player1.discard_hand()
     game.player2.discard_hand()
     for i in range(27):
-        moon = game.player1.give("CS2_008")
-        moon.play(target=game.player1.hero)
+        moon = game.current_player.give("CS2_008")
+        moon.play(target=game.current_player.hero)
     for i in range(7):
         # whisp
-        a = game.player1.give("CS2_231")
+        a = game.current_player.give("CS2_231")
         a.play()
     game.end_turn()
     for i in range(29):
-        moon = game.player2.give("CS2_008")
-        moon.play(target=game.player2.hero)
+        moon = game.current_player.give("CS2_008")
+        moon.play(target=game.current_player.hero)
     for i in range(1):
         # fiery war axe
-        a = game.player2.give("CS2_106")
+        a = game.current_player.give("CS2_106")
         a.play()
+    game.player1.discard_hand()
+    game.player2.discard_hand()
     # try:
     #     fire.play(target=game.player1.hero)
     # except fireplace.exceptions.GameOver:
