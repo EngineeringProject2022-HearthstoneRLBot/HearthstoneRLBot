@@ -39,11 +39,8 @@ def trainNetwork(model, trainingData):
                 else:
                     value = 0
                 yValue.append(value)
-    # x = [i[0] for i in trainingData]
     x = np.asarray(x)
-    yPolicy = [i[1] for i in trainingData]
     yPolicy = np.asarray(yPolicy)
-    yValue = [i[2] for i in trainingData]
     yValue = np.asarray(yValue)
     x = x.squeeze(1)
     model.fit(x=x, y=[yPolicy, yValue], batch_size=128, epochs=250, verbose=1)
