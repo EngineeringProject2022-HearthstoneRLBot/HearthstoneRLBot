@@ -13,7 +13,7 @@ from Tests.ScenarioTests import weapon_test
 from montecarlo.montecarlo import MonteCarlo
 from montecarlo.node import Node, NoChildException
 
-from GameConvinience import getCardIdFromAction
+# from GameConvinience import getCardIdFromAction
 
 RANDOM_MOVE_SAMPLES = 5
 
@@ -43,8 +43,8 @@ def playGame(model, simulations, seedObject=None):
     data = []
     cardsp1 = []
     cardsp2 = []
-    game = _setup_game(data)
-    # game = weapon_test()
+    # game = _setup_game(data)
+    game = weapon_test()
     montecarlo = []
     for i in range(2):
         tmp = MonteCarlo(Node(game), model)

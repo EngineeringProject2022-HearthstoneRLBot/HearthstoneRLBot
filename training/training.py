@@ -14,7 +14,7 @@ LEARNING_RATE = 0.000001
 def trainNetwork(model, trainingData):
     trainingData = parseGames(trainingData)
     data = []
-    with open("../data/Model-INIT/21-08-2022T161028.txt", "rb") as rb:
+    with open(f"../data/{MODEL_NAME}/22-08-2022T172846.txt", "rb") as rb:
         metadata = pickle.load(rb)
         while True:
             try:
@@ -25,8 +25,8 @@ def trainNetwork(model, trainingData):
     yPolicy = []
     yValue = []
     for game in data:
-        winner = game[1]
-        for turn in game[0]:
+        winner = game[1] # who won the game
+        for turn in game[0]: # list of turns
             if type(turn) is not str:
                 input = turn[0]
                 x.append(input)
@@ -43,7 +43,7 @@ def trainNetwork(model, trainingData):
     yPolicy = np.asarray(yPolicy)
     yValue = np.asarray(yValue)
     x = x.squeeze(1)
-    model.fit(x=x, y=[yPolicy, yValue], batch_size=128, epochs=250, verbose=1)
+    model.fit(x=x, y=[yPolicy, yValue], batch_size=128, epochs=50, verbose=1)
 
     model.save('../Model/models/test_weapon')
 
