@@ -85,43 +85,45 @@ def mostRecentFile():
 
     return f"data/{INIT_MODEL_NAME}/{mostRecentFilepath}.txt"
 
-def getGamesWithoutExceptions(filepath:str, offset:int=50,num_games:int =50): # offset to ilosc gier do wziecia na raz
+def getGamesWithoutExceptions(filepath:str, num_games:int =50): # offset to ilosc gier do wziecia na raz
     global FILE_POSITION
     arrOfGames = []
     metadata = ()# seed i tabela wartosci, moze pozniej sie przyda
-    firstIter = True
-    currentIteration = 0
+    first_iteration = True
+
     with open(filepath,"rb") as rb:
         while True:
             try:
-                if FILE_POSITION > num_games:
-                    return
-                else:
-                    if firstIter:
-                        metadata = pickle.load(rb)
-                        firstIter = not firstIter
-                        currentIteration += 1
-                    elif FILE_POSITION <= num_games:
+                if first_iteration:
+                    metadata = pickle.load(rb)
+                    first_iteration = not first_iteration
+                elif FILE_POSITION <= num_games:
+                    tmp = pickle.load(rb)
+                    if not tmp:
+                        FILE_POSITION -= 1
+                        return
+                    if tmp[1] < 4: # mniejsze od 4 to dozwolone stany gry ( nie wyjątki )
                         FILE_POSITION += 1
-                        tmp = pickle.load(rb)
-                        if tmp[1] < 4: # mniejsze od 4 to dozwolone stany gry ( nie wyjątki )
-                            arrOfGames.append(tmp)
-                        else:
-                            FILE_POSITION -= 1
+                        if FILE_POSITION >= num_games:
+                            return metadata, arrOfGames
+                        arrOfGames.append(tmp)
+                    else:
+                        FILE_POSITION -= 1
             except EOFError:
-                #lastIteration += 1
-                FILE_POSITION
                 return metadata, arrOfGames
 
         return metadata,arrOfGames
 
-def getGamesWithoutExceptionsFromSeveralFiles(numberOfGames: int):
+def getGamesWithoutExceptionsFromSeveralFiles(numberOfGames: int): ## nazwa jak do testow xd
     x = []
+    global FILE_POSITION
+    FILE_POSITION = 0
     for filepath in glob.iglob('data/Model-INIT/*'):
         d = getGamesWithoutExceptions(filepath,num_games=numberOfGames)
+        if d[0] == [] or d[1] == []:
+            continue
         x.append(d)
 
-    asda = 5
 
 def fileStatistics(filePath):
     games = 0
