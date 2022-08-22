@@ -148,11 +148,77 @@ def interpretDecodedAction(result, game):
     target_log = ''.join(target_log)
     return(src_log + target_log)
 
+
+# This function returns the card that is abot to be played based on action number and game object,
+# if a card is not played (ex hero power is used instead) it returns None
+def getCardIdFromAction(action, game):
+    result = decodeAction(action)
+    tmp_player = 1 if game.current_player is game.player1 else 2
+    if tmp_player == 2:
+        p2 = game.player1
+        p1 = game.player2
+    elif tmp_player == 1:
+        p1 = game.player1
+        p2 = game.player2
+    source_number = 0
+    source = result[0]
+    if result[1] == '0':
+        source_number = result[2]
+    elif result[1] == '1':
+        source_number = result[1] + result[2]
+    if source == 'A':
+        return p1.hand[int(source_number)-1].data.id
+    else:
+        pass
+
+def checkPlayableHandCards(results, game):
+    log = ''
+    src_log = ''
+    target_log = ''
+    tmp_player = 1 if game.current_player is game.player1 else 2
+
+    if tmp_player == 2:
+        p2 = game.player1
+        p1 = game.player2
+    elif tmp_player == 1:
+        p1 = game.player1
+        p2 = game.player2
+
+    source_number = []
+    source = []
+    target_number = []
+    target = []
+    for i in range(len(results)):
+        #source_number = 0
+        source.append(results[i][0])
+        if results[i][1] == '0':
+            source_number.append(results[i][2])
+        elif results[i][1] == '1':
+            source_number.append(results[i][1] + results[i][2])
+        target.append(results[i][3])
+        target_number.append(results[i][4])
+
+    allPossibilitiesList = []
+    for i in range(10):
+        allPossibilitiesList.append([])
+
+    for i in range(len(source)):
+        if source[i] == 'A':
+            allPossibilitiesList[int(source_number[i])-1].append((target[i], target_number[i]))
+            print(allPossibilitiesList)
+            print(source[i], source_number[i], target[i], target_number[i])
+            #src_log = str(p1.hero), " hand card ", source_number, " - ", p1.hand[int(source_number) - 1].data.name, " -"
+            #return src_log
+
 def createHand(game):
     possible_actions_interpreted = []
+    decoded_actions = []
     possible_actions = checkValidActionsSparse(game)
     for action in possible_actions:
         possible_actions_interpreted.append(interpretDecodedAction(decodeAction(action), game))
+        decoded_actions.append(decodeAction(action))
+
+    print(checkPlayableHandCards(decoded_actions, game)) #tmp for taking just possible actions for a card once
 
     counter = 0
     for possible_moves in possible_actions_interpreted:
@@ -161,20 +227,32 @@ def createHand(game):
 
     choice = input("Choose number of action: ")
     act = possible_actions[int(choice)]
+    # print(getCardIdFromAction(act, game))
     playTurnSparse(game, act)
     return 0
+
+def checkBoard(game):
+    tmp_player = 1 if game.current_player is game.player1 else 2
+    if tmp_player == 2:
+        p2 = game.player1
+        p1 = game.player2
+    elif tmp_player == 1:
+        p1 = game.player1
+        p2 = game.player2
+    for elem in p1.field:
+        print("Card name:",elem.data.name, ", Cost:", elem.cost, ", Atk:", elem.atk, ", Hp:", elem.health)
 
 # TU TYLKO MOJE TESTY, ZOSTAWIAM JE ZAKOMENTOWANE JESZCZE A POTEM JE USUNE JAK WSZYSTKO BEDZIE OGARNIETE NA 100% JKBC!!!
 # for i in range(252):
 #     print(decodeAction(i))
 #
 #
-# logger = logging.log
-# logger.disabled = True
-# logger.propagate = False
-# cards.db.initialize()
-# game = prepare_game()
-#
+logger = logging.log
+logger.disabled = True
+logger.propagate = False
+cards.db.initialize()
+game = prepare_game()
+
 # for elem in game.player1.deck:
 #     if isinstance(elem, fireplace.card.Minion):
 #         print('Minion')
@@ -184,13 +262,16 @@ def createHand(game):
 #         print('Weapon')
 #     else:
 #         print("Unknown")
-# while True:
-#     print(game.player1.hero.health)
-#     print(game.player2.hero.health)
-#     createHand(game)
+while True:
+    print(game.player1.hero.health)
+    print(game.player2.hero.health)
+    checkBoard(game)
+    createHand(game)
+
+    a=0
 
 
-
+#
 # game.player1.discard_hand()
 # game.player2.discard_hand()
 # for i in range(1):
@@ -317,7 +398,7 @@ def createHand(game):
 # print(interpretDecodedAction('B01C6',game))
 # print(interpretDecodedAction('B01C7',game))
 # print(interpretDecodedAction('E0000',game))
-#
+
 # BasicDruid =  ['EX1_169', 'EX1_169', 'CS2_005', 'CS2_005', 'CS2_189', 'CS2_189', 'CS2_120', 'CS2_120', 'CS2_009', 'CS2_009', 'CS2_013', 'CS2_013', 'CS2_007', 'CS2_007', 'CS2_127', 'CS2_127', 'CS2_182', 'CS2_182', 'CS2_119', 'CS2_119', 'DS1_055', 'DS1_055', 'EX1_593', 'EX1_593', 'CS2_200', 'CS2_200', 'CS2_162', 'CS2_162', 'CS2_201', 'CS2_201']
 # BasicHunter = ['DS1_185', 'DS1_185', 'CS2_171', 'CS2_171', 'DS1_175', 'DS1_175', 'DS1_184', 'DS1_184', 'CS2_172', 'CS2_172', 'CS2_120', 'CS2_120', 'CS2_141', 'CS2_141', 'CS2_122', 'CS2_122', 'CS2_196', 'CS2_196', 'CS2_127', 'CS2_127', 'DS1_070', 'DS1_070', 'DS1_183', 'DS1_183', 'CS2_119', 'CS2_119', 'CS2_150', 'CS2_150', 'CS2_201', 'CS2_201']
 # BasicMage =   ['CFM_623', 'CFM_623', 'CS2_168', 'CS2_168', 'CS2_025', 'CS2_025', 'CS2_172', 'CS2_172', 'EX1_050', 'EX1_050', 'CS2_120', 'CS2_120', 'CS2_023', 'CS2_023', 'CS2_122', 'CS2_122', 'CS2_124', 'CS2_124', 'CS2_029', 'CS2_029', 'CS2_119', 'CS2_119', 'CS2_022', 'CS2_022', 'CS2_179', 'CS2_179', 'EX1_593', 'EX1_593', 'CS2_200', 'CS2_200']
