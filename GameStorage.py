@@ -8,29 +8,31 @@ from datetime import datetime
 from Model import Resnet
 from GamePlayer import playGame
 import glob
-
 # ta funkcja sie przyda we wszystkim - granie najswiezszego pliku, podsumowanie najswiezszego pliku itd itd
 # jak ktos sie chce podjac obstawiam ze to mega latwe będzie, taki format mamy aktualnie nazwy pliku:
 # "data/"+ datetime.now().strftime("%d-%m-%YT%H%M%S") +".txt"
 # więc wystarczy z tego wyciągnąć datetime.now() robiąc przeciwną operację i porównywać
-from constants import INIT_MODEL_NAME
+from constants import INIT_MODEL_NAME, FILE_POSITION
 
 
 def mostRecentFile():
     mostRecent = None
-
+    mostRecentFilepath = None
     for filepath in glob.iglob('data/*'):
         x = filepath \
             .replace("data\\", "") \
             .replace(".txt", "")
         if not mostRecent:
-            mostRecent = datetime.strptime(x, "%d-%m-%YT%H%M%S")
+            mostRecent = datetime.strptime(x,"%d-%m-%YT%H%M%S")
+            mostRecentFilepath = x
             continue
-        tmp = datetime.strptime(x, "%d-%m-%YT%H%M%S")
-        if mostRecent < tmp:
+        tmp = datetime.strptime(x,"%d-%m-%YT%H%M%S")
+        if mostRecent <= tmp:
+            mostRecentFilepath = x
             mostRecent = tmp
 
-    return f"data\\{mostRecent}.txt"
+
+    return f"data\\{mostRecentFilepath}.txt"
 
 def summarizeFile(filePath, comprehensive):
     if not comprehensive:
@@ -64,6 +66,62 @@ def summarizeData(comprehensive, file=None):
         for filepath in glob.iglob('data/*'):
             summarizeFile(filepath, comprehensive)
 
+def mostRecentFile():
+    mostRecent = None
+    mostRecentFilepath = None
+    for filepath in glob.iglob('data/Model-INIT/*'):
+        x = filepath \
+            .replace("data/", "") \
+            .replace("Model-INIT\\", "") \
+            .replace(".txt", "")
+        if not mostRecent:
+            mostRecent = datetime.strptime(x,"%d-%m-%YT%H%M%S")
+            mostRecentFilepath = x
+            continue
+        tmp = datetime.strptime(x,"%d-%m-%YT%H%M%S")
+        if mostRecent <= tmp:
+            mostRecentFilepath = x
+            mostRecent = tmp
+
+    return f"data/{INIT_MODEL_NAME}/{mostRecentFilepath}.txt"
+
+def getGamesWithoutExceptions(filepath:str, offset:int=50,num_games:int =50): # offset to ilosc gier do wziecia na raz
+    global FILE_POSITION
+    arrOfGames = []
+    metadata = ()# seed i tabela wartosci, moze pozniej sie przyda
+    firstIter = True
+    currentIteration = 0
+    with open(filepath,"rb") as rb:
+        while True:
+            try:
+                if FILE_POSITION > num_games:
+                    return
+                else:
+                    if firstIter:
+                        metadata = pickle.load(rb)
+                        firstIter = not firstIter
+                        currentIteration += 1
+                    elif FILE_POSITION <= num_games:
+                        FILE_POSITION += 1
+                        tmp = pickle.load(rb)
+                        if tmp[1] < 4: # mniejsze od 4 to dozwolone stany gry ( nie wyjątki )
+                            arrOfGames.append(tmp)
+                        else:
+                            FILE_POSITION -= 1
+            except EOFError:
+                #lastIteration += 1
+                FILE_POSITION
+                return metadata, arrOfGames
+
+        return metadata,arrOfGames
+
+def getGamesWithoutExceptionsFromSeveralFiles(numberOfGames: int):
+    x = []
+    for filepath in glob.iglob('data/Model-INIT/*'):
+        d = getGamesWithoutExceptions(filepath,num_games=numberOfGames)
+        x.append(d)
+
+    asda = 5
 
 def fileStatistics(filePath):
     games = 0
