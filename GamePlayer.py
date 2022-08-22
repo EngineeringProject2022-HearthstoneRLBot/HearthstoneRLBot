@@ -13,6 +13,8 @@ from Tests.ScenarioTests import weapon_test
 from montecarlo.montecarlo import MonteCarlo
 from montecarlo.node import Node, NoChildException
 
+from GameConvinience import getCardIdFromAction
+
 RANDOM_MOVE_SAMPLES = 5
 
 
@@ -39,6 +41,8 @@ def playGame(model, simulations, seedObject=None):
     if seedObject != None:
         random.setstate(seedObject)
     data = []
+    cardsp1 = []
+    cardsp2 = []
     game = _setup_game(data)
     # game = weapon_test()
     montecarlo = []
@@ -65,6 +69,15 @@ def playGame(model, simulations, seedObject=None):
             probabilities = currTree.get_probabilities()
 
             action = currTree.make_exploratory_choice().state
+            # This part will collect the order in which players played their cards
+            if game.current_player is game.player1:
+                card = getCardIdFromAction(action, game)
+                if card is not None:
+                    cardsp1.append(card)
+            elif game.current_player is game.player2:
+                card = getCardIdFromAction(action, game)
+                if card is not None:
+                    cardsp2.append(card)
 
             # else:
             #    montecarlo.root_node = montecarlo.make_choice(currPlayer)
@@ -77,6 +90,11 @@ def playGame(model, simulations, seedObject=None):
             data.append((currInput, probabilities, currPlayer, action))
             # to wywolanie bedzie wrapperowane w jakas funkcje playturn czy cos podobnego
             is_random = playTurnSparse(game, action)
+
+            if game.player1.last_card_played is not None:
+                print(game.player1.last_card_played.id)
+            if game.player2.last_card_played is not None:
+                print(game.player2.last_card_played.id)
 
             for x in montecarlo:
                 x.sync_tree(game, action, is_random)
