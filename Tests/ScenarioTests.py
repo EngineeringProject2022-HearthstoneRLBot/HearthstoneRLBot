@@ -157,18 +157,20 @@ def warlock_heropower_test(): #Two warlocks with 2 HP and nothing else, nie wiem
     return game
 
 
-def hunter_heropower_test(): #Both hunters on 2hp
+def hunter_heropower_test(): #Both hunters on 1hp
     game = prepare_game(CardClass.HUNTER, CardClass.HUNTER)
     game.player1.discard_hand()
     game.player2.discard_hand()
 
-    for i in range(28):
+    for i in range(29):
         moon = game.player1.give("CS2_008")
         moon.play(target=game.player1.hero)
     game.end_turn() #Both players on 2HP
-    for i in range(28):
+    for i in range(29):
         moon = game.player2.give("CS2_008")
         moon.play(target=game.player2.hero)
+    game.player1.deck = []
+    game.player2.deck = []
     # try:
     #     fire.play(target=game.player1.hero)
     # except fireplace.exceptions.GameOver:
@@ -222,6 +224,33 @@ def arcane_missles_without_randomness_test():
     #     print("g")
     return game
 
+def simpler_weapon_test(): #1 with 1hp and 3/2 weapon other with 1hp and 1 whisp
+    game = prepare_game(CardClass.WARLOCK, CardClass.WARLOCK)
+
+    game.player1.discard_hand()
+    game.player2.discard_hand()
+    for i in range(29):
+        moon = game.current_player.give("CS2_008")
+        moon.play(target=game.current_player.hero)
+    for i in range(1):
+        # whisp
+        a = game.current_player.give("CS2_231")
+        a.play()
+    game.end_turn()
+    for i in range(29):
+        moon = game.current_player.give("CS2_008")
+        moon.play(target=game.current_player.hero)
+    for i in range(1):
+        # fiery war axe
+        a = game.current_player.give("CS2_106")
+        a.play()
+    game.player1.discard_hand()
+    game.player2.discard_hand()
+    # try:
+    #     fire.play(target=game.player1.hero)
+    # except fireplace.exceptions.GameOver:
+    #     print("g")
+    return game
 
 def weapon_test(): #1 with 1hp and 3/2 weapon other with 3hp and board full of whisps
     game = prepare_game(CardClass.WARLOCK, CardClass.WARLOCK)
