@@ -1,4 +1,4 @@
-from GameConvinience import translateClassId
+from GameConvenience import translateClassId
 import os
 import pickle
 import random

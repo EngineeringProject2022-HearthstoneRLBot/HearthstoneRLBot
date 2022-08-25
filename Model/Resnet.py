@@ -1,11 +1,11 @@
-from keras.models import Model
-from keras.layers import BatchNormalization
-from keras.layers import Conv2D
-from keras.layers import Dense
-from keras.layers import Flatten
-from keras.layers import Input
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import BatchNormalization
+from tensorflow.keras.layers import Conv2D
+from tensorflow.keras.layers import Dense
+from tensorflow.keras.layers import Flatten
+from tensorflow.keras.layers import Input
 import tensorflow as tf
-from tensorflow.python.keras.layers import ReLU, Add
+from tensorflow.keras.layers import ReLU, Add
 
 class Network:
     def __init__(self):
@@ -18,7 +18,7 @@ class Network:
         inputShape = (401, 41, 3)
         inputs = Input(shape=inputShape)
         network = self.buildConvLayer(inputs)
-        for i in range(10):
+        for i in range(5):
             network = self.buildResLayer(network)
         value_head = self.buildValueHead(network)
         policy_head = self.buildPolicyHead(network)
@@ -45,13 +45,13 @@ class Network:
         return policy
 
     def buildConvLayer(self, inputs):
-        conv = Conv2D(padding='same', filters=252, strides=1, kernel_size=3)(inputs)
+        conv = Conv2D(padding='same', filters=1024, strides=1, kernel_size=3)(inputs)
         conv = self.bn_relu(conv)
         return conv
 
     def buildResLayer(self, inputs):
         block = self.buildConvLayer(inputs)
-        block = Conv2D(padding='same', filters=252, strides=1, kernel_size=3)(block)
+        block = Conv2D(padding='same', filters=1024, strides=1, kernel_size=3)(block)
         block = BatchNormalization()(block)
         skip = Add()([inputs, block])
         skip = ReLU()(skip)

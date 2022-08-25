@@ -13,7 +13,7 @@ from Tests.ScenarioTests import weapon_test
 from montecarlo.montecarlo import MonteCarlo
 from montecarlo.node import Node, NoChildException
 
-from GameConvinience import getCardIdFromAction
+from GameConvenience import getCardIdFromAction
 
 RANDOM_MOVE_SAMPLES = 5
 
