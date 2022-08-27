@@ -6,21 +6,22 @@ import tensorflow as tf
 from keras import backend as k
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 
-MODEL_NAME = "Model-INIT"
-LEARNING_RATE = 0.000001
+MODEL_NAME = "test_weapon4"
+LEARNING_RATE = 0.01
 
 
 
 def trainNetwork(model, trainingData):
     trainingData = parseGames(trainingData)
     data = []
-    with open(f"../data/{MODEL_NAME}/22-08-2022T172846.txt", "rb") as rb:
-        metadata = pickle.load(rb)
-        while True:
-            try:
-                data.append(pickle.load(rb))
-            except (EOFError, pickle.UnpicklingError):
-                break
+    for i in range(13):
+        with open(f"../data/{MODEL_NAME}/25-08-2022T213323.txt", "rb") as rb:
+            metadata = pickle.load(rb)
+            while True:
+                try:
+                    data.append(pickle.load(rb))
+                except (EOFError, pickle.UnpicklingError):
+                    break
     x = []
     yPolicy = []
     yValue = []
@@ -43,9 +44,9 @@ def trainNetwork(model, trainingData):
     yPolicy = np.asarray(yPolicy)
     yValue = np.asarray(yValue)
     x = x.squeeze(1)
-    model.fit(x=x, y=[yPolicy, yValue], batch_size=128, epochs=50, verbose=1)
+    model.fit(x=x, y=[yPolicy, yValue], batch_size=2, epochs=5, verbose=1)
 
-    model.save('../Model/models/test_weapon')
+    model.save('../Model/models/test_weapon5')
 
 def parseGames(games):
     pass
