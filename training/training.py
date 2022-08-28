@@ -3,13 +3,11 @@ import pickle
 import numpy as np
 import os
 import tensorflow as tf
-from tensorflow.keras import backend as k
+from keras import backend as k
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 
 MODEL_NAME = "Model-INIT"
 LEARNING_RATE = 0.000001
-from tensorflow.compat.v1 import ConfigProto
-from tensorflow.compat.v1 import InteractiveSession
 
 config = ConfigProto()
 config.gpu_options.allow_growth = True
@@ -18,13 +16,14 @@ session = InteractiveSession(config=config)
 def trainNetwork(model, trainingData):
     trainingData = parseGames(trainingData)
     data = []
-    with open(f"../data/{MODEL_NAME}/23-08-2022T103724.txt", "rb") as rb:
-        metadata = pickle.load(rb)
-        while True:
-            try:
-                data.append(pickle.load(rb))
-            except (EOFError, pickle.UnpicklingError):
-                break
+    for i in range(13):
+        with open(f"../data/{MODEL_NAME}/25-08-2022T213323.txt", "rb") as rb:
+            metadata = pickle.load(rb)
+            while True:
+                try:
+                    data.append(pickle.load(rb))
+                except (EOFError, pickle.UnpicklingError):
+                    break
     x = []
     yPolicy = []
     yValue = []
@@ -50,7 +49,7 @@ def trainNetwork(model, trainingData):
     x = x.squeeze(1)
     model.fit(x=x, y=[yPolicy, yValue], batch_size=1, epochs=20, verbose=1)
 
-    model.save('../Model/models/test_weapon')
+    model.save('../Model/models/test_weapon5')
 
 def parseGames(games):
     pass

@@ -23,6 +23,7 @@ class Node:
         self.discovery_factor = 1
         ### below code is added by us
         self.finished = False
+        self.networkValue = -999
         ###
 
     def update_win_value(self, value):

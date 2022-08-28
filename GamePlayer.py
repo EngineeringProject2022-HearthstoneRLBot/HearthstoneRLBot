@@ -120,6 +120,11 @@ def playGame(model, simulations, seedObject=None):
 def child_finder(node, montecarlo):
     x = InputBuilder.convToInput(node.game, node.player_number)
     expert_policy_values, win_value = montecarlo.model(x)
+    node.networkValue = win_value
+    if node.player_number != (1 if node.game.current_player is node.game.player1 else 2):
+        win_value *= -1
+    #if node.state == 251:
+    #    return
     for action in checkValidActionsSparse(node.game):
         child = Node(deepcopy(node.game))
         child.state = action
