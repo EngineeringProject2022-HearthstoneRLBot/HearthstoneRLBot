@@ -13,6 +13,7 @@ class Node:
     def __init__(self, game):
         self.state = None
         self.game = game
+        self.cached_win_value = None
         self.win_value = 0
         self.policy_value = None
         self.visits = 0
