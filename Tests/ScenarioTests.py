@@ -162,11 +162,11 @@ def hunter_heropower_test(): #Both hunters on 1hp
     game.player1.discard_hand()
     game.player2.discard_hand()
 
-    for i in range(29):
+    for i in range(28):
         moon = game.player1.give("CS2_008")
         moon.play(target=game.player1.hero)
     game.end_turn() #Both players on 2HP
-    for i in range(29):
+    for i in range(28):
         moon = game.player2.give("CS2_008")
         moon.play(target=game.player2.hero)
     game.player1.deck = []
