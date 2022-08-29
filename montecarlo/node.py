@@ -13,6 +13,7 @@ class Node:
     def __init__(self, game):
         self.state = None
         self.game = game
+        self.cached_win_value = None
         self.win_value = 0
         self.policy_value = None
         self.visits = 0
@@ -23,7 +24,6 @@ class Node:
         self.discovery_factor = 1
         ### below code is added by us
         self.finished = False
-        self.networkValue = -999
         ###
 
     def update_win_value(self, value):
@@ -76,21 +76,16 @@ class Node:
             raise NoChildException
 
     def get_score(self):
-        ###Below code is modified by us
-        # if self.finished:
-        #     # who won?
-        #     if self.game.current_player.playstate is PlayState.WON:
-        #         self.win_value = 1
-        #     else:
-        #         self.win_value = -1
-        if not self.expanded:
-            # or self.visits[callingPlayer -1] < 6:
+
+        # this node is already recognised as finished, but hasn't been explored once, so it's unfair to not give it
+        # a chance.
+        if not self.expanded and not self.cached_win_value:
             discovery_operand = float('inf')
             win_operand = 0
         else:
             discovery_operand = self.discovery_factor * (self.policy_value or 1) * (
                         (sqrt(self.parent.visits)) / (1 + self.visits))
-            win_multiplier = 1
+            win_multiplier = 0
             win_operand = win_multiplier * self.win_value
         self.score = win_operand + discovery_operand
         return self.score

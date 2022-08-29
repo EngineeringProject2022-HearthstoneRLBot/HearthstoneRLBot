@@ -2,6 +2,7 @@ import traceback
 from copy import deepcopy
 import random
 
+import numpy as np
 from fireplace.exceptions import GameOver
 from fireplace.utils import random_draft
 from hearthstone.enums import CardClass, PlayState
@@ -13,7 +14,7 @@ from Tests.ScenarioTests import weapon_test, simpler_weapon_test, mage_heropower
 from montecarlo.montecarlo import MonteCarlo
 from montecarlo.node import Node, NoChildException
 
-from GameConvenience import getCardIdFromAction
+from GameConvenience import getCardIdFromAction, interpretDecodedAction, decodeAction
 
 RANDOM_MOVE_SAMPLES = 5
 
@@ -96,13 +97,14 @@ def playGame(model, simulations, seedObject=None):
                 x.sync_tree(game, action, is_random)
                 x.root_node.parent = None
 
-            # if len(game.moves) >= 120:  # game too long, auto-draw
-            #     break
     except GameOver as e:
-        if game.player1.playstate is PlayState.WON:
-            winner = 1
-        elif game.player2.playstate is PlayState.WON:
-            winner = 2
+        currPlayer = 1 if game.current_player is game.player1 else 2
+        currInput = InputBuilder.convToInput(game, currPlayer)
+        data.append((currInput, np.zeros(252), currPlayer, None))
+        if game.current_player.playstate is PlayState.WON:
+            winner = currPlayer
+        elif game.current_player.opponent is PlayState.WON:
+            winner = 2 if currPlayer == 1 else 1
         else:
             winner = 3
     except NoChildException as e:
@@ -118,36 +120,47 @@ def playGame(model, simulations, seedObject=None):
 
 
 def child_finder(node, montecarlo):
-    x = InputBuilder.convToInput(node.game, node.player_number)
-    expert_policy_values, win_value = montecarlo.model(x)
-    node.networkValue = win_value
+    #if we have 50 simulations, and after doing 35 we have reached an end node, we are going to "explore this node 15
+    # times. This is necessary and good(a win or loss updates our win value average 15 times.) However, the value isn't
+    # going to change so we can just cache this value
+    if not node.cached_win_value:
+        x = InputBuilder.convToInput(node.game, node.player_number)
+        expert_policy_values, win_value = montecarlo.model(x)
+        node.win_value = win_value
+    else:
+        win_value = node.cached_win_value
+
     if node.player_number != (1 if node.game.current_player is node.game.player1 else 2):
         win_value *= -1
-    #if node.state == 251:
-    #    return
-    for action in checkValidActionsSparse(node.game):
-        child = Node(deepcopy(node.game))
-        child.state = action
-        is_random = 0
-        try:
-            is_random = playTurnSparse(child.game, action)
-        except GameOver:
-            child.finished = True
-        child.player_number = child.game.current_player.entity_id - 1
-        child.policy_value = expert_policy_values[0, action]
-        if is_random:
-            child.policy_value /= RANDOM_MOVE_SAMPLES
-        node.add_child(child)
-        if is_random:
-            for i in range(RANDOM_MOVE_SAMPLES - 1):
-                child = Node(deepcopy(node.game))
-                child.state = action
-                try:
-                    playTurnSparse(child.game, action)
-                except GameOver:
-                    child.finished = True
-                child.player_number = child.game.current_player.entity_id - 1
-                child.policy_value = expert_policy_values[0, action] / RANDOM_MOVE_SAMPLES
-                node.add_child(child)
+
+    # if a node is finished, we know it has no children beacuse it's a game state where the game is actually over.
+    # all we have to do is propagate the win value upwards
+    if node.finished:
+        node.cached_win_value = win_value
+    else:
+        for action in checkValidActionsSparse(node.game):
+            child = Node(deepcopy(node.game))
+            child.state = action
+            is_random = 0
+            try:
+                is_random = playTurnSparse(child.game, action)
+            except GameOver:
+                child.finished = True
+            child.player_number = 1 if node.game.current_player is node.game.player1 else 2
+            child.policy_value = expert_policy_values[0, action]
+            if is_random:
+                child.policy_value /= RANDOM_MOVE_SAMPLES
+            node.add_child(child)
+            if is_random:
+                for i in range(RANDOM_MOVE_SAMPLES - 1):
+                    child = Node(deepcopy(node.game))
+                    child.state = action
+                    try:
+                        playTurnSparse(child.game, action)
+                    except GameOver:
+                        child.finished = True
+                    child.player_number = 1 if node.game.current_player is node.game.player1 else 2
+                    child.policy_value = expert_policy_values[0, action] / RANDOM_MOVE_SAMPLES
+                    node.add_child(child)
     if node.parent is not None:
         node.update_win_value(float(win_value))
