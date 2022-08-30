@@ -20,7 +20,7 @@ def trainNetwork(model, trainingData):
     trainingData = parseGames(trainingData)
     data = []
     for i in range(13):
-        with open(f"../data/{MODEL_NAME}/29-08-2022T211512.txt", "rb") as rb:
+        with open(f"../data/{MODEL_NAME}/30-08-2022T180904.txt", "rb") as rb:
             metadata = pickle.load(rb)
             while True:
                 try:

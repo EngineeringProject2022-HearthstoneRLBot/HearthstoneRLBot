@@ -73,7 +73,7 @@ class Hero:
 
         self.currentHeroState["health"] = hero.health
         self.currentHeroState["attack"] = hero.atk
-        self.currentHeroState["base_health"] = 30
+        self.currentHeroState["base_health"] = 0
         self.currentHeroState["base_attack"] = 0
         self.currentHeroState["sleeping"] = 0 #ustawiam sobie na 0 bo wydaje mi sie ze bedzie wygodiej a nie zdarzy sie
         self.currentHeroState["frozen"] = int(hero.frozen)

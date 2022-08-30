@@ -38,17 +38,20 @@ class InputBuilder:
         finalPlayerBoard =  np.c_[np.zeros(41), finalPlayerBoard]
         return finalPlayerBoard
 
-    def convToInput(game, simulatingPlayer):
-        if simulatingPlayer == 1:
-            p1 = game.player1
-            p2 = game.player2
-        elif simulatingPlayer == 2:
-            p1 = game.player2
-            p2 = game.player1
+    @staticmethod
+    def convToInput(game):
+        p1 = game.current_player
+        p2 = game.current_player.opponent
+        # if simulatingPlayer == 1:
+        #     p1 = game.player1
+        #     p2 = game.player2
+        # elif simulatingPlayer == 2:
+        #     p1 = game.player2
+        #     p2 = game.player1
 
         player1Hand = p1.hand
         player2Hand = p2.hand
-        currPlayer = game.current_player
+        # currPlayer = game.current_player
         boardPlayer1 = p1.field #game.board #albo field
         boardPlayer2 = p2.field
         
@@ -67,10 +70,10 @@ class InputBuilder:
         FP1Board = InputBuilder.BoardFunction(boardPlayer1, res1)
         FP2Board = InputBuilder.BoardFunction(boardPlayer2, res2)
 
-        if(str(currPlayer) == 'Player1'):
-            playerArr = np.zeros((41,401))
-        elif(str(currPlayer) == 'Player2'):
-            playerArr = np.ones((41,401))
+        # if(str(currPlayer) == 'Player1'):
+        #     playerArr = np.zeros((41,401))
+        # elif(str(currPlayer) == 'Player2'):
+        #     playerArr = np.ones((41,401))
         # remove opp hand
         MegaFinalMatrix = array([FP1Hand, FP1Board, FP2Board,
         #                         FP2Hand,

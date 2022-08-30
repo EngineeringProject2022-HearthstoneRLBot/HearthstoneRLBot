@@ -13,7 +13,7 @@ class Node:
     def __init__(self, game):
         self.state = None
         self.game = game
-        self.cached_win_value = None
+        self.cached_network_value = None
         self.win_value = 0
         self.policy_value = None
         self.visits = 0
@@ -79,13 +79,13 @@ class Node:
 
         # this node is already recognised as finished, but hasn't been explored once, so it's unfair to not give it
         # a chance.
-        if not self.expanded and not self.cached_win_value:
+        if not self.expanded and not self.cached_network_value:
             discovery_operand = float('inf')
             win_operand = 0
         else:
             discovery_operand = self.discovery_factor * (self.policy_value or 1) * (
                         (sqrt(self.parent.visits)) / (1 + self.visits))
-            win_multiplier = 0
+            win_multiplier = 1
             win_operand = win_multiplier * self.win_value
         self.score = win_operand + discovery_operand
         return self.score
