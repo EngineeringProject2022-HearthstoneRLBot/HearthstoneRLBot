@@ -3,6 +3,8 @@ import pickle
 import random
 from math import log, sqrt
 
+from constants import WIN_MULTIPLIER
+
 
 class NoChildException(Exception):
     pass
@@ -85,7 +87,7 @@ class Node:
         else:
             discovery_operand = self.discovery_factor * (self.policy_value or 1) * (
                         (sqrt(self.parent.visits)) / (1 + self.visits))
-            win_multiplier = 1
+            win_multiplier = WIN_MULTIPLIER
             win_operand = win_multiplier * self.win_value
         self.score = win_operand + discovery_operand
         return self.score

@@ -4,7 +4,7 @@ from fireplace import cards, logging
 # os.environ['PYTHONHASHSEED'] = '0' # niby mi działa z zakomentowanymi tymi liniami, ale zostawiam na później
 # os.environ['CUDA_VISIBLE_DEVICES'] = '' #czy to nie zepsuje procesowania z CUDA?
 import testEasyScenario
-from GameStorage import dumpGames
+from GameStorage import dumpGames, loadGame
 from constants import GAME_NUM, SIMULATION_NUM
 
 
@@ -20,10 +20,10 @@ def main():
     # wystarczy same imie nie trzeba sciezki
     # default(nie trzeba wpisywac) = Model-INIT
     # tak samo dla loadgame
-    dumpGames(GAME_NUM, SIMULATION_NUM, model_name="test_weapon5")
+    #dumpGames(GAME_NUM, SIMULATION_NUM, model_name="test_weapon5")
     #dumpGames(GAME_NUM, SIMULATION_NUM)
     #testEasyScenario.testEasyScenario()
-    # loadGame("15-08-2022T134702", 1)
+    loadGame("30-08-2022T183257", 2,model_name="test_weapon5")
     #summarizeData(False)
 
     #... patrz niżej co tu wg mnie fajnie byłoby zrobić
