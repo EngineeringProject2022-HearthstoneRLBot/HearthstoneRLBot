@@ -449,6 +449,7 @@ def getAmount(x, card, currEffect, key):
             return x.get_args(card)[-1].evaluate(card)
         except:
             currEffect["UnknownAmount" + key] = 1
+            return 0
     else:
         currEffect["SetAmount" + key] = 1
         return x.get_args(card)[-1]
@@ -461,6 +462,7 @@ def getTimes(x, card, currEffect, key):
             times = times.evaluate(card)
         except:
             currEffect["UnknownAmount" + key] = 1
+            times = 0
         currEffect["SetAmount" + key] = 0
     else:
         currEffect["SetAmount" + key] = 1
