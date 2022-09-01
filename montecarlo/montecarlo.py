@@ -90,7 +90,7 @@ class MonteCarlo:
         if not found:
             child = Node(deepcopy(game))
             child.state = move
-            child.player_number = child.game.current_player.entity_id - 1
+            child.player_number = 1 if child.game.current_player is child.game.player1 else 2
             self.root_node.add_child(child)
             self.root_node = child
 
