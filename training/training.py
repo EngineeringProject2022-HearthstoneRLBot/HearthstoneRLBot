@@ -32,7 +32,7 @@ def trainNetwork(model, trainingData):
     yValue = []
     for game in data:
         winner = game[1] # who won the game
-        for turn in game[0]: # list of turns
+        for turn in game[0][1:]: # list of turns
             if type(turn) is not str:
                 if winner < 3:
                     input = turn[0]
