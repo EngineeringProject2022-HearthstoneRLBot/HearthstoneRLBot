@@ -19,8 +19,8 @@ session = InteractiveSession(config=config)
 def trainNetwork(model, trainingData):
     trainingData = parseGames(trainingData)
     data = []
-    for i in range(13):
-        with open(f"../data/{MODEL_NAME}/30-08-2022T180904.txt", "rb") as rb:
+    for i in range(3):
+        with open(f"../data/{MODEL_NAME}/05-09-2022T164550.txt", "rb") as rb:
             metadata = pickle.load(rb)
             while True:
                 try:
@@ -52,7 +52,7 @@ def trainNetwork(model, trainingData):
     x = x.squeeze(1)
     model.fit(x=x, y=[yPolicy, yValue], batch_size=1, epochs=5, verbose=1)
 
-    model.save('../Model/models/test_weapon5')
+    model.save('../Model/models/TRAINED_MODEL')
 
 def parseGames(games):
     pass

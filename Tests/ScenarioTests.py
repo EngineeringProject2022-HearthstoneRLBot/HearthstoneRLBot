@@ -131,6 +131,8 @@ def mage_heropower_test(): #Two mages with 1 HP and nothing else
     for i in range(29):
         moon = game.player2.give("CS2_008")
         moon.play(target=game.player2.hero)
+    game.player1.deck = []
+    game.player2.deck = []
     # try:
     #     fire.play(target=game.player1.hero)
     # except fireplace.exceptions.GameOver:
