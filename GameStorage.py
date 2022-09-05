@@ -6,7 +6,7 @@ import numpy as np
 import tensorflow as tf
 from datetime import datetime
 from Model import Resnet
-from GamePlayer import playGame
+from GamePlayer import playGame, playRandGame
 import glob
 # ta funkcja sie przyda we wszystkim - granie najswiezszego pliku, podsumowanie najswiezszego pliku itd itd
 # jak ktos sie chce podjac obstawiam ze to mega latwe będzie, taki format mamy aktualnie nazwy pliku:
@@ -150,16 +150,19 @@ def fileStatistics(filePath):
     return games, firstWins, secondWins, draws, exceptions
 
 
-def selfPlay(model, numbgame, simulations, fileName, model_name):
+def selfPlay(model, numbgame, simulations, fileName, model_name, pureRand=False):
     for i in range(numbgame):
         print("GAME " + str(i + 1))
         state = random.getstate()
-        winner, data = playGame(model, simulations)
+        if not pureRand:
+            winner, data = playGame(model, simulations)
+        else:
+            winner, data = playRandGame()
         with open(f"data/{model_name}/{fileName}.txt", "ab") as fp:
             pickle.dump((data, winner, state), fp)
 
 
-def dumpGames(numGames, numSims, model_name=None):
+def dumpGames(numGames, numSims, model_name=None, pureRand=False):
     if not model_name:
         model_name = INIT_MODEL_NAME
 
@@ -180,14 +183,14 @@ def dumpGames(numGames, numSims, model_name=None):
     import time
     t0 = time.time()
 
-    selfPlay(model, numGames, numSims, fileName, model_name)
+    selfPlay(model, numGames, numSims, fileName, model_name, pureRand)
 
     t1 = time.time()
     total = t1 - t0
     print(total)
 
 
-def loadGame(fileName, gameNumber=-1, model_name=None):  # bez argumentu to ostatnia
+def loadGame(fileName, gameNumber=-1, model_name=None, pureRand = False):  # bez argumentu to ostatnia
     if not model_name:
         model_name = INIT_MODEL_NAME
     model = tf.keras.models.load_model(f"Model/models/{model_name}")
@@ -206,9 +209,10 @@ def loadGame(fileName, gameNumber=-1, model_name=None):  # bez argumentu to osta
                 gameData = pickle.load(rb)
             except EOFError as e:
                 break
-
-        playGame(model, metadata[1], gameData[2])
-
+        if not pureRand:
+            playGame(model, metadata[1], gameData[2])
+        else:
+            playRandGame(gameData[2])
 
 def loadParseDataForTraining():
     pass
