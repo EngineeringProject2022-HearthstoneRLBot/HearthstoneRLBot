@@ -81,8 +81,10 @@ def playRandomChooseOne(card):
 def useCard(player, enemy, action):
     card = player.hand[int(action / 17)]
 
+    choose = None
     if card.must_choose_one: # jesli jest i choose one to biore randomowo
-        card = card.choose_cards[0]
+        #card = card.choose_cards[0]
+        choose = card.choose_cards[0].data.card_id
 
     cardtarget = action % 17
     targetchar = None
@@ -90,7 +92,10 @@ def useCard(player, enemy, action):
         targetchar = player.characters[cardtarget]
     elif cardtarget < 16:
         targetchar = enemy.characters[cardtarget-8]
-    card.play(target=targetchar)
+    if card.must_choose_one:
+        card.play(choose=choose, target=targetchar)
+    else:
+        card.play(target=targetchar)
     card.cant_play = True # inaczej w nieskonczonosc gram ta sama karte...
 
 
