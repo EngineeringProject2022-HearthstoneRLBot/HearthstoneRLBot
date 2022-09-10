@@ -188,153 +188,167 @@ def _setup_game(data):
     mulliganRandomChoice(game)
     return game
 
-
-def playRandGame(seedObject=None):
-    if seedObject != None:
-        random.setstate(seedObject)
-    data = []
-    #game = _setup_game(data)
-    game = hunter_heropower_test()
-    try:
-        while True:
-            game.current_player.discard_hand()
-            currPlayer = 1 if game.current_player is game.player1 else 2
-            currInput = InputBuilder.convToInput(game)
-            actions = checkValidActionsSparse(game)
-            action = random.choice(actions)
-            probabilities = np.zeros(252)
-            for poss_action in actions:
-                probabilities[action] = 1/len(actions)
-                # probably unnecessary: add the tiny difference to ensure probabilities add to 1
-                if poss_action == actions[-1]:
-                    probabilities[poss_action] += 1 - sum(probabilities)
-            # This part will collect the order in which players played their cards
-            # For now commented as it raises some errors in some cases
-            # if game.current_player is game.player1:
-            #     card = getCardIdFromAction(action, game)
-            #     if card is not None:
-            #         cardsp1.append(card)
-            # elif game.current_player is game.player2:
-            #     card = getCardIdFromAction(action, game)
-            #     if card is not None:
-            #         cardsp2.append(card)
-
-            # else:
-            #    montecarlo.root_node = montecarlo.make_choice(currPlayer)
-            #    #rest of moves are the network playing "optimally"
-
-            # zamieniłem bo chcemy appendować co zrobiliśmy i dopiero wtedy zagrać turę - ten ostatni ruch
-            # spowodował naszą wygraną (co nie byłoby zapisane do pliku, bo exception)
-            print("Turn: " + str(game.turn) + ", Action:" + str(action) + " - ",
-                  (interpretDecodedAction(decodeAction(action), game)))
-            data.append((currInput, probabilities, currPlayer, action))
-            # to wywolanie bedzie wrapperowane w jakas funkcje playturn czy cos podobnego
-            is_random = playTurnSparse(game, action)
+class GamePlayer():
+    def __init__(self, model, simulations, seedObject=None, rand=False):
+        if seedObject != None:
+            random.setstate(seedObject)
+        data = []
+        # game = _setup_game(data)
+        #game = hunter_heropower_test()
+        # game = _setup_game(data)
+        self.game = hunter_heropower_test()
+        self.data = []
+        # game = mage_heropower_test()
+        if not rand:
+            self.model = model
+            self.simulations = simulations
+            self.montecarlo = []
+            for i in range(2):
+                tmp = MonteCarlo(Node(self.game), self.model)
+                tmp.child_finder = child_finder
+                tmp.root_node.player_number = 1 if self.game.current_player is self.game.player1 else 2
+                tmp.player_number = i + 1
+                self.montecarlo.append(tmp)
 
 
-    except GameOver as e:
-        currPlayer = 1 if game.current_player is game.player1 else 2
-        currInput = InputBuilder.convToInput(game)
-        data.append((currInput, np.zeros(252), currPlayer, None))
+    def playRandGame(self):
+        try:
+            while True:
+                #game.current_player.discard_hand()
+                currPlayer = 1 if self.game.current_player is self.game.player1 else 2
+                currInput = InputBuilder.convToInput(self.game)
+                actions = checkValidActionsSparse(self.game)
+                action = random.choice(actions)
+                probabilities = np.zeros(252)
+                for poss_action in actions:
+                    probabilities[poss_action] = 1/len(actions)
+                    # probably unnecessary: add the tiny difference to ensure probabilities add to 1
+                    if poss_action == actions[-1]:
+                        probabilities[poss_action] += 1 - sum(probabilities)
+                # This part will collect the order in which players played their cards
+                # For now commented as it raises some errors in some cases
+                # if game.current_player is game.player1:
+                #     card = getCardIdFromAction(action, game)
+                #     if card is not None:
+                #         cardsp1.append(card)
+                # elif game.current_player is game.player2:
+                #     card = getCardIdFromAction(action, game)
+                #     if card is not None:
+                #         cardsp2.append(card)
+                print("Turn: " + str(self.game.turn) + ", Action:" + str(action) + " - ",
+                      (interpretDecodedAction(decodeAction(action), self.game)))
+                self.data.append((currInput, probabilities, currPlayer, action))
+                # to wywolanie bedzie wrapperowane w jakas funkcje playturn czy cos podobnego
+                play_rand_turn(self.game, action)
 
-        if game.current_player.playstate is PlayState.WON:
-            winner = currPlayer
-        elif game.current_player.opponent.playstate is PlayState.WON:
-            winner = 2 if currPlayer == 1 else 1
-        else:
-            winner = 3
-    except NoChildException as e:
-        winner = 4
-        data.append(traceback.format_exc())
-        print(traceback.format_exc())
-        # handle this issue, record it into the data
-    except Exception as e:
-        winner = 4
-        data.append(traceback.format_exc())
-        print(traceback.format_exc())
-    return winner, data
 
 
-def playGame(model, simulations, seedObject=None):
-    if seedObject != None:
-        random.setstate(seedObject)
-    data = []
-    cardsp1 = []
-    cardsp2 = []
-    game = _setup_game(data)
-    #game = hunter_heropower_test()
-    montecarlo = []
-    for i in range(2):
-        tmp = MonteCarlo(Node(game), model)
-        tmp.child_finder = child_finder
-        tmp.root_node.player_number = 1 if game.current_player is game.player1 else 2
-        tmp.player_number = i + 1
-        montecarlo.append(tmp)
-    # montecarlo = MonteCarlo(Node(game), model)
-    # montecarlo.child_finder = child_finder
-    # montecarlo.root_node.player_number = game.current_player.entity_id - 1
-    winner = 0
+        except GameOver as e:
+            currPlayer = 1 if self.game.current_player is self.game.player1 else 2
+            currInput = InputBuilder.convToInput(self.game)
+            self.data.append((currInput, np.zeros(252), currPlayer, None))
 
-    try:
-        while True:
-            #game.current_player.discard_hand()
-            currPlayer = 1 if game.current_player is game.player1 else 2
-            (currTree, otherTree) = (montecarlo[0], montecarlo[1]) if currPlayer == 1 else (
-                montecarlo[1], montecarlo[0])
-            currInput = InputBuilder.convToInput(currTree.root_node.game)
-            currTree.simulate(simulations)  # number of simulations per turn. do not put less than 2
+            if self.game.current_player.playstate is PlayState.WON:
+                winner = currPlayer
+            elif self.game.current_player.opponent.playstate is PlayState.WON:
+                winner = 2 if currPlayer == 1 else 1
+            else:
+                winner = 3
+        except NoChildException as e:
+            winner = 4
+            self.data.append(traceback.format_exc())
+            print(traceback.format_exc())
+            # handle this issue, record it into the data
+        except Exception as e:
+            winner = 4
+            self.data.append(traceback.format_exc())
+            print(traceback.format_exc())
+        return winner, self.data
 
-            probabilities = currTree.get_probabilities()
 
-            action = currTree.make_exploratory_choice().state
-            # This part will collect the order in which players played their cards
-            # For now commented as it raises some errors in some cases
-            # if game.current_player is game.player1:
-            #     card = getCardIdFromAction(action, game)
-            #     if card is not None:
-            #         cardsp1.append(card)
-            # elif game.current_player is game.player2:
-            #     card = getCardIdFromAction(action, game)
-            #     if card is not None:
-            #         cardsp2.append(card)
+    def playGame(self):
+        # montecarlo = MonteCarlo(Node(game), model)
+        # montecarlo.child_finder = child_finder
+        # montecarlo.root_node.player_number = game.current_player.entity_id - 1
+        winner = 0
 
-            # else:
-            #    montecarlo.root_node = montecarlo.make_choice(currPlayer)
-            #    #rest of moves are the network playing "optimally"
+        try:
+            while True:
+                #game.current_player.discard_hand()
 
-            # zamieniłem bo chcemy appendować co zrobiliśmy i dopiero wtedy zagrać turę - ten ostatni ruch
-            # spowodował naszą wygraną (co nie byłoby zapisane do pliku, bo exception)
-            print("Turn: " + str(game.turn) + ", Action:" + str(action) + " - ",
-                  (interpretDecodedAction(decodeAction(action), game)))
-            data.append((currInput, probabilities, currPlayer, action))
-            # to wywolanie bedzie wrapperowane w jakas funkcje playturn czy cos podobnego
-            is_random = playTurnSparse(game, action)
 
-            for x in montecarlo:
-                x.sync_tree(game, action, is_random)
-                x.root_node.parent = None
+                currPlayer = 1 if self.game.current_player is self.game.player1 else 2
+                (currTree, otherTree) = (self.montecarlo[0], self.montecarlo[1]) if currPlayer == 1 else (
+                    self.montecarlo[1], self.montecarlo[0])
+                currInput = InputBuilder.convToInput(currTree.root_node.game)
+                currTree.simulate(self.simulations)  # number of simulations per turn. do not put less than 2
 
-    except GameOver as e:
-        currPlayer = 1 if game.current_player is game.player1 else 2
-        currInput = InputBuilder.convToInput(game)
-        data.append((currInput, np.zeros(252), currPlayer, None))
+                probabilities = currTree.get_probabilities()
 
-        if game.current_player.playstate is PlayState.WON:
-            winner = currPlayer
-        elif game.current_player.opponent.playstate is PlayState.WON:
-            winner = 2 if currPlayer == 1 else 1
-        else:
-            winner = 3
-    except NoChildException as e:
-        winner = 4
-        data.append(traceback.format_exc())
-        print(traceback.format_exc())
-        # handle this issue, record it into the data
-    except Exception as e:
-        winner = 4
-        data.append(traceback.format_exc())
-        print(traceback.format_exc())
-    return winner, data
+                action = currTree.make_exploratory_choice().state
+                # This part will collect the order in which players played their cards
+                # For now commented as it raises some errors in some cases
+                # if game.current_player is game.player1:
+                #     card = getCardIdFromAction(action, game)
+                #     if card is not None:
+                #         cardsp1.append(card)
+                # elif game.current_player is game.player2:
+                #     card = getCardIdFromAction(action, game)
+                #     if card is not None:
+                #         cardsp2.append(card)
+
+                # else:
+                #    montecarlo.root_node = montecarlo.make_choice(currPlayer)
+                #    #rest of moves are the network playing "optimally"
+
+                # zamieniłem bo chcemy appendować co zrobiliśmy i dopiero wtedy zagrać turę - ten ostatni ruch
+                # spowodował naszą wygraną (co nie byłoby zapisane do pliku, bo exception)
+                print("Turn: " + str(self.game.turn) + ", Action:" + str(action) + " - ",
+                      (interpretDecodedAction(decodeAction(action), self.game)))
+                self.data.append((currInput, probabilities, currPlayer, action))
+                # to wywolanie bedzie wrapperowane w jakas funkcje playturn czy cos podobnego
+                play_monte_carlo_turn(self.game, action, trees=self.montecarlo)
+
+
+
+        except GameOver as e:
+            currPlayer = 1 if self.game.current_player is self.game.player1 else 2
+            currInput = InputBuilder.convToInput(self.game)
+            self.data.append((currInput, np.zeros(252), currPlayer, None))
+
+            if self.game.current_player.playstate is PlayState.WON:
+                winner = currPlayer
+            elif self.game.current_player.opponent.playstate is PlayState.WON:
+                winner = 2 if currPlayer == 1 else 1
+            else:
+                winner = 3
+        except NoChildException as e:
+            winner = 4
+            self.data.append(traceback.format_exc())
+            print(traceback.format_exc())
+            # handle this issue, record it into the data
+        except Exception as e:
+            winner = 4
+            self.data.append(traceback.format_exc())
+            print(traceback.format_exc())
+        return winner, self.data
+
+
+def play_rand_turn(game, action=None):
+    if action is None:
+        actions = checkValidActionsSparse(game)
+        action = random.choice(actions)
+    is_random = playTurnSparse(game, action)
+
+
+def play_monte_carlo_turn(game, action=None, currTree=None, simulations = 50, trees=[]):
+    if action is None:
+        currTree.simulate(simulations)  # number of simulations per turn. do not put less than 2
+        action = currTree.make_exploratory_choice().state
+    is_random = playTurnSparse(game, action)
+    for x in trees:
+        x.sync_tree(game, action, is_random)
+        x.root_node.parent = None
 
 
 def child_finder(node, montecarlo):

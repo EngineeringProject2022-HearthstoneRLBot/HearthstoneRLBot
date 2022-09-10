@@ -6,7 +6,7 @@ import numpy as np
 import tensorflow as tf
 from datetime import datetime
 from Model import Resnet
-from GamePlayer import playGame, playRandGame
+from GamePlayer import GamePlayer
 import glob
 # ta funkcja sie przyda we wszystkim - granie najswiezszego pliku, podsumowanie najswiezszego pliku itd itd
 # jak ktos sie chce podjac obstawiam ze to mega latwe będzie, taki format mamy aktualnie nazwy pliku:
@@ -152,12 +152,14 @@ def fileStatistics(filePath):
 
 def selfPlay(model, numbgame, simulations, fileName, model_name, pureRand=False):
     for i in range(numbgame):
+
         print("GAME " + str(i + 1))
         state = random.getstate()
+        game_player = GamePlayer(model, simulations)
         if not pureRand:
-            winner, data = playGame(model, simulations)
+            winner, data = game_player.playGame()
         else:
-            winner, data = playRandGame()
+            winner, data = game_player.playRandGame()
         with open(f"data/{model_name}/{fileName}.txt", "ab") as fp:
             pickle.dump((data, winner, state), fp)
 
@@ -209,10 +211,11 @@ def loadGame(fileName, gameNumber=-1, model_name=None, pureRand = False):  # bez
                 gameData = pickle.load(rb)
             except EOFError as e:
                 break
+        game_player = GamePlayer(model, metadata[1], metadata[2])
         if not pureRand:
-            playGame(model, metadata[1], gameData[2])
+            game_player.playGame()
         else:
-            playRandGame(gameData[2])
+            game_player.playRandGame()
 
 def loadParseDataForTraining():
     pass
