@@ -193,8 +193,8 @@ def playRandGame(seedObject=None):
     if seedObject != None:
         random.setstate(seedObject)
     data = []
-    #game = _setup_game(data)
-    game = hunter_heropower_test()
+    game = _setup_game(data)
+    #game = hunter_heropower_test()
     try:
         while True:
             game.current_player.discard_hand()
