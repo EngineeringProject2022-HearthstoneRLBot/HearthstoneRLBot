@@ -341,7 +341,9 @@ def play_rand_turn(game, action=None):
     is_random = playTurnSparse(game, action)
 
 
-def play_monte_carlo_turn(game, action=None, currTree=None, simulations = 50, trees=[]):
+def play_monte_carlo_turn(game, action=None, currTree=None, simulations=50, trees=None):
+    if trees is None:
+        trees = []
     if action is None:
         currTree.simulate(simulations)  # number of simulations per turn. do not put less than 2
         action = currTree.make_exploratory_choice().state
