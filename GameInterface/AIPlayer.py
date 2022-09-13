@@ -8,8 +8,8 @@ from GamePlayer import child_finder
 
 
 class AIPlayer(PlayerInterface):
-    def __init__(self, name, hero, deck, model_name, simulations):
-        super().__init__(name, hero, deck)
+    def __init__(self, name, hero, deck, model_name, simulations, print=True):
+        super().__init__(name, hero, deck, print)
         model = tf.keras.models.load_model(f"../Model/models/{model_name}")
         self.model = model
         self.simulations = simulations
@@ -24,6 +24,12 @@ class AIPlayer(PlayerInterface):
 
     def getPreferredAction(self):
         self.montecarlo.simulate(self.simulations)
-        action = self.montecarlo.make_exploratory_choice().state
-        playTurnSparse(self.game, action)
+        return self.montecarlo.make_exploratory_choice().state
+
+    def getProbabilities(self):
+        return self.montecarlo.get_probabilities()
+
+    def sync(self, action, isRandom):
+        self.montecarlo.sync_tree(self.game, action, isRandom)
+        self.montecarlo.root_node.parent = None
 

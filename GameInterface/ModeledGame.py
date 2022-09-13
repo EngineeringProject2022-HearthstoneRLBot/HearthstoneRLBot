@@ -1,14 +1,21 @@
+import numpy as np
 from fireplace.exceptions import GameOver
 from fireplace.game import Game
 from fireplace.player import Player
-from hearthstone.enums import CardClass
+from fireplace import logging
+from hearthstone.enums import CardClass, PlayState
 
+from GameConvenience import interpretDecodedAction, decodeAction
 from GameSetupUtils import mulliganRandomChoice
 from GameState import InputBuilder
 
 
 class ModeledGame:
-    def __init__(self, player1, player2):
+    def __init__(self, player1, player2, log = False):
+        logger = logging.log
+        logger.disabled = not log
+        logger.propagate = log
+
         self.player1 = player1
         self.player2 = player2
         game = Game(players=(self.createPlayer(player1),
@@ -17,9 +24,10 @@ class ModeledGame:
         mulliganRandomChoice(game)
         self.game = game
         self.winner = None
-        self.gameData = []
+        self.data = []
         self.player1.joinGame(game)
         self.player2.joinGame(game)
+
 
     def createPlayer(self, player):
         return Player(player.name, player.deck, CardClass(player.hero).default_hero)
@@ -29,13 +37,35 @@ class ModeledGame:
         while True:
             data = InputBuilder.convToInput(self.game)
             player = 1 if self.game.current_player is self.game.player1 else 2
-            try:
-                action, probabilities = self.playTurn()
-            except:
-            self.data.append((data, probabilities, player, action)) #to wcześniej było przed wykonaniem ruchu co teraz
+            action, probabilities, isRandom = self.playTurn()
+            self.sync(action, isRandom)
+            self.data.append((data, probabilities, player, action))
+
+            if self.gameFinished():
+                break
+
+        self.data.append((InputBuilder.convToInput(self.game), np.zeros(252),
+                          1 if self.game.current_player is self.game.player1 else 2, None))
+        print('Game Finished! :)')
 
     def playTurn(self):
         if self.game.current_player.name == self.player1.name:
-            return self.player1.play() #tu zwroty muszą być
+            return self.player1.play()
         else:
             return self.player2.play()
+
+    def sync(self, action, isRandom):
+        self.player1.sync(action, isRandom)
+        self.player2.sync(action, isRandom)
+
+    def gameFinished(self):
+        if self.game.player1.playstate is PlayState.WON:
+            winner = 1
+            return True
+        if self.game.player2.playstate is PlayState.WON:
+            winner = 2
+            return True
+        if self.game.ended:
+            winner = 3
+            return True
+        return False
