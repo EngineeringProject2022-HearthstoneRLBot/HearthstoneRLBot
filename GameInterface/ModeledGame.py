@@ -33,7 +33,19 @@ class ModeledGame:
         return Player(player.name, player.deck, CardClass(player.hero).default_hero)
 
     def start(self):
-        self.data.append((self.player1.hero, self.player1.deck, self.player2.hero, self.player2.deck))
+        self.data.append((self.player1.hero, self.player1.deck,
+                          self.player2.hero, self.player2.deck,
+                          self.game.player1.name, self.game.player2.name))  # dodałem zapisywanie nazw dzięki
+                                                                            # czemu ustawiając je np na
+                                                                            # HunterStupidD1, MageIntelligentD3
+                                                                            # będziemy wiedzieli, że np
+                                                                            # player1 to jest głupi hunter, a
+                                                                            # player2 to inteligentny mag xD
+                                                                            # można ustawić dowolne nazwy co też pozwoli
+                                                                            # grać np HunterIteration1 vs HunterIteration2
+                                                                            # i ich odróżniać (nie tylko na pdostawie deck)
+                                                                            # wg mnie to daje więcej swobody niż
+                                                                            # zapisywanie typu klasy, hero i decka samego
         while True:
             data = InputBuilder.convToInput(self.game)
             player = 1 if self.game.current_player is self.game.player1 else 2
