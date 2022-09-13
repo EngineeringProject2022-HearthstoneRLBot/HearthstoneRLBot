@@ -92,7 +92,7 @@ def getGamesWithoutExceptions(filepath:str, num_games:int =50): # offset to ilos
     first_iteration = True
 
     with open(filepath,"rb") as rb:
-        while True:
+        while FILE_POSITION < num_games:
             try:
                 if first_iteration:
                     metadata = pickle.load(rb)
@@ -114,15 +114,35 @@ def getGamesWithoutExceptions(filepath:str, num_games:int =50): # offset to ilos
 
         return metadata,arrOfGames
 
-def getGamesWithoutExceptionsFromSeveralFiles(numberOfGames: int): ## nazwa jak do testow xd
-    x = []
+def getGamesWithoutExceptionsFromSeveralFiles(numberOfGames: int):
+    cleanGames = []
     global FILE_POSITION
     FILE_POSITION = 0
     for filepath in glob.iglob('data/Model-INIT/*'):
-        d = getGamesWithoutExceptions(filepath,num_games=numberOfGames)
-        if d[0] == [] or d[1] == []:
+        gamesInFile = getGamesWithoutExceptions(filepath,num_games=numberOfGames)
+        if gamesInFile[0] == [] or gamesInFile[1] == []:
             continue
-        x.append(d)
+        cleanGames.append(gamesInFile)
+    return cleanGames
+
+def getTotalNumberOfGames():
+    totalNumberOfGames = 0
+    for filepath in glob.iglob('data/Model-INIT/*'):
+        first_iteration = True
+        with open(filepath,"rb") as rb:
+            while True:
+                try:
+                    if first_iteration:
+                        pickle.load(rb)
+                        first_iteration = not first_iteration
+                    else:
+                        pickle.load(rb)
+                        totalNumberOfGames += 1
+                except EOFError:
+                    break
+
+        return totalNumberOfGames
+
 
 
 def fileStatistics(filePath):
