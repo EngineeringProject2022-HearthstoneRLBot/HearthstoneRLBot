@@ -88,7 +88,7 @@ def _new_setup_game(data):
                      'FP1_001',
                      'FP1_001', 'EX1_622', 'EX1_622', 'EX1_339', 'EX1_339', 'NEW1_020', 'NEW1_020', 'FP1_009',
                      'CS2_181',
-                     'CS2_181', 'EX1_591', 'EX1_591', 'CS1_112', 'FP1_012', 'FP1_012', 'GVG_014', 'EX1_091', 'AT_132',
+                     'CS2_181', 'EX1_591', 'EX1_591', 'CS1_112', 'FP1_012', 'FP1_012', 'CS2_186', 'EX1_091', 'AT_132',
                      'GVG_008', 'GVG_008', 'EX1_572']
     OilRogue = [7, 'CS2_072', 'CS2_072', 'EX1_145', 'EX1_145', 'CS2_074', 'CS2_074', 'CS2_233', 'CS2_233', 'EX1_124',
                 'EX1_124', 'EX1_581', 'EX1_581', 'EX1_613', 'EX1_129', 'EX1_129', 'EX1_134', 'EX1_134', 'GVG_022',
@@ -132,7 +132,7 @@ def _new_setup_game(data):
                      'GVG_069', 'FP1_012', 'GVG_110']
     DragonPriest = [6, 'CS2_235', 'CS2_235', 'CS2_004', 'CS2_004', 'BRM_004', 'BRM_004', 'EX1_622', 'EX1_622',
                     'CS2_234',
-                    'AT_116', 'AT_116', 'FP1_023', 'GVG_010', 'GVG_010', 'CS1_112', 'CS1_112', 'GVG_014', 'NEW1_020',
+                    'AT_116', 'AT_116', 'FP1_023', 'GVG_010', 'GVG_010', 'CS1_112', 'CS1_112', 'CS2_186', 'NEW1_020',
                     'BRM_033', 'BRM_033', 'BRM_020', 'AT_017', 'AT_017', 'EX1_284', 'EX1_284', 'BRM_034', 'BRM_034',
                     'AT_123', 'BRM_031', 'EX1_572']
     AllDecks = [BasicDruid, BasicHunter, BasicMage, BasicPaladin, BasicPriest, BasicRogue, BasicShaman, BasicWarlock,
@@ -196,7 +196,7 @@ class GamePlayer():
         # game = _setup_game(data)
         #game = hunter_heropower_test()
         # game = _setup_game(data)
-        self.game = hunter_heropower_test()
+        self.game = _new_setup_game(data)
         self.data = []
         # game = mage_heropower_test()
         if not rand:

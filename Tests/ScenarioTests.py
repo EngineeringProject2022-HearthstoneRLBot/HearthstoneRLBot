@@ -1,3 +1,4 @@
+from fireplace import cards
 from hearthstone.enums import CardClass
 
 from GameSetupUtils import prepare_game
@@ -416,6 +417,13 @@ def test_cogmaster():
     tmp2 = Hero()
     hero1 = game.player1.hero
     hero2 = game.player2.hero
+    frostwolf = game.player1.give("CS2_226")
+    frostwolf.play()
+    game.end_turn()
+    implosion = game.player2.give("GVG_045")
+    implosion.play(frostwolf)
+    a = HandCard(implosion)
+    b = a.encode_state()
     weapon = game.player1.give("CS2_106")
     weapon.play()
     #doomhammer = game.player1.give("EX1_567")
@@ -666,3 +674,5 @@ def test_cogmaster():
     # blessedchamp = game.player1.give("EX1_355")
     # blessedchamp.play(target=cogmaster)
     # assert cogmaster.atk == 4
+# cards.db.initialize()
+# test_cogmaster()

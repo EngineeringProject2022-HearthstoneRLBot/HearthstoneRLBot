@@ -1,7 +1,7 @@
 import fireplace
 from hearthstone.enums import CardClass
 from fireplace import cards, logging
-from Tests.ScenarioTests import weapon_test, simpler_weapon_test, mage_heropower_test, hunter_heropower_test, ragnaros_complex_test, fireball_test, \
+from Tests.ScenarioTests import weapon_test, simpler_weapon_test, mage_heropower_test, hunter_heropower_test, fireball_test, \
     trade_or_win_test, flamestrike_test, healing_test
 
 # import os

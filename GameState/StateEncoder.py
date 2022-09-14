@@ -457,7 +457,7 @@ def getAmount(x, card, currEffect, key):
 
 def getTimes(x, card, currEffect, key):
     times = x.times
-    if isinstance(times, LazyValue):
+    if isinstance(times, LazyValue) or type(times) is not int:
         try:
             times = times.evaluate(card)
         except:
