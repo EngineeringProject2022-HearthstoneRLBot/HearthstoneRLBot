@@ -408,7 +408,7 @@ def getSummonDetails(x, card, currentEffect):
     selector = x.get_args(card)[0]
     currentEffect["Summon"] = 1
     currentEffect["SummonTimes"] = getTimes(x, card, currentEffect, "Summon")
-    currentEffect["SummonTagets"] = decodeWithRequirements(decodeTarget(selector), card.data.requirements)
+    currentEffect["SummonTargets"] = decodeWithRequirements(decodeTarget(selector), card.data.requirements)
 
     try:
         toSummonID = x.get_args(card)[1]
@@ -438,7 +438,7 @@ def getSummonDetails(x, card, currentEffect):
                 currentEffect["SummonedAvgHealth"] = toSummon.health
     except:
         currentEffect["UnknownSummon"] = 1
-    currentEffect["SummonTagets"] = decodeTarget(selector)
+    currentEffect["SummonTargets"] = decodeTarget(selector)
 
 
 def getAmount(x, card, currEffect, key):
