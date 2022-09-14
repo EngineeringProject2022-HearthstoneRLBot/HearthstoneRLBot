@@ -1,6 +1,8 @@
 import fireplace
 from hearthstone.enums import CardClass
 from fireplace import cards, logging
+from Tests.ScenarioTests import weapon_test, simpler_weapon_test, mage_heropower_test, hunter_heropower_test, ragnaros_complex_test, fireball_test, \
+    trade_or_win_test, flamestrike_test, healing_test
 
 # import os
 # os.environ['PYTHONHASHSEED'] = '0' # niby mi działa z zakomentowanymi tymi liniami, ale zostawiam na później
@@ -195,16 +197,13 @@ def checkPlayableHandCards(results, game):
     target = []
     for i in range(len(results)):
         #source_number = 0
-        source.append(results[i][0])
-        if results[i][1] == '0':
-            source_number.append(results[i][2])
-        elif results[i][1] == '1':
-            source_number.append(results[i][1] + results[i][2])
-        target.append(results[i][3])
-        target_number.append(results[i][4])
-
-    print(source)
-    print(source_number)
+        source.append(results[i][1][0])
+        if results[i][1][1] == '0':
+            source_number.append(results[i][1][2])
+        elif results[i][1][1] == '1':
+            source_number.append(results[i][1][1] + results[i][1][2])
+        target.append(results[i][1][3])
+        target_number.append(results[i][1][4])
 
     allPossibilitiesList = []
     for i in range(19):
@@ -217,51 +216,62 @@ def checkPlayableHandCards(results, game):
                 source_number[i] = ''.join(source_number[i])
             hand_source = source[i], source_number[i], target[i], target_number[i]
             hand_source = ''.join(hand_source)
-            allPossibilitiesList[int(source_number[i])-1].append(hand_source)
+            allPossibilitiesList[int(source_number[i])-1].append((results[i][0], hand_source))
         elif source[i] == 'B': #+9
             if int(source_number[i]) < 10:
                 source_number[i] = '0',source_number[i]
                 source_number[i] = ''.join(source_number[i])
             board_source = source[i], source_number[i], target[i], target_number[i]
             board_source = ''.join(board_source)
-            allPossibilitiesList[int(source_number[i])-1+10].append(board_source)
+            allPossibilitiesList[int(source_number[i])-1+10].append((results[i][0], board_source))
         elif source[i] == 'X':
             if int(source_number[i]) < 10:
                 source_number[i] = '0',source_number[i]
                 source_number[i] = ''.join(source_number[i])
             hero_power_source = source[i], source_number[i], target[i], target_number[i]
             hero_power_source = ''.join(hero_power_source)
-            allPossibilitiesList[17].append(hero_power_source)
+            allPossibilitiesList[17].append((results[i][0],hero_power_source))
         elif source[i] == 'H':
             if int(source_number[i]) < 10:
                 source_number[i] = '0',source_number[i]
                 source_number[i] = ''.join(source_number[i])
             hero_power_source = source[i], source_number[i], target[i], target_number[i]
             hero_power_source = ''.join(hero_power_source)
-            allPossibilitiesList[18].append(hero_power_source)
-        print(allPossibilitiesList)
+            allPossibilitiesList[18].append((results[i][0], hero_power_source))
+    return allPossibilitiesList
 
 
 def createHand(game):
+    all = []
     possible_actions_interpreted = []
     decoded_actions = []
     possible_actions = checkValidActionsSparse(game)
     for action in possible_actions:
         possible_actions_interpreted.append(interpretDecodedAction(decodeAction(action), game))
-        decoded_actions.append(decodeAction(action))
+        decoded_actions.append((action, decodeAction(action)))
 
-    checkPlayableHandCards(decoded_actions, game) #tmp for taking just possible actions for a card once
+    # print("0-9, Card from Hand")
+    # print("10-16, Minions on Board")
+    # print("17, Hero Power")
+    # print("18, Hero")
 
-    counter = 0
-    for possible_moves in possible_actions_interpreted:
-        print(counter, possible_moves)
-        counter += 1
+    all = checkPlayableHandCards(decoded_actions, game) #tmp for taking just possible actions for a card once
+    print(all)
+    choice = input("Choose source: ")
+    if int(choice) == 251:
+        playTurnSparse(game, 251)
+    else:
+        optionsForChoice = (all[int(choice)])
+        count = 0
+        for elem in optionsForChoice:
+            print(count,interpretDecodedAction(elem[1], game))
+            count += 1
+        choice = input("Choose action:")
+        playTurnSparse(game, optionsForChoice[int(choice)][0])
 
-    choice = input("Choose number of action: ")
-    act = possible_actions[int(choice)]
-    # print(getCardIdFromAction(act, game))
-    playTurnSparse(game, act)
-    return 0
+        # print(getCardIdFromAction(act, game))
+        # playTurnSparse(game, act)
+        return 0
 
 def checkBoard(game):
     tmp_player = 1 if game.current_player is game.player1 else 2
@@ -296,13 +306,9 @@ def testing_game_convienience():
     #     else:
     #         print("Unknown")
     while True:
-        print(game.player1.hero.health)
-        print(game.player2.hero.health)
-        checkBoard(game)
+        #checkBoard(game)
         createHand(game)
-
         a=0
-
 
     #
     # game.player1.discard_hand()
