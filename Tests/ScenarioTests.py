@@ -677,5 +677,5 @@ def test_cogmaster():
     # blessedchamp = game.player1.give("EX1_355")
     # blessedchamp.play(target=cogmaster)
     # assert cogmaster.atk == 4
-cards.db.initialize()
-test_cogmaster()
+# cards.db.initialize()
+# test_cogmaster()
