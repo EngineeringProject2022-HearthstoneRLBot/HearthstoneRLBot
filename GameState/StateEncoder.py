@@ -52,7 +52,6 @@ def encode_complex_plane(dictionary):
     arr[37] = dictionary.get("DiscardCards", 0)
     if arr[37] == 1:
         arr[38] = dictionary.get("DiscardCardsTimes")
-        # TODO only return the 2 relevant fields
         arr[40:42] = encode_targets(dictionary.get("DiscardTargets"))[3:5]
         arr[39] = dictionary.get("UnknownAmountDiscard", 0)
         set = dictionary.get("SetAmountDiscard")
@@ -172,7 +171,7 @@ def encode_complex_plane(dictionary):
                 arr[162] = 1
             else:
                 arr[161] = 1
-        arr[163] = dictionary.get("UnknownAmountMana")
+        arr[163] = dictionary.get("UnknownAmountMana", 0)
 
     return arr
 
@@ -457,13 +456,16 @@ def getAmount(x, card, currEffect, key):
 
 def getTimes(x, card, currEffect, key):
     times = x.times
-    if isinstance(times, LazyValue) or type(times) is not int:
+    if isinstance(times, LazyValue):
         try:
             times = times.evaluate(card)
         except:
             currEffect["UnknownAmount" + key] = 1
             times = 0
         currEffect["SetAmount" + key] = 0
+    elif type(times) is not int:
+        currEffect["UnknownAmount" + key] = 1
+        times = 0
     else:
         currEffect["SetAmount" + key] = 1
     return times
