@@ -8,7 +8,7 @@ from numpy import sort
 
 GAME_INDEX = 0
 
-class DataGenerator(keras.utils.Sequence):
+class DataGeneratorFile(keras.utils.Sequence):
     'Generates data for Keras'
     def __init__(self,model_name, batch_size=32, dim=(401, 41, 3), n_channels=1, shuffle=True):
         'Initialization'
