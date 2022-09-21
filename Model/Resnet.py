@@ -1,9 +1,9 @@
-from keras.models import Model
-from keras.layers import BatchNormalization
-from keras.layers import Conv2D
-from keras.layers import Dense
-from keras.layers import Flatten
-from keras.layers import Input
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import BatchNormalization
+from tensorflow.keras.layers import Conv2D
+from tensorflow.keras.layers import Dense
+from tensorflow.keras.layers import Flatten
+from tensorflow.keras.layers import Input
 import tensorflow as tf
 from tensorflow.python.keras.layers import ReLU, Add
 
@@ -18,7 +18,7 @@ class Network:
         inputShape = (401, 41, 3)
         inputs = Input(shape=inputShape)
         network = self.buildConvLayer(inputs)
-        for i in range(5):
+        for i in range(30):
             network = self.buildResLayer(network)
         network = self.buildResLayer(network)
         value_head = self.buildValueHead(network)

@@ -164,6 +164,8 @@ def hunter_heropower_test(): #Both hunters on 1hp
     game = prepare_game(CardClass.HUNTER, CardClass.HUNTER)
     game.player1.discard_hand()
     game.player2.discard_hand()
+    game.player1.name = 'Gieniek'
+    game.player2.name = 'Mariolka'
 
     for i in range(28):
         moon = game.player1.give("CS2_008")
