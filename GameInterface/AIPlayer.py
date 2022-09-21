@@ -24,6 +24,8 @@ class AIPlayer(PlayerInterface):
 
     def getPreferredAction(self):
         self.montecarlo.simulate(self.simulations)
+        if self.montecarlo.make_exploratory_choice().state == 251:
+            a = 'a'
         return self.montecarlo.make_exploratory_choice().state
 
     def getProbabilities(self):

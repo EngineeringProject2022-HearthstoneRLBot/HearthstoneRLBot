@@ -47,6 +47,8 @@ class MonteCarlo:
     def make_exploratory_choice(self):
         self.root_node.active = False
         children_visits = map(lambda child: child.visits, self.root_node.children)
+        l = list(map(lambda child: child.win_value, self.root_node.children))   ###
+        return self.root_node.children[l.index(max(l))]                         ###
         children_visit_probabilities = [visit / self.root_node.visits for visit in children_visits]
         sum_probs = sum(children_visit_probabilities)
         if sum_probs != 1.0:
