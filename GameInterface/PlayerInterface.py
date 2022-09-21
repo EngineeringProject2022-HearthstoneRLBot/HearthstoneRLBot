@@ -34,5 +34,5 @@ class PlayerInterface:
     def joinGame(self, game):
         self.game = game
 
-    def sync(self, action, isRandom):
+    def sync(self, game, action, isRandom):
         pass

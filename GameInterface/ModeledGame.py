@@ -47,6 +47,7 @@ class ModeledGame:
                                                                             # wg mnie to daje więcej swobody niż
                                                                             # zapisywanie typu klasy, hero i decka samego
         while True:
+            self.startTurn()
             data = InputBuilder.convToInput(self.game)
             player = 1 if self.game.current_player is self.game.player1 else 2
             action, probabilities, isRandom = self.playTurn()
@@ -67,8 +68,8 @@ class ModeledGame:
             return self.player2.play()
 
     def sync(self, action, isRandom):
-        self.player1.sync(action, isRandom)
-        self.player2.sync(action, isRandom)
+        self.player1.sync(self.game, action, isRandom)
+        self.player2.sync(self.game, action, isRandom)
 
     def gameFinished(self):
         if self.game.player1.playstate is PlayState.WON:
@@ -81,3 +82,6 @@ class ModeledGame:
             winner = 3
             return True
         return False
+
+    def startTurn(self):
+        pass

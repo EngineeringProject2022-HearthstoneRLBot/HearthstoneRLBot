@@ -29,7 +29,7 @@ class AIPlayer(PlayerInterface):
     def getProbabilities(self):
         return self.montecarlo.get_probabilities()
 
-    def sync(self, action, isRandom):
-        self.montecarlo.sync_tree(self.game, action, isRandom)
+    def sync(self, game, action, isRandom):
+        self.montecarlo.sync_tree(game, action, isRandom)
         self.montecarlo.root_node.parent = None
 
