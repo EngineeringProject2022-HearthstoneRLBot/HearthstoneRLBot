@@ -194,7 +194,7 @@ class GamePlayer():
             random.setstate(seedObject)
         data = []
         # game = _setup_game(data)
-        #game = hunter_heropower_test()
+        #self.game = hunter_heropower_test()
         # game = _setup_game(data)
         self.game = _new_setup_game(data)
         self.data = []
@@ -274,7 +274,7 @@ class GamePlayer():
 
         try:
             while True:
-                #game.current_player.discard_hand()
+                #self.game.current_player.discard_hand()
 
 
                 currPlayer = 1 if self.game.current_player is self.game.player1 else 2

@@ -1,12 +1,9 @@
-import copy
 import glob
 import pickle
 
 import numpy as np
-import keras
-from numpy import sort
+from tensorflow import keras
 import sparse
-GAME_INDEX = 0
 
 class DataGenerator(keras.utils.Sequence):
     'Generates data for Keras'
