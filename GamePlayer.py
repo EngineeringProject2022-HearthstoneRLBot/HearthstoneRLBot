@@ -194,9 +194,9 @@ class GamePlayer():
             random.setstate(seedObject)
         data = []
         # game = _setup_game(data)
-        self.game = hunter_heropower_test()
+        #self.game = hunter_heropower_test()
         # game = _setup_game(data)
-        #self.game = _new_setup_game(data)
+        self.game = _new_setup_game(data)
         self.data = []
         # game = mage_heropower_test()
         if not rand:
