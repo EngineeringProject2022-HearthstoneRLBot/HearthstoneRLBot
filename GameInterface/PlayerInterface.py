@@ -16,7 +16,7 @@ class PlayerInterface:
         action = self.getPreferredAction()
         probabilities = self.getProbabilities()
         if self.print:
-            print("Turn: " + str(self.game.turn) + ", Action:" + str(action) + " - ",
+            print(self.name + " Turn: " + str(self.game.turn) + ", Action:" + str(action) + " - ",
                   (interpretDecodedAction(decodeAction(action), self.game)))
         isRandom = False
         try:
@@ -34,5 +34,5 @@ class PlayerInterface:
     def joinGame(self, game):
         self.game = game
 
-    def sync(self, action, isRandom):
+    def sync(self, game, action, isRandom):
         pass

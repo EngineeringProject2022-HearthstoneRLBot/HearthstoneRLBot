@@ -33,6 +33,7 @@ class ModeledGame:
         return Player(player.name, player.deck, CardClass(player.hero).default_hero)
 
     def start(self):
+        self.startGame()
         self.data.append((self.player1.hero, self.player1.deck,
                           self.player2.hero, self.player2.deck,
                           self.game.player1.name, self.game.player2.name))  # dodałem zapisywanie nazw dzięki
@@ -47,6 +48,7 @@ class ModeledGame:
                                                                             # wg mnie to daje więcej swobody niż
                                                                             # zapisywanie typu klasy, hero i decka samego
         while True:
+            self.startTurn()
             data = InputBuilder.convToInput(self.game)
             player = 1 if self.game.current_player is self.game.player1 else 2
             action, probabilities, isRandom = self.playTurn()
@@ -58,7 +60,12 @@ class ModeledGame:
 
         self.data.append((InputBuilder.convToInput(self.game), np.zeros(252),
                           1 if self.game.current_player is self.game.player1 else 2, None))
-        print('Game Finished! :)')
+        if self.winner == 1:
+            print(f'Game Finished! :) Player {self.game.player1.name} won!')
+        elif self.winner == 2:
+            print(f'Game Finished! :) Player {self.game.player2.name} won!')
+        else:
+            print(f'Game Finished! :( Couldn\'t find a winner')
 
     def playTurn(self):
         if self.game.current_player.name == self.player1.name:
@@ -67,17 +74,23 @@ class ModeledGame:
             return self.player2.play()
 
     def sync(self, action, isRandom):
-        self.player1.sync(action, isRandom)
-        self.player2.sync(action, isRandom)
+        self.player1.sync(self.game, action, isRandom)
+        self.player2.sync(self.game, action, isRandom)
 
     def gameFinished(self):
         if self.game.player1.playstate is PlayState.WON:
-            winner = 1
+            self.winner = 1
             return True
         if self.game.player2.playstate is PlayState.WON:
-            winner = 2
+            self.winner = 2
             return True
         if self.game.ended:
-            winner = 3
+            self.winner = 3
             return True
         return False
+
+    def startTurn(self):
+        pass
+
+    def startGame(self):
+        pass

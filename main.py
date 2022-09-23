@@ -20,7 +20,7 @@ def main():
     # wystarczy same imie nie trzeba sciezki
     # default(nie trzeba wpisywac) = Model-INIT
     # tak samo dla loadgame
-    #dumpGames(GAME_NUM, SIMULATION_NUM, model_name = "TRAINED_MODEL2", pureRand=False)
+    #dumpGames(GAME_NUM, SIMULATION_NUM, model_name = "TRAINED_MODEL4", pureRand=False)
     dumpGames(GAME_NUM, SIMULATION_NUM, pureRand=True)
     #dumpGames(GAME_NUM, SIMULATION_NUM)
     #testEasyScenario.testEasyScenario()

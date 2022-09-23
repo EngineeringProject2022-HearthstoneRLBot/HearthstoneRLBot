@@ -381,6 +381,7 @@ def child_finder(node, montecarlo):
         for action in checkValidActionsSparse(node.game):
             child = Node(deepcopy(node.game))
             child.state = action
+            child.stateText = ("Action:" + str(action) + " - " + interpretDecodedAction(decodeAction(action), node.game))
             is_random = 0
             try:
                 is_random = playTurnSparse(child.game, action)

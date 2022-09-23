@@ -24,12 +24,14 @@ class AIPlayer(PlayerInterface):
 
     def getPreferredAction(self):
         self.montecarlo.simulate(self.simulations)
+        if self.montecarlo.make_exploratory_choice().state == 251:
+            a = 'a'
         return self.montecarlo.make_exploratory_choice().state
 
     def getProbabilities(self):
         return self.montecarlo.get_probabilities()
 
-    def sync(self, action, isRandom):
-        self.montecarlo.sync_tree(self.game, action, isRandom)
+    def sync(self, game, action, isRandom):
+        self.montecarlo.sync_tree(game, action, isRandom)
         self.montecarlo.root_node.parent = None
 
