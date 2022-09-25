@@ -7,9 +7,9 @@ from DataGenerator import DataGenerator
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 # os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 # uncomment above to disable cuda
-MODEL_NAME = "Model-INIT"
-#MODEL_NAME = "test_weapon"
-LEARNING_RATE = 0.000001
+MODEL_NAME = "TRAINED_MODEL3"
+#MODEL_NAME = "test_weapon5"
+LEARNING_RATE = 0.001
 from tensorflow.compat.v1 import ConfigProto
 from tensorflow.compat.v1 import InteractiveSession
 import keras
