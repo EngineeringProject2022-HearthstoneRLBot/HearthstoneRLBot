@@ -211,8 +211,10 @@ def mapBattlecrySpells(card):
             for x in card.data.scripts.play:
                 getTargetedActionDetails(x, currentBattlecryEffect, card)
         else:
-            for x in card.data.scripts.play(card):
-                getTargetedActionDetails(x, currentBattlecryEffect, card)
+            if card.data.id != "OG_316":
+                # Herald Volazj cheater
+                for x in card.data.scripts.play(card):
+                    getTargetedActionDetails(x, currentBattlecryEffect, card)
     except TypeError:
         None
     return currentBattlecryEffect
