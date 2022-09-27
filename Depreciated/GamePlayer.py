@@ -11,12 +11,11 @@ from GameCommunication import checkValidActionsSparse, playTurnSparse
 from GameSetupUtils import mulliganRandomChoice
 from GameState import InputBuilder
 from Tests.ScenarioTests import weapon_test, simpler_weapon_test, mage_heropower_test, hunter_heropower_test
-from montecarlo.montecarlo import MonteCarlo
-from montecarlo.node import Node, NoChildException
+import Configuration
+from Montecarlo.montecarlo import MonteCarlo
+from Montecarlo.node import Node, NoChildException
 
 from GameConvenience import getCardIdFromAction, interpretDecodedAction, decodeAction
-
-RANDOM_MOVE_SAMPLES = 5
 
 
 def _new_setup_game(data):
@@ -265,9 +264,9 @@ class GamePlayer():
 
 
     def playGame(self):
-        # montecarlo = MonteCarlo(Node(game), model)
-        # montecarlo.child_finder = child_finder
-        # montecarlo.root_node.player_number = game.current_player.entity_id - 1
+        # Montecarlo = MonteCarlo(Node(game), model)
+        # Montecarlo.child_finder = child_finder
+        # Montecarlo.root_node.player_number = game.current_player.entity_id - 1
         winner = 0
 
         try:
@@ -296,7 +295,7 @@ class GamePlayer():
                 #         cardsp2.append(card)
 
                 # else:
-                #    montecarlo.root_node = montecarlo.make_choice(currPlayer)
+                #    Montecarlo.root_node = Montecarlo.make_choice(currPlayer)
                 #    #rest of moves are the network playing "optimally"
 
                 # zamieniłem bo chcemy appendować co zrobiliśmy i dopiero wtedy zagrać turę - ten ostatni ruch
@@ -388,10 +387,10 @@ def child_finder(node, montecarlo):
             child.player_number = 1 if child.game.current_player is child.game.player1 else 2
             child.policy_value = expert_policy_values[0, action]
             if is_random:
-                child.policy_value /= RANDOM_MOVE_SAMPLES
+                child.policy_value /= Configuration.RANDOM_MOVE_SAMPLES
             node.add_child(child)
             if is_random:
-                for i in range(RANDOM_MOVE_SAMPLES - 1):
+                for i in range(Configuration.RANDOM_MOVE_SAMPLES - 1):
                     child = Node(deepcopy(node.game))
                     child.state = action
                     try:
@@ -399,7 +398,7 @@ def child_finder(node, montecarlo):
                     except GameOver:
                         child.finished = True
                     child.player_number = 1 if child.game.current_player is child.game.player1 else 2
-                    child.policy_value = expert_policy_values[0, action] / RANDOM_MOVE_SAMPLES
+                    child.policy_value = expert_policy_values[0, action] / Configuration.RANDOM_MOVE_SAMPLES
                     node.add_child(child)
     if node.parent is not None:
         node.update_win_value(float(win_value))

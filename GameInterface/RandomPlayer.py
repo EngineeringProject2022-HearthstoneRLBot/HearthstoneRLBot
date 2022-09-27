@@ -1,7 +1,6 @@
 import random
 
-from GameCommunication import checkValidActionsSparse, checkValidActions
-from GameInterface import PlayerInterface
+from GameInterface import *
 
 
 class RandomPlayer(PlayerInterface):

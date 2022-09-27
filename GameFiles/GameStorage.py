@@ -1,18 +1,48 @@
-from GameConvenience import translateClassId
 import os
 import pickle
-import random
-import numpy as np
-import tensorflow as tf
-from datetime import datetime
-from Model import Resnet
-from GamePlayer import GamePlayer
 import glob
-# ta funkcja sie przyda we wszystkim - granie najswiezszego pliku, podsumowanie najswiezszego pliku itd itd
-# jak ktos sie chce podjac obstawiam ze to mega latwe będzie, taki format mamy aktualnie nazwy pliku:
-# "data/"+ datetime.now().strftime("%d-%m-%YT%H%M%S") +".txt"
-# więc wystarczy z tego wyciągnąć datetime.now() robiąc przeciwną operację i porównywać
-from constants import INIT_MODEL_NAME, FILE_POSITION
+import Configuration
+import numpy as np
+from GameInterface.GameCreator import *
+from datetime import datetime
+
+
+def dumpGames():
+    model_name = Configuration.OUTPUT_FOLDER
+    path = f"data/{model_name}"
+    if not os.path.exists(path):
+        os.makedirs(path)
+    fileName = datetime.now().strftime("%d-%m-%YT%H%M%S")
+
+    with open(f"data/{model_name}/{fileName}.txt", "wb") as fp:  # dumpuję aktualny(pierwszy) stan randoma jako pierwszy obiekt przed zrobieniem czegokolwiek
+        pickle.dump((random.getstate()), fp)
+        np.random.seed(random.randrange(999999999))
+        tf.random.set_seed(random.randrange(999999999))
+
+    for i in range(Configuration.GAME_NUM):
+        print("GAME " + str(i + 1))
+        state = random.getstate()
+        game = Configuration.GAME_CREATION()
+        game.start()
+        with open(f"data/{model_name}/{fileName}.txt", "ab") as fp:
+            pickle.dump((game.data, game.winner, state), fp)
+
+
+####FUNCTIONS TO CHECK
+
+
+def selfPlay(model, numbgame, simulations, fileName, model_name, pureRand=False):
+    for i in range(numbgame):
+
+        print("GAME " + str(i + 1))
+        state = random.getstate()
+        game_player = GamePlayer(model, simulations)
+        if not pureRand:
+            winner, data = game_player.playGame()
+        else:
+            winner, data = game_player.playRandGame()
+        with open(f"data/{model_name}/{fileName}.txt", "ab") as fp:
+            pickle.dump((data, winner, state), fp)
 
 
 def mostRecentFile():
@@ -83,7 +113,8 @@ def mostRecentFile():
             mostRecentFilepath = x
             mostRecent = tmp
 
-    return f"data/{INIT_MODEL_NAME}/{mostRecentFilepath}.txt"
+    return f"data/{Configuration.INIT_MODEL_NAME}/{mostRecentFilepath}.txt"
+
 
 def getGamesWithoutExceptions(filepath:str, num_games:int =50): # offset to ilosc gier do wziecia na raz
     global FILE_POSITION
@@ -113,6 +144,8 @@ def getGamesWithoutExceptions(filepath:str, num_games:int =50): # offset to ilos
                 return metadata, arrOfGames
 
         return metadata,arrOfGames
+
+
 
 def getGamesWithoutExceptionsFromSeveralFiles(numberOfGames: int):
     cleanGames = []
@@ -170,48 +203,6 @@ def fileStatistics(filePath):
     return games, firstWins, secondWins, draws, exceptions
 
 
-def selfPlay(model, numbgame, simulations, fileName, model_name, pureRand=False):
-    for i in range(numbgame):
-
-        print("GAME " + str(i + 1))
-        state = random.getstate()
-        game_player = GamePlayer(model, simulations)
-        if not pureRand:
-            winner, data = game_player.playGame()
-        else:
-            winner, data = game_player.playRandGame()
-        with open(f"data/{model_name}/{fileName}.txt", "ab") as fp:
-            pickle.dump((data, winner, state), fp)
-
-
-def dumpGames(numGames, numSims, model_name=None, pureRand=False):
-    if not model_name:
-        model_name = INIT_MODEL_NAME
-
-    model = tf.keras.models.load_model(f"Model/models/{model_name}")
-    path = f"data/{model_name}"
-    isExist = os.path.exists(path)
-    if not isExist:
-        os.makedirs(path)
-    fileName = datetime.now().strftime("%d-%m-%YT%H%M%S")
-
-    with open(f"data/{model_name}/{fileName}.txt", "wb") as fp:  # dumpuję aktualny(pierwszy) stan randoma jako pierwszy obiekt przed zrobieniem czegokolwiek
-        pickle.dump((random.getstate(), numSims), fp)
-        np.random.seed(random.randrange(999999999))
-        tf.random.set_seed(random.randrange(999999999))
-
-
-
-    import time
-    t0 = time.time()
-
-    selfPlay(model, numGames, numSims, fileName, model_name, pureRand)
-
-    t1 = time.time()
-    total = t1 - t0
-    print(total)
-
-
 def loadGame(fileName, gameNumber=-1, model_name=None, pureRand = False):  # bez argumentu to ostatnia
     if not model_name:
         model_name = INIT_MODEL_NAME
@@ -236,6 +227,3 @@ def loadGame(fileName, gameNumber=-1, model_name=None, pureRand = False):  # bez
             game_player.playGame()
         else:
             game_player.playRandGame()
-
-def loadParseDataForTraining():
-    pass

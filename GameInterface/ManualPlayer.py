@@ -1,10 +1,8 @@
 from subprocess import TimeoutExpired
 
-from GameCommunication import checkValidActions
-from GameInterface import PlayerInterface
+from GameInterface import *
 
 from waiting import wait
-import random
 
 class ManualPlayer(PlayerInterface):
     def __init__(self, name, hero, deck, print = True):

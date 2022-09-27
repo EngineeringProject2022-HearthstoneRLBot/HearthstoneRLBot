@@ -1,12 +1,9 @@
-import numpy as np
-from fireplace.exceptions import GameOver
+from GameInterface import *
 from fireplace.game import Game
 from fireplace.player import Player
 from fireplace import logging
 from hearthstone.enums import CardClass, PlayState
 
-from GameConvenience import interpretDecodedAction, decodeAction
-from GameSetupUtils import mulliganRandomChoice
 from GameState import InputBuilder
 
 

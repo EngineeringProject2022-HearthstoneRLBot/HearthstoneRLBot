@@ -7,9 +7,9 @@ import sparse
 
 class DataGenerator(keras.utils.Sequence):
     'Generates data for Keras'
-    def __init__(self,model_name, batch_size=32, dim=(401, 41, 3), n_channels=1, shuffle=True):
+    def __init__(self,data_folder, batch_size=32, dim=(401, 41, 3), n_channels=1, shuffle=True):
         'Initialization'
-        self.model_name = model_name
+        self.data_folder = data_folder
         self.dim = dim
         self.batch_size = batch_size
         self.dictionary = {}
@@ -22,7 +22,7 @@ class DataGenerator(keras.utils.Sequence):
     def __getNoTurns__(self):
         noTurns = 0
 
-        for filepath in glob.iglob(f'../data/{self.model_name}/*'):
+        for filepath in glob.iglob(f'../data/{self.data_folder}/*'):
             with open(filepath,"rb") as rb:
                 #METADATA AND DECK TO BE IGNORED
                 try:

@@ -1,8 +1,6 @@
 from fireplace.exceptions import GameOver
 
-from GameCommunication import *
-from GameConvenience import interpretDecodedAction, decodeAction
-
+from GameInterface import *
 
 class PlayerInterface:
     def __init__(self, name, hero, deck, print = True):
