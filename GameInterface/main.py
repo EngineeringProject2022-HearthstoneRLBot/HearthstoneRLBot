@@ -4,40 +4,27 @@ from GameInterface.DiscardingGame import DiscardingGame
 from GameInterface.ManualPlayer import ManualPlayer
 from GameInterface.ModeledGame import ModeledGame
 from GameInterface.RandomPlayer import RandomPlayer
+from GameCreator import GameCreator
+from GameCreator import HeroDecks
+from GameCreator import PlayerType
 
+
+# GameCreator.createDefaultGame() user Manual:
+# Arguments:
+# player1/2Type --> type of player (ex.Random/Modeled) if you pass only player1Type then player2Type will be the same
+# modelp1/p2    --> model that player will use,        if you pass only modelp1 then the players will use the same model
+# depthp1/p2    --> number of simulations in the tree, if you pass only depthp1 then the players will have the same depth
+# p1/p2         --> basically decks for players that we can give manually, use HeroDecks. ... and just choose the deck USE "()" p1=()
+# createDefaultGame(playerType=PlayerType.Random)  - Basic random vs random moves on randomly picked decks
+# createDefaultGame(playerType=PlayerType.Modeled) - Basic model  vs model  moves on randomly picked decks
+# createDefaultGame(player1Type=PlayerType.Modeled, modelp1="NAZWA_MODELU", depthp1=25) #both players on same model->NAZWA_MODELU and on the same depth=25
+# createDefaultGame(player1Type=PlayerType.Modeled, modelp1="NAZWA_MODELU", depthp1=25 ,p1=(HeroDecks.BasicDruid), player2Type=PlayerType.Random, p2=(HeroDecks.FastDruid), printLogs=True)
 
 def main():
-    print('x')
     cards.db.initialize()
-    deck1 = ['CS2_072', 'CS2_072', 'CS2_074', 'CS2_074', 'CS2_189', 'CS2_189', 'CS1_042', 'CS1_042', 'CS2_075',
-                  'CS2_075', 'CS2_172', 'CS2_172', 'EX1_050', 'EX1_050', 'EX1_581', 'EX1_581', 'CS2_141', 'CS2_141',
-                  'EX1_025', 'EX1_025', 'CS2_147', 'CS2_147', 'CS2_131', 'CS2_131', 'CS2_076', 'CS2_076', 'EX1_593',
-                  'EX1_593', 'CS2_150', 'CS2_150']
-    deck2 = ['EX1_169', 'EX1_169', 'CS2_005', 'CS2_005', 'CS2_189', 'CS2_189', 'CS2_120', 'CS2_120', 'CS2_009',
-                  'CS2_009', 'CS2_013', 'CS2_013', 'CS2_007', 'CS2_007', 'CS2_127', 'CS2_127', 'CS2_182', 'CS2_182',
-                  'CS2_119', 'CS2_119', 'DS1_055', 'DS1_055', 'EX1_593', 'EX1_593', 'CS2_200', 'CS2_200', 'CS2_162',
-                  'CS2_162', 'CS2_201', 'CS2_201']
-    #p1 = AIPlayer("Model", 3, deck1, "TRAINED_MODEL6", 20, True)
-    #p2 = AIPlayer("Y", 4, deck2, "Model-INIT", 2)
-    #p1 = RandomPlayer("X", 3, deck1)
-    #p1 = RandomPlayer("Rogue", 7, deck1, False)
-    p1 = AIPlayer("RogueModel", 7, deck1, "TRAINED_MODEL6", 10, True)
-    p2 = RandomPlayer("Druid", 2, deck2, False)
-    #p2 = AIPlayer("Ja", 3, deck2, "TRAINED_MODEL6", 20)
-    #game = ModeledGame(p1, p2)
-    n = 0
-    i = 0
-    while True:
-        game = ModeledGame(p1, p2)
-        game.start()
-        if game.winner == 1:
-            if game.game.player1.name == game.player1.name:
-                i+=1
-        elif game.winner == 2:
-            if game.game.player2.name == game.player1.name:
-                i+=1
-        n+=1
-        print(f'{p1.name} won {i}/{n} times. WR: {i/n}')
+    game = GameCreator.createDefaultGame(player1Type=PlayerType.Modeled, modelp1="XYZ") #both players on the same model: XYZ
+    game.start()
+
 
 if __name__ == "__main__":
     main()
