@@ -193,10 +193,8 @@ class GamePlayer():
         if seedObject != None:
             random.setstate(seedObject)
         data = []
-        # game = _setup_game(data)
-        #self.game = hunter_heropower_test()
-        # game = _setup_game(data)
         self.game = _new_setup_game(data)
+        #self.game = hunter_heropower_test()
         self.data = []
         # game = mage_heropower_test()
         if not rand:
@@ -221,7 +219,7 @@ class GamePlayer():
                 action = random.choice(actions)
                 probabilities = np.zeros(252)
                 for poss_action in actions:
-                    probabilities[poss_action] = 1/len(actions)
+                    probabilities[poss_action] = 1 / len(actions)
                     # probably unnecessary: add the tiny difference to ensure probabilities add to 1
                     if poss_action == actions[-1]:
                         probabilities[poss_action] += 1 - sum(probabilities)
@@ -381,6 +379,7 @@ def child_finder(node, montecarlo):
         for action in checkValidActionsSparse(node.game):
             child = Node(deepcopy(node.game))
             child.state = action
+            child.stateText = ("Action:" + str(action) + " - " + interpretDecodedAction(decodeAction(action), node.game))
             is_random = 0
             try:
                 is_random = playTurnSparse(child.game, action)

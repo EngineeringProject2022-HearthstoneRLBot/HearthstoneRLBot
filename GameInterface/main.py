@@ -1,5 +1,6 @@
 from fireplace import cards
 from GameInterface.AIPlayer import AIPlayer
+from GameInterface.DiscardingGame import DiscardingGame
 from GameInterface.ManualPlayer import ManualPlayer
 from GameInterface.ModeledGame import ModeledGame
 from GameInterface.RandomPlayer import RandomPlayer
@@ -23,6 +24,7 @@ def main():
     cards.db.initialize()
     game = GameCreator.createDefaultGame(player1Type=PlayerType.Modeled, modelp1="XYZ") #both players on the same model: XYZ
     game.start()
+
 
 if __name__ == "__main__":
     main()
