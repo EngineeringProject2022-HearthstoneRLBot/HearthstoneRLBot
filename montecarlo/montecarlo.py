@@ -67,7 +67,7 @@ class MonteCarlo:
         for i in range(expansion_count):
             current_node = self.root_node
             while current_node.expanded:
-                current_node = current_node.get_preferred_child()
+                current_node = current_node.get_preferred_child(self.player_number)
 
             self.expand(current_node)
 

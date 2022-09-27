@@ -205,7 +205,7 @@ class GamePlayer():
                 tmp = MonteCarlo(Node(self.game), self.model)
                 tmp.child_finder = child_finder
                 tmp.root_node.player_number = 1 if self.game.current_player is self.game.player1 else 2
-                tmp.player_number = i + 1
+                tmp.player_number = 1 if self.game.current_player is self.game.player1 else 2
                 self.montecarlo.append(tmp)
 
 
@@ -359,6 +359,7 @@ def child_finder(node, montecarlo):
     # times. This is necessary and good(a win or loss updates our win value average 15 times.) However, the value isn't
     # going to change so we can just cache this value
     if not node.cached_network_value:
+
         x = InputBuilder.convToInput(node.game)
         expert_policy_values, network_value = montecarlo.model(x)
         win_value = network_value
