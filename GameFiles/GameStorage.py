@@ -1,6 +1,8 @@
 import os
 import pickle
 import glob
+import traceback
+
 import Configuration
 import numpy as np
 from GameInterface.GameCreator import *
@@ -23,12 +25,18 @@ def dumpGames():
         print("GAME " + str(i + 1))
         state = random.getstate()
         game = Configuration.GAME_CREATION()
-        game.start()
+        output = None
+        try:
+            game.start()
+            output = (game.data, game.winner,   state, game.prepareGamersData(), None)
+        except Exception:
+            output = (game.data, 4,             state, game.prepareGamersData(), traceback.format_exc())
+            print(traceback.format_exc())
         with open(f"data/{model_name}/{fileName}.txt", "ab") as fp:
-            pickle.dump((game.data, game.winner, state), fp)
+            pickle.dump(output, fp)
 
 
-####FUNCTIONS TO CHECK
+####FUNCTIONS TO CHECK (depreciated?)
 
 
 def selfPlay(model, numbgame, simulations, fileName, model_name, pureRand=False):

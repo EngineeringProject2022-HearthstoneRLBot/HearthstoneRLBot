@@ -31,19 +31,6 @@ class ModeledGame:
 
     def start(self):
         self.startGame()
-        self.data.append((self.player1.hero, self.player1.deck,
-                          self.player2.hero, self.player2.deck,
-                          self.game.player1.name, self.game.player2.name))  # dodałem zapisywanie nazw dzięki
-                                                                            # czemu ustawiając je np na
-                                                                            # HunterStupidD1, MageIntelligentD3
-                                                                            # będziemy wiedzieli, że np
-                                                                            # player1 to jest głupi hunter, a
-                                                                            # player2 to inteligentny mag xD
-                                                                            # można ustawić dowolne nazwy co też pozwoli
-                                                                            # grać np HunterIteration1 vs HunterIteration2
-                                                                            # i ich odróżniać (nie tylko na pdostawie deck)
-                                                                            # wg mnie to daje więcej swobody niż
-                                                                            # zapisywanie typu klasy, hero i decka samego
         while True:
             self.startTurn()
             data = InputBuilder.convToInput(self.game)
@@ -85,6 +72,25 @@ class ModeledGame:
             self.winner = 3
             return True
         return False
+
+    def prepareGamersData(self):
+        # Moim zdaniem to nie ma tak, że dobrze albo że nie dobrze. Gdybym miał powiedzieć, co cenię w życiu najbardziej,
+        # powiedziałbym, że ludzi. Ekhm… Ludzi, którzy podali mi pomocną dłoń, kiedy sobie nie radziłem, kiedy byłem sam.
+        # I co ciekawe, to właśnie przypadkowe spotkania wpływają na nasze życie. Chodzi o to, że kiedy wyznaje się
+        # pewne wartości, nawet pozornie uniwersalne, bywa, że nie znajduje się zrozumienia, które by tak rzec, które
+        # pomaga się nam rozwijać. Ja miałem szczęście, by tak rzec, ponieważ je znalazłem. I dziękuję życiu. Dziękuję
+        # mu, życie to śpiew, życie to taniec, życie to miłość. Wielu ludzi pyta mnie o to samo, ale jak ty to robisz?
+        # Skąd czerpiesz tę radość? A ja odpowiadam, że to proste, to umiłowanie życia, to właśnie ono sprawia, że
+        # dzisiaj na przykład buduję maszyny, a jutro… kto wie, dlaczego by nie, oddam się pracy społecznej i
+        # będę ot, choćby sadzić… znaczy… marchew.
+
+        # Dodałem tu self.player1.name aby później sobie zmapować kto zaczynał
+        # Z poczatku myslalem, że ustawię po prostu player1 i player2 i na tej podstawie będę dawał info o tym
+        # Kto wygrał (czy nasz ustalony player1 czy nasz ustalony player2) no ale wtedy byśmy stracili info
+        # Kto zaczynał (więc to było błędne w starym GamePlayerze, ale nie używane to nie wyszło)
+        return (self.player1.name, self.player1.hero, self.player1.deck,
+                self.player2.name, self.player2.hero, self.player2.deck,
+                self.game.player1.name, self.game.player2.name)
 
     def startTurn(self):
         pass
