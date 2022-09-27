@@ -1,7 +1,7 @@
 from ModeledGame import ModeledGame
 
 class DiscardingGame(ModeledGame):
-    def beforeStart(self):
+    def startGame(self):
         self.game.player1.max_mana = 10
         self.game.player2.max_mana = 10
         for i in range(28):
