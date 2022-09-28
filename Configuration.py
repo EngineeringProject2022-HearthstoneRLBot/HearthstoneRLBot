@@ -1,12 +1,32 @@
-from fireplace import cards
-from GameInterface.AIPlayer import AIPlayer
-from GameInterface.DiscardingGame import DiscardingGame
-from GameInterface.ManualPlayer import ManualPlayer
-from GameInterface.ModeledGame import ModeledGame
-from GameInterface.RandomPlayer import RandomPlayer
-from GameCreator import GameCreator
-from GameCreator import HeroDecks
-from GameCreator import PlayerType
+from GameInterface import *
+
+# MonteCarlo
+WIN_MULTIPLIER = 0
+RANDOM_MOVE_SAMPLES = 5
+
+# DumpGames
+OUTPUT_FOLDER = 'DEFAULT_OUTPUT'
+GAME_NUM = 200
+
+# Training
+INPUT_MODEL_NAME = 'XYZ'
+OUTPUT_MODEL_NAME = 'XYZV2'
+LEARNING_RATE = 0.001
+
+# Game creation
+def GAME_CREATION():
+    #return GameCreator.createDefaultGame(PlayerType.Random)
+    return GameCreator.createCustomGame()
+
+def CUSTOM_GAME():
+    p1 = RandomPlayer("HUNTER_TEST", Hero.Hunter, PlayerDecks.BasicHunter)
+    p2 = RandomPlayer("HUNTER_TEST", Hero.Hunter, PlayerDecks.BasicHunter)
+    startGameEffs = [GESetMana(10), GEDealDmg(28), GEEndTurn(), GERemoveDeck(), GEDiscard()]
+    startTurnEffs = [GEDiscard()]
+    game = DecoratedGame(p1, p2,
+                         startGameEffs=startGameEffs,
+                         startTurnEffs=startTurnEffs)
+    return game
 
 
 # GameCreator.createDefaultGame() user Manual:
@@ -19,12 +39,4 @@ from GameCreator import PlayerType
 # createDefaultGame(playerType=PlayerType.Modeled) - Basic model  vs model  moves on randomly picked decks
 # createDefaultGame(player1Type=PlayerType.Modeled, modelp1="NAZWA_MODELU", depthp1=25) #both players on same model->NAZWA_MODELU and on the same depth=25
 # createDefaultGame(player1Type=PlayerType.Modeled, modelp1="NAZWA_MODELU", depthp1=25 ,p1=(HeroDecks.BasicDruid), player2Type=PlayerType.Random, p2=(HeroDecks.FastDruid), printLogs=True)
-
-def main():
-    cards.db.initialize()
-    game = GameCreator.createDefaultGame(player1Type=PlayerType.Modeled, modelp1="XYZ") #both players on the same model: XYZ
-    game.start()
-
-
-if __name__ == "__main__":
-    main()
+# createCustomGame() zwraca CUSTOM_GAME z konfiguracji ( to jest miejsce jeżeli się chce dodać własny test i go popróbować )

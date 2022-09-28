@@ -2,7 +2,7 @@
 # from copy import deepcopy
 #
 # from GameCommunication import playTurnSparse
-# from montecarlo.node import Node
+# from Montecarlo.node import Node
 #
 #
 # class RandomNode(Node):

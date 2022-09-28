@@ -1,20 +1,4 @@
-import fireplace
-from hearthstone.enums import CardClass
-from fireplace import cards, logging
-from Tests.ScenarioTests import weapon_test, simpler_weapon_test, mage_heropower_test, hunter_heropower_test, fireball_test, \
-    trade_or_win_test, flamestrike_test, healing_test
-
-# import os
-# os.environ['PYTHONHASHSEED'] = '0' # niby mi działa z zakomentowanymi tymi liniami, ale zostawiam na później
-# os.environ['CUDA_VISIBLE_DEVICES'] = '' #czy to nie zepsuje procesowania z CUDA?
-from GameCommunication import checkValidActionsSparse, playTurnSparse
-from GameSetupUtils import prepare_game
-from GameState import Hero, HandCard
-from fireplace.utils import *
-# import os
-# os.environ['PYTHONHASHSEED'] = '0' # niby mi działa z zakomentowanymi tymi liniami, ale zostawiam na później
-# os.environ['CUDA_VISIBLE_DEVICES'] = '' #czy to nie zepsuje procesowania z CUDA?
-import sys
+from GameInterface import *
 
 def translateClassId(id):
     if id == 2:
