@@ -1,6 +1,6 @@
 from Model import Resnet
 from Model.Resnet50Ref import Resnet50Ref
-from Configuration import INIT_MODEL_NAME
+INIT_MODEL_NAME = "Model-INIT"
 
 myNetwork = Resnet50Ref()
 model = myNetwork.getModel()

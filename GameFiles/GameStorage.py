@@ -39,18 +39,18 @@ def dumpGames():
 ####FUNCTIONS TO CHECK (depreciated?)
 
 
-def selfPlay(model, numbgame, simulations, fileName, model_name, pureRand=False):
-    for i in range(numbgame):
-
-        print("GAME " + str(i + 1))
-        state = random.getstate()
-        game_player = GamePlayer(model, simulations)
-        if not pureRand:
-            winner, data = game_player.playGame()
-        else:
-            winner, data = game_player.playRandGame()
-        with open(f"data/{model_name}/{fileName}.txt", "ab") as fp:
-            pickle.dump((data, winner, state), fp)
+# def selfPlay(model, numbgame, simulations, fileName, model_name, pureRand=False):
+#     for i in range(numbgame):
+#
+#         print("GAME " + str(i + 1))
+#         state = random.getstate()
+#         game_player = GamePlayer(model, simulations)
+#         if not pureRand:
+#             winner, data = game_player.playGame()
+#         else:
+#             winner, data = game_player.playRandGame()
+#         with open(f"data/{model_name}/{fileName}.txt", "ab") as fp:
+#             pickle.dump((data, winner, state), fp)
 
 
 def mostRecentFile():
@@ -211,27 +211,27 @@ def fileStatistics(filePath):
     return games, firstWins, secondWins, draws, exceptions
 
 
-def loadGame(fileName, gameNumber=-1, model_name=None, pureRand = False):  # bez argumentu to ostatnia
-    if not model_name:
-        model_name = INIT_MODEL_NAME
-    model = tf.keras.models.load_model(f"Model/models/{model_name}")
-
-    with open(f"data/{model_name}/{fileName}.txt", "rb") as rb:
-        metadata = pickle.load(rb)
-        random.setstate(metadata[0])
-        np.random.seed(random.randrange(999999999))
-        tf.random.set_seed(random.randrange(999999999))
-
-        i = 0
-        gameData = None
-        while i != gameNumber:
-            i += 1
-            try:
-                gameData = pickle.load(rb)
-            except EOFError as e:
-                break
-        game_player = GamePlayer(model, metadata[1], metadata[2])
-        if not pureRand:
-            game_player.playGame()
-        else:
-            game_player.playRandGame()
+# def loadGame(fileName, gameNumber=-1, model_name=None, pureRand = False):  # bez argumentu to ostatnia
+#     if not model_name:
+#         model_name = INIT_MODEL_NAME
+#     model = tf.keras.models.load_model(f"Model/models/{model_name}")
+#
+#     with open(f"data/{model_name}/{fileName}.txt", "rb") as rb:
+#         metadata = pickle.load(rb)
+#         random.setstate(metadata[0])
+#         np.random.seed(random.randrange(999999999))
+#         tf.random.set_seed(random.randrange(999999999))
+#
+#         i = 0
+#         gameData = None
+#         while i != gameNumber:
+#             i += 1
+#             try:
+#                 gameData = pickle.load(rb)
+#             except EOFError as e:
+#                 break
+#         game_player = GamePlayer(model, metadata[1], metadata[2])
+#         if not pureRand:
+#             game_player.playGame()
+#         else:
+#             game_player.playRandGame()

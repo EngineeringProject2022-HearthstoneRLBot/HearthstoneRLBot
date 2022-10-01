@@ -67,7 +67,7 @@ class MonteCarlo:
         for i in range(expansion_count):
             current_node = self.root_node
             while current_node.expanded:
-                current_node = current_node.get_preferred_child()
+                current_node = current_node.get_preferred_child(self.player_number)
 
             self.expand(current_node)
 
@@ -76,14 +76,14 @@ class MonteCarlo:
         if len(node.children):
             node.expanded = True
 
-    def sync_tree(self, game, move, is_random: int):
+    def sync_tree(self, game, move, is_random: int, playerNumber: int):
         found = False
-        # orientation doesn't matter as long as its the same for both here, as we are only going to look at the board, not hands
-        currInput = InputBuilder.convToInput(game)
+        player = game.player1 if playerNumber == 1 else game.player2
+        currInput = InputBuilder.convToInput(game, player)
         for x in self.root_node.children:
             if x.state == move:
                 # we found a child with the same move, but it could be a different random state if is_random, so we gta compare boards
-                if is_random == 0 or (is_random == 1 and (currInput[:, :, :, 1:3] == InputBuilder.convToInput(x.game)[:, :, :, 1:3]).all()):
+                if is_random == 0 or (is_random == 1 and (currInput == InputBuilder.convToInput(x.game, player)).all()):
                     self.root_node = x
                     if self.root_node.expanded and self.root_node.visits != 0:
                         self.root_node.visits -= 1

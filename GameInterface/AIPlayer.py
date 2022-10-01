@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from GameInterface import *
 import tensorflow as tf
 from GameState import InputBuilder
@@ -9,37 +11,35 @@ from Montecarlo.node import Node
 class AIPlayer(PlayerInterface):
     def __init__(self, name, hero, deck, model_name, simulations, print=True):
         super().__init__(name, hero, deck, print)
-        model = tf.keras.models.load_model(f"../Model/models/{model_name}")
+        model = tf.keras.models.load_model(f"./Model/models/{model_name}")
         self.model = model
         self.simulations = simulations
+
 
     def joinGame(self, game):
         super().joinGame(game)
         montecarlo = MonteCarlo(Node(game), self.model)
         montecarlo.child_finder = AIPlayer.child_finder
         montecarlo.root_node.player_number = 1 if self.game.current_player is self.game.player1 else 2
-        montecarlo.player_number = 1 if self.game.player1.name == self.name else 2
+        montecarlo.player_number = 1 if self.name == self.game.player1.name else 2
         self.montecarlo = montecarlo
+
 
     def getPreferredAction(self):
         self.montecarlo.simulate(self.simulations)
-        if self.montecarlo.make_exploratory_choice().state == 251:
-            a = 'a'
         return self.montecarlo.make_exploratory_choice().state
 
     def getProbabilities(self):
         return self.montecarlo.get_probabilities()
 
     def sync(self, game, action, isRandom):
-        self.montecarlo.sync_tree(game, action, isRandom)
+        self.montecarlo.sync_tree(game, action, isRandom, self.montecarlo.player_number)
         self.montecarlo.root_node.parent = None
 
 
     @staticmethod
     def child_finder(node, montecarlo):
         # node.game.current_player.discard_hand()
-        if node.game.current_player.hero.health == 0 and node.game.current_player.opponent.hero.health == 1:
-            a = "a"
         # if we have 50 simulations, and after doing 35 we have reached an end node, we are going to "explore this node 15
         # times. This is necessary and good(a win or loss updates our win value average 15 times.) However, the value isn't
         # going to change so we can just cache this value

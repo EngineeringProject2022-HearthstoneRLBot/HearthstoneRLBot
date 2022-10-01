@@ -55,16 +55,18 @@ class Node:
         for child in children:
             self.add_child(child)
 
-    def get_preferred_child(self):
+    def get_preferred_child(self, treePlayerNumber: int):
         best_children = []
         best_score = float('-inf')
-
+        flip = False
+        if treePlayerNumber != self.player_number:
+            flip = True
         for child in self.children:
             score = 0
             numbers = 0
             for child_2 in self.children:
                 if child_2.state == child.state:
-                    score += child.get_score()
+                    score += child.get_score(flip)
                     numbers += 1
             # score = child.get_score(callingPlayer)
             score = score / numbers
@@ -78,7 +80,7 @@ class Node:
         except IndexError:
             raise NoChildException
 
-    def get_score(self):
+    def get_score(self, flipWinValue: bool):
 
         # this node is already recognised as finished, but hasn't been explored once, so it's unfair to not give it
         # a chance.
@@ -86,10 +88,13 @@ class Node:
             discovery_operand = float('inf')
             win_operand = 0
         else:
+            win_value = self.win_value
+            if flipWinValue:
+                win_value *= -1
             discovery_operand = self.discovery_factor * (self.policy_value or 1) * (
                         (sqrt(self.parent.visits)) / (1 + self.visits))
             win_multiplier = Configuration.WIN_MULTIPLIER
-            win_operand = win_multiplier * self.win_value
-        self.score = win_operand + discovery_operand
-        return self.score
+            win_operand = win_multiplier * win_value
+        score = win_operand + discovery_operand
+        return score
         ###
