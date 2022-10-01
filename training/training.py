@@ -3,9 +3,12 @@ import tensorflow as tf
 import Configuration
 import keras
 from tensorflow.keras import backend as k
-from GameFiles import DataGenerator
+
 from tensorflow.compat.v1 import ConfigProto
 from tensorflow.compat.v1 import InteractiveSession
+
+from GameFiles.DataGenerator import DataGenerator
+
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 # os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
@@ -18,10 +21,13 @@ def trainNetwork(model):
         # This callback saves a SavedModel every 100 batches.
         # We include the training loss in the saved model name.
         keras.callbacks.ModelCheckpoint(
-            filepath=checkpoint_dir + "/ckpt-loss={loss:.2f}", save_freq=2000
+            filepath=checkpoint_dir + "/ckpt-loss={loss:.2f}", save_freq=Configuration.CALLBACK_FREQ
         )
     ]
-    model.fit(trainingGenerator, epochs=1, callbacks=callbacks)
+    if Configuration.CALLBACKS == 1:
+        model.fit(trainingGenerator, epochs=1, callbacks=callbacks)
+    else:
+        model.fit(trainingGenerator, epochs=1)
     model.save(f'../Model/models/{Configuration.OUTPUT_MODEL_NAME}')
 
 config = ConfigProto()
@@ -30,7 +36,7 @@ session = InteractiveSession(config=config)
 
 model = tf.keras.models.load_model(f"../Model/models/{Configuration.INPUT_MODEL_NAME}")
 model.compile(loss=['categorical_crossentropy', 'mean_squared_error'],
-              loss_weights = [0, 1], optimizer=tf.keras.optimizers.Adam(Configuration.LEARNING_RATE))
+              loss_weights = [Configuration.POLICY_WEIGHT, Configuration.WINVALUE_WEIGHT], optimizer=tf.keras.optimizers.Adam(Configuration.LEARNING_RATE))
 # model.optimizer = tf.keras.optimizers.Adam(
 #     learning_rate=0.001,
 #     beta_1=0.9,
