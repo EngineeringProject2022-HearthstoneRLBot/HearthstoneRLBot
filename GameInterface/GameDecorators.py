@@ -76,3 +76,34 @@ class GEEndTurn(GameEffect):
     def run(self, game):
         game.end_turn()
 
+# still being tested and developed
+class GEGiveAndPlayMinions(GameEffect):
+    def __init__(self, cardsP1 = [], cardsP2 = None):
+        self.cardsP1 = cardsP1
+        if cardsP2 is None:
+            self.cardsP2 = []
+
+    def run(self, game):
+        for card in self.cardsP1:
+            given = game.player1.give(card)
+            given.play()
+        game.end_turn()
+        for card in self.cardsP2:
+            given = game.player2.give(card)
+            given.play()
+        game.end_turn()
+
+class GEGiveCards(GameEffect):
+    def __init__(self, cardsP1 = [], cardsP2 = None):
+        self.cardsP1 = cardsP1
+        if cardsP2 is None:
+            self.cardsP2 = []
+
+    def run(self, game):
+        for card in self.cardsP1:
+            game.player1.give(card)
+        game.end_turn()
+        for card in self.cardsP2:
+            game.player2.give(card)
+        game.end_turn()
+

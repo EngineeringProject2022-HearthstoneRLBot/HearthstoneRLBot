@@ -2,7 +2,7 @@ import random
 from copy import deepcopy
 
 from GameState import InputBuilder
-from Montecarlo.node import Node
+from montecarlo.node import Node
 import numpy as np
 
 class MonteCarlo:

@@ -11,7 +11,7 @@ class GameCreator:
 
     @staticmethod
     def createDefaultGame(player1Type=PlayerType.Modeled, player2Type=None, modelp1="Model-INIT", modelp2=None,
-                          depthp1=20, depthp2=None, p1=None, p2=None, printLogs=False):
+                          depthp1=10, depthp2=None, p1=None, p2=None, printLogs=False):
         if player2Type is None:
             player2Type = player1Type
         if depthp2 is None:
@@ -24,6 +24,12 @@ class GameCreator:
             p2 = GameCreator.drawRandomDeck()
         nameDeckOne, heroDeckOne, deck1 = p1
         nameDeckTwo, heroDeckTwo, deck2 = p2
+
+        #solving same decks and player types
+        if nameDeckOne == nameDeckTwo and player1Type == player2Type and modelp1 == modelp2 and depthp1 == depthp2:
+            nameDeckOne = nameDeckOne + "1"
+            nameDeckTwo = nameDeckTwo + "2"
+
         if player1Type == PlayerType.Random:
             name1 = nameDeckOne + '_' + 'Random'
             p1 = RandomPlayer(name1, heroDeckOne, deck1, printLogs)
@@ -38,7 +44,7 @@ class GameCreator:
             name2 = nameDeckTwo + '_' + modelp2 + '_' + 'depth' + str(depthp2)
             p2 = AIPlayer(name2, heroDeckTwo, deck2, modelp2, depthp2)
 
-        game = ModeledGame(p1, p2)
+        game = DecoratedGame(p1, p2)
         return game
 
     @staticmethod
@@ -72,16 +78,32 @@ class GameCreator:
         return game
 
     @staticmethod
-    def createHunterTestGame():
-        p1 = RandomPlayer("HUNTER_TEST", Hero.Hunter, PlayerDecks.BasicHunter)
-        p2 = RandomPlayer("HUNTER_TEST", Hero.Hunter, PlayerDecks.BasicHunter)
+    def createHunterTestGame(player1Type=PlayerType.Modeled, player2Type=None, modelp1="Model-INIT", modelp2=None):
+        if player2Type is None:
+            player2Type = player1Type
+        if modelp2 is None:
+            modelp2 = modelp1
+        game = GameCreator.createDefaultGame(player1Type=player1Type, player2Type=player2Type, modelp1=modelp1, modelp2=modelp2,
+                                             p1=("HUNTER_TEST", Hero.Hunter, PlayerDecks.BasicHunter), p2=("HUNTER_TEST", Hero.Hunter, PlayerDecks.BasicHunter))
         startGameEffs = [GESetMana(10), GEDealDmg(28), GEEndTurn(), GERemoveDeck(), GEDiscard()]
         startTurnEffs = [GEDiscard()]
-        game = DecoratedGame(p1, p2,
-                             startGameEffs=startGameEffs,
-                             startTurnEffs=startTurnEffs)
+        game.startGameEffs = startGameEffs
+        game.startTurnEffs = startTurnEffs
         return game
 
+    # @staticmethod
+    # def testGiveAndPlay(player1Type=PlayerType.Random, player2Type=None, modelp1="Model-INIT", modelp2=None):
+    #     if player2Type is None:
+    #         player2Type = player1Type
+    #     if modelp2 is None:
+    #         modelp2 = modelp1
+    #     game = GameCreator.createDefaultGame(player1Type=player1Type, player2Type=player2Type, modelp1=modelp1, modelp2=modelp2,
+    #                                          p1=("TMP", Hero.Hunter, PlayerDecks.BasicHunter), p2=("TMP", Hero.Rogue, PlayerDecks.BasicHunter))
+    #     startGameEffs = [GESetMana(10), GEDealDmg(28), GEGiveAndPlayMinions(['CS2_231', 'CS2_231']), GERemoveDeck(), GEDiscard()]
+    #     startTurnEffs = [GEDiscard()]
+    #     game.startGameEffs = startGameEffs
+    #     game.startTurnEffs = startTurnEffs
+    #     return game
 
     @staticmethod
     def createCustomGame():
