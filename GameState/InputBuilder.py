@@ -42,6 +42,12 @@ class InputBuilder:
     def convToInput(game, player_perspective=None):
         if player_perspective is None:
             player_perspective = game.current_player
+        elif player_perspective == 1:
+            player_perspective = game.player1
+        elif player_perspective == 2:
+            player_perspective = game.player2
+        else:
+            raise Exception
 
         p1 = player_perspective
         p2 = p1.opponent
