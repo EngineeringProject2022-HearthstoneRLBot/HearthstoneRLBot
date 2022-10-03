@@ -4,8 +4,8 @@ from GameInterface import *
 import tensorflow as tf
 from GameState import InputBuilder
 import Configuration
-from montecarlo.montecarlo import MonteCarlo
-from montecarlo.node import Node
+from Montecarlo.montecarlo import MonteCarlo
+from Montecarlo.node import Node
 
 
 class AIPlayer(PlayerInterface):

@@ -28,7 +28,7 @@ def trainNetwork(model):
         model.fit(trainingGenerator, epochs=1, callbacks=callbacks)
     else:
         model.fit(trainingGenerator, epochs=1)
-    model.save(f'../Model/models/{Configuration.OUTPUT_MODEL_NAME}')
+    model.save(f'./Model/models/{Configuration.OUTPUT_MODEL_NAME}')
 
 config = ConfigProto()
 config.gpu_options.allow_growth = True
