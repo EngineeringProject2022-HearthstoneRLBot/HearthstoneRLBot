@@ -31,21 +31,21 @@ class GEDealDmg(GameEffect):
 
     def run(self, game):
         for i in range(self.dmg):
-            moon = game.player1.give("CS2_008")
-            moon.play(target = game.player1.hero)
+            moon = game.current_player.give("CS2_008")
+            moon.play(target = game.current_player.hero)
         for i in range(self.dmg2):
-            moon = game.player1.give("CS2_008")
-            moon.play(target = game.player2.hero)
+            moon = game.current_player.give("CS2_008")
+            moon.play(target = game.current_player.opponent.hero)
 
 
-class GESetMana(GameEffect):
+class GESetMaxMana(GameEffect):
     def __init__(self, m=10, m2=None):
         self.m = m
         self.m2 = m if m2 is None else m2
 
     def run(self, game):
-        game.player1.max_mana = self.m
-        game.player2.max_mana = self.m2
+        game.current_player.max_mana = self.m
+        game.current_player.opponent.max_mana = self.m2
 
 
 class GEDiscard(GameEffect):
@@ -55,9 +55,9 @@ class GEDiscard(GameEffect):
 
     def run(self, game):
         if self.p:
-            game.player1.discard_hand()
+            game.current_player.discard_hand()
         if self.p2:
-            game.player2.discard_hand()
+            game.current_player.opponent.discard_hand()
 
 
 class GERemoveDeck(GameEffect):
@@ -67,12 +67,67 @@ class GERemoveDeck(GameEffect):
 
     def run(self, game):
         if self.p:
-            game.player1.deck = []
+            game.current_player.deck = []
         if self.p2:
-            game.player2.deck = []
+            game.current_player.opponent.deck = []
 
 
 class GEEndTurn(GameEffect):
     def run(self, game):
         game.end_turn()
 
+# still being tested and developed
+# coin : GAME_005
+class GEPlayMinionTimes(GameEffect):
+    def __init__(self, cards):
+        self.cards = cards
+
+    def run(self, game):
+        p = game.current_player
+        for tuple in self.cards:
+            for j in range(0, tuple[1]):
+                cardToBePlayed = p.give(tuple[0])
+                while(cardToBePlayed.cost > p.mana):
+                    coin = p.give('GAME_005')
+                    coin.play()
+                cardToBePlayed.play()
+
+class GEGiveCards(GameEffect):
+    def __init__(self, cardsP1 = None, cardsP2 = None):
+        if cardsP1 is None:
+            self.cardsP1 = []
+        else:
+            self.cardsP1 = cardsP1
+
+        if cardsP2 is None:
+            self.cardsP2 = []
+        else:
+            self.cardsP2 = cardsP2
+
+
+    def run(self, game):
+        p1 = str(game.player1)[0]
+        if p1 != "1":
+            p1 = game.player2
+            p2 = game.player1
+        else:
+            p1 = game.player1
+            p2 = game.player2
+
+            for tuple in self.cardsP1:
+                for j in range(0, tuple[1]):
+                    p1.give(tuple[0])
+            for tuple in self.cardsP2:
+                for j in range(0, tuple[1]):
+                    p2.give(tuple[0])
+
+class GESetStarterPlayer(GameEffect):
+    def __init__(self, player):
+        self.player = str(player)
+
+    def run(self, game):
+        p1 = str(game.player1)[0]
+        if p1 != self.player:
+            game.end_turn()
+        else:
+            pass

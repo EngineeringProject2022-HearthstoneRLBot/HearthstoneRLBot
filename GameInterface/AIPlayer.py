@@ -7,7 +7,6 @@ import Configuration
 from Montecarlo.montecarlo import MonteCarlo
 from Montecarlo.node import Node
 
-
 class AIPlayer(PlayerInterface):
     def __init__(self, name, hero, deck, model_name, simulations, print=True):
         super().__init__(name, hero, deck, print)
