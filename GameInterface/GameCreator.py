@@ -11,10 +11,10 @@ class GameCreator:
 
 
     @staticmethod
-    def createDefaultGame(player1Type=PlayerType.Modeled, player2Type=None, modelp1="Model-INIT", modelp2=None,
+    def createDefaultGame(typep1=PlayerType.Modeled, typep2=None, modelp1="Model-INIT", modelp2=None,
                           simulationsp1=10, simulationsp2=None, p1=None, p2=None, printLogs=False):
-        if player2Type is None:
-            player2Type = player1Type
+        if typep2 is None:
+            typep2 = typep1
         if simulationsp2 is None:
             simulationsp2 = simulationsp1
         if modelp2 is None:
@@ -26,17 +26,17 @@ class GameCreator:
         nameDeckOne, heroDeckOne, deck1 = p1
         nameDeckTwo, heroDeckTwo, deck2 = p2
 
-        if player1Type == PlayerType.Random:
+        if typep1 == PlayerType.Random:
             name1 = '1' + nameDeckOne + '_' + 'Random'
             p1 = RandomPlayer(name1, heroDeckOne, deck1, printLogs)
-        elif player1Type == PlayerType.Modeled:
+        elif typep1 == PlayerType.Modeled:
             name1 = '1' + nameDeckOne + '_' + modelp1 + '_' + 'simulations' + str(simulationsp1)
             p1 = AIPlayer(name1, heroDeckOne, deck1, modelp1, simulationsp1)
 
-        if player2Type == PlayerType.Random:
+        if typep2 == PlayerType.Random:
             name2 = '2' + nameDeckTwo + '_' + 'Random'
             p2 = RandomPlayer(name2, heroDeckTwo, deck2, printLogs)
-        elif player2Type == PlayerType.Modeled:
+        elif typep2 == PlayerType.Modeled:
             name2 = '2' + nameDeckTwo + '_' + modelp2 + '_' + 'simulations' + str(simulationsp2)
             p2 = AIPlayer(name2, heroDeckTwo, deck2, modelp2, simulationsp2)
 
@@ -74,12 +74,12 @@ class GameCreator:
         return game
 
     @staticmethod
-    def createHunterTestGame(player1Type=PlayerType.Modeled, player2Type=None, modelp1="Model-INIT", modelp2=None):
-        if player2Type is None:
-            player2Type = player1Type
+    def createHunterTestGame(typep1=PlayerType.Modeled, typep2=None, modelp1="Model-INIT", modelp2=None):
+        if typep2 is None:
+            typep2 = typep1
         if modelp2 is None:
             modelp2 = modelp1
-        game = GameCreator.createDefaultGame(player1Type=player1Type, player2Type=player2Type, modelp1=modelp1, modelp2=modelp2,
+        game = GameCreator.createDefaultGame(typep1=typep1, typep2=typep2, modelp1=modelp1, modelp2=modelp2,
                                              p1=("HUNTER_TEST", Hero.Hunter, PlayerDecks.BasicHunter), p2=("HUNTER_TEST", Hero.Hunter, PlayerDecks.BasicHunter))
         startGameEffs = [GESetStarterPlayer(1), GESetMaxMana(10), GEDealDmg(28), GEEndTurn(), GERemoveDeck(), GEDiscard()]
         startTurnEffs = [GEDiscard()]
@@ -88,13 +88,13 @@ class GameCreator:
         return game
 
     @staticmethod
-    def createFireballTest(player1Type=PlayerType.Modeled, player2Type=None, modelp1="Model-INIT", modelp2=None):
-        if player2Type is None:
-            player2Type = player1Type
+    def createFireballTest(typep1=PlayerType.Modeled, typep2=None, modelp1="Model-INIT", modelp2=None):
+        if typep2 is None:
+            typep2 = typep1
         if modelp2 is None:
             modelp2 = modelp1
 
-        game = GameCreator.createDefaultGame(player1Type=player1Type, player2Type=player2Type, modelp1=modelp1, modelp2=modelp2,
+        game = GameCreator.createDefaultGame(typep1=typep1, typep2=typep2, modelp1=modelp1, modelp2=modelp2,
                                              p1=("FIREBALL_TEST", Hero.Mage, PlayerDecks.BasicMage), p2=("FIREBALL_TEST", Hero.Mage, PlayerDecks.BasicMage))
         startGameEffs = [GESetStarterPlayer(1), GESetMaxMana(10), GEDealDmg(24), GEPlayMinionTimes([('CS2_231', 7)]), GEEndTurn(), GERemoveDeck(), GEDiscard(), GEGiveCards([], [('CS2_029', 1)])]
         startTurnEffs = []
@@ -103,13 +103,13 @@ class GameCreator:
         return game
 
     @staticmethod
-    def createWeaponTest(player1Type=PlayerType.Modeled, player2Type=None, modelp1="Model-INIT", modelp2=None):
-        if player2Type is None:
-            player2Type = player1Type
+    def createWeaponTest(typep1=PlayerType.Modeled, typep2=None, modelp1="Model-INIT", modelp2=None):
+        if typep2 is None:
+            typep2 = typep1
         if modelp2 is None:
             modelp2 = modelp1
 
-        game = GameCreator.createDefaultGame(player1Type=player1Type, player2Type=player2Type, modelp1=modelp1, modelp2=modelp2,
+        game = GameCreator.createDefaultGame(typep1=typep1, typep2=typep2, modelp1=modelp1, modelp2=modelp2,
                                              p1=("WEAPON_TEST", Hero.Warlock, PlayerDecks.BasicWarlock), p2=("WEAPON_TEST", Hero.Warlock, PlayerDecks.BasicWarlock))
         startGameEffs = [GESetStarterPlayer(1), GESetMaxMana(10), GEDealDmg(27, 29), GEPlayMinionTimes([('CS2_231', 7)]), GEEndTurn(), GERemoveDeck(), GEDiscard(), GEPlayMinionTimes([('CS2_106', 1)])]
         startTurnEffs = []

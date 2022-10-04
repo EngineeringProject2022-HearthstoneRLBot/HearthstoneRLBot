@@ -93,13 +93,13 @@ class GEPlayMinionTimes(GameEffect):
                 cardToBePlayed.play()
 
 class GEGiveCards(GameEffect):
-    def __init__(self, cardsP1 = [], cardsP2 = []):
-        if cardsP1 == []:
+    def __init__(self, cardsP1 = None, cardsP2 = None):
+        if cardsP1 is None:
             self.cardsP1 = []
         else:
             self.cardsP1 = cardsP1
 
-        if cardsP2 == []:
+        if cardsP2 is None:
             self.cardsP2 = []
         else:
             self.cardsP2 = cardsP2
