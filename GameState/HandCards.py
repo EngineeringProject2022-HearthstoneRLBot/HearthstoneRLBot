@@ -53,6 +53,7 @@ class HandCard:
                 "cantAttack": int(card.cant_attack),
                 "cantAttackHeroes": int(card.cannot_attack_heroes),
                 "cantBeTargetedSpellsHeroPowers": 1 if card.cant_be_targeted_by_abilities == 1 and card.cant_be_targeted_by_hero_powers == 1 else 0,
+                "exhausted": 1 if card.exhausted else 0
             }
         elif self.handCardFeatures["isWeapon"]:
             self.weaponFeatures = {
@@ -82,7 +83,7 @@ class HandCard:
         basicFeatures = np.zeros(169)
         basicFeatures[0:6] = [x for x in self.handCardFeatures.values()]
         if self.handCardFeatures["isMinion"] == 1:
-            basicFeatures[51:83] = [x for x in self.minionFeatures.values()]
+            basicFeatures[51:84] = [x for x in self.minionFeatures.values()]
         elif self.handCardFeatures["isWeapon"] == 1:
             basicFeatures[51:54] = [x for x in self.weaponFeatures.values()]
 

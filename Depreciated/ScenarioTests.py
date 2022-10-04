@@ -1,7 +1,7 @@
 from fireplace import cards
 from hearthstone.enums import CardClass
 
-from GameSetupUtils import prepare_game
+from GameInterface import prepare_game
 from GameState import Hero, HandCard
 from fireplace.utils import *
 
@@ -420,8 +420,14 @@ def test_cogmaster():
     hero1 = game.player1.hero
     hero2 = game.player2.hero
     frostwolf = game.player1.give("CS2_226")
+
     frostwolf.play()
+    handcardalpha = HandCard(frostwolf)
     game.end_turn()
+    game.end_turn()
+    handcard = HandCard(frostwolf)
+    frostwolf.attack(game.player2.hero)
+    handcard2 = HandCard(frostwolf)
     # implosion = game.player2.give("GVG_045")
     # implosion.play(frostwolf)
     # a = HandCard(implosion)
