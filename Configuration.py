@@ -21,8 +21,8 @@ CALLBACK_FREQ = 2000
 
 # Game creation
 def GAME_CREATION():
-    #return GameCreator.createDefaultGame(PlayerType.Random)
-    return GameCreator.createCustomGame()
+    return GameCreator.createDefaultGame(PlayerType.Modeled)
+    #return GameCreator.createCustomGame()
 
 def CUSTOM_GAME():
     p1 = RandomPlayer("HUNTER_TEST", Hero.Hunter, PlayerDecks.BasicHunter)

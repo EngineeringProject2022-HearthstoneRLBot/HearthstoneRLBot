@@ -9,14 +9,16 @@ MAX_BOARD = 15 # ustaw 8 aby nie było wyjątków
 def checkValidHandCard(allychars, enemychars, card):
     cardindexes = np.zeros(17)
 
-    if card.must_choose_one: # randomowe wybranie karty do walidowania...
-        card = card.choose_cards[0]
+
     if card.cant_play:
         return cardindexes
     if hasattr(card, 'is_playable') and not card.is_playable():
         return cardindexes
     elif hasattr(card, 'is_usable') and not card.is_usable():
         return cardindexes
+
+    if card.must_choose_one: # randomowe wybranie karty do walidowania...
+        card = card.choose_cards[0]
 
     if not card.requires_target():
         cardindexes[16] = 1

@@ -39,9 +39,18 @@ class InputBuilder:
         return finalPlayerBoard
 
     @staticmethod
-    def convToInput(game):
-        p1 = game.current_player
-        p2 = game.current_player.opponent
+    def convToInput(game, player_perspective=None):
+        if player_perspective is None:
+            player_perspective = game.current_player
+        elif player_perspective == 1:
+            player_perspective = game.player1
+        elif player_perspective == 2:
+            player_perspective = game.player2
+        else:
+            raise Exception
+
+        p1 = player_perspective
+        p2 = p1.opponent
         # if simulatingPlayer == 1:
         #     p1 = game.player1
         #     p2 = game.player2
