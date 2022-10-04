@@ -15,7 +15,7 @@ class DataGenerator(keras.utils.Sequence):
         self.dim = dim
         self.batch_size = batch_size
         self.dictionary = {}
-        self.list_IDs = [*range(1, self.__getNoTurns__() + 1)]
+        self.list_IDs = [*range(1, self.__getNoTurns__())]
         self.n_channels = n_channels
         self.shuffle = shuffle
         self.on_epoch_end()
@@ -36,7 +36,7 @@ class DataGenerator(keras.utils.Sequence):
                             continue
                         singleGameTurns = len(game[0])
 
-                        for turnNo in range(1, singleGameTurns, 1):
+                        for turnNo in range(0, singleGameTurns, 1):
                             if game[0][turnNo][2] == winner:
                                 value = 1
                             elif game[0][turnNo][2] < 3:
@@ -44,14 +44,14 @@ class DataGenerator(keras.utils.Sequence):
                             else:
                                 value = 0
 
-                            self.dictionary[len(self.dictionary) + 1] = [sparse.COO(np.asarray(game[0][turnNo][0])),
+                            self.dictionary[noTurns + turnNo + 1] = [sparse.COO(np.asarray(game[0][turnNo][0])),
                                                                          [np.asarray(game[0][turnNo][1]),
                                                                           np.asarray(value)]]
-
+                        noTurns += singleGameTurns
                 except EOFError:
                     print(f"EOF {filepath}")
 
-        return len(self.dictionary)
+        return noTurns
 
     def __len__(self):
         'Denotes the number of batches per epoch'
