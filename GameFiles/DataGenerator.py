@@ -2,8 +2,10 @@ import glob
 import pickle
 
 import numpy as np
-from tensorflow import keras
 import sparse
+from tensorflow import keras
+
+from GameFiles.DataProvider import DataProvider
 
 
 class DataGenerator(keras.utils.Sequence):
@@ -11,47 +13,21 @@ class DataGenerator(keras.utils.Sequence):
 
     def __init__(self, data_folder, batch_size=32, dim=(401, 41, 3), n_channels=1, shuffle=True):
         'Initialization'
-        self.data_folder = data_folder
+        self.__data_provider = DataProvider(data_folder)
         self.dim = dim
         self.batch_size = batch_size
-        self.dictionary = {}
-        self.list_IDs = [*range(1, self.__getNoTurns__())]
+        self.data = self.getData()
+        self.no_turns = self.getNoTurns()
+        self.list_IDs = [*range(0, self.no_turns)]
         self.n_channels = n_channels
         self.shuffle = shuffle
         self.on_epoch_end()
 
-    def __getNoTurns__(self):
-        noTurns = 0
+    def getData(self):
+        return self.__data_provider.data
 
-        for filepath in glob.iglob(f'../data/{self.data_folder}/*'):
-            with open(filepath, "rb") as rb:
-                # METADATA AND DECK TO BE IGNORED
-                try:
-                    # SKIP METADATA
-                    pickle.load(rb)
-                    while True:
-                        game = pickle.load(rb)
-                        winner = game[1]
-                        if winner > 3:
-                            continue
-                        singleGameTurns = len(game[0])
-
-                        for turnNo in range(0, singleGameTurns, 1):
-                            if game[0][turnNo][2] == winner:
-                                value = 1
-                            elif game[0][turnNo][2] < 3:
-                                value = -1
-                            else:
-                                value = 0
-
-                            self.dictionary[noTurns + turnNo + 1] = [sparse.COO(np.asarray(game[0][turnNo][0])),
-                                                                         [np.asarray(game[0][turnNo][1]),
-                                                                          np.asarray(value)]]
-                        noTurns += singleGameTurns
-                except EOFError:
-                    print(f"EOF {filepath}")
-
-        return noTurns
+    def getNoTurns(self):
+        return self.__data_provider.total_no_turns
 
     def __len__(self):
         'Denotes the number of batches per epoch'
@@ -84,9 +60,9 @@ class DataGenerator(keras.utils.Sequence):
 
         for id in listIdsTmp:
             try:
-                X.append(self.dictionary[id][0].todense())
-                yPolicy.append(self.dictionary[id][1][0])
-                yValue.append(self.dictionary[id][1][1])
-            except:
+                X.append(self.data[id][0].todense())
+                yPolicy.append(self.data[id][1][0])
+                yValue.append(self.data[id][1][1])
+            except Exception:
                 print(listIdsTmp)
         return np.asarray(X).squeeze(1), [np.asarray(yPolicy), np.asarray(yValue)]
