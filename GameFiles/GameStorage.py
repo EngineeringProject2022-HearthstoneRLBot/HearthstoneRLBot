@@ -36,7 +36,7 @@ def dumpGames():
             print(traceback.format_exc())
         with open(f"data/{model_name}/{fileName}.txt", "ab") as fp:
             pickle.dump(output, fp)
-        excel_gen.AppendGameToExcel(game=output,fileName=fileName)
+        excel_gen.append_to_csv(game=output, fileName=fileName)
 
 
 

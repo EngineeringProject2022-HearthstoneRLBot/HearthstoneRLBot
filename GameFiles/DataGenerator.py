@@ -11,9 +11,9 @@ from GameFiles.DataProvider import DataProvider
 class DataGenerator(keras.utils.Sequence):
     'Generates data for Keras'
 
-    def __init__(self, data_folder, batch_size=32, dim=(401, 41, 3), n_channels=1, shuffle=True):
+    def __init__(self, batch_size=32, dim=(401, 41, 3), n_channels=1, shuffle=True):
         'Initialization'
-        self.__data_provider = DataProvider(data_folder)
+        self.__data_provider = DataProvider()
         self.dim = dim
         self.batch_size = batch_size
         self.data = self.getData()
