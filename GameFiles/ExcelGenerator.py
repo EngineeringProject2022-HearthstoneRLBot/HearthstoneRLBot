@@ -60,12 +60,12 @@ class ExcelGenerator:
             if PlayerDecks.decks[key] == deck:
                 return key
 
-    def __txt_to_csv_wrapper(self,*args):
+    def __convert_txt_to_csv(self, *args):
         game = args[0]
         filepath = args[2]
         tmp_path = filepath.replace('\\','/').split('/')
         self.append_to_csv(game, tmp_path[-1])
 
     def generate_game_csv_from_txt(self):
-        self.data_provider.iterateFilesAndGames(self.__txt_to_csv_wrapper)
+        self.data_provider.iterate_through_files(self.__convert_txt_to_csv)
 
