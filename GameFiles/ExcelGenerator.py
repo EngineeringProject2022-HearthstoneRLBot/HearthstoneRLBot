@@ -10,7 +10,7 @@ import pandas as pd
 class ExcelGenerator:
 
     def __init__(self):
-        self.data_provider = DataProvider(data_folder=Configuration.OUTPUT_FOLDER,init_data = False)
+        self.data_provider = DataProvider(init_data = False)
         self.cols = {'Player1Name','Player1Deck','Player2Name','Winner','NumberOfTurns','StartPlayer','SecondPlayer','FileName'}
 
     def append_to_csv(self, game, fileName):
