@@ -1,24 +1,18 @@
-import datetime
 import glob
 import os
 import pickle
-
-from pandas import DataFrame
-
 from GameInterface.GameData import PlayerDecks
-from GameFiles.DataProvider import DataProvider
 import pandas as pd
 
 class ExcelGenerator:
 
-    def __init__(self, data_provider:DataProvider):
-        self.data_provider = data_provider
+    def __init__(self):
         self.cols = {'Player1Name','Player1Deck','Player2Name','Winner','NumberOfTurns','StartPlayer','SecondPlayer','FileName'}
 
-    def generateExcelForGame(self,game,fileName,index):
+    def AppendGameToExcel(self,game,fileName):
 
-        self.CreateDirectoryIfMissing(path = f'data/ExcelFiles/SingleGames')
-
+        self.CreateDirectoryIfMissing(path = 'data/ExcelFiles/SingleGames')
+        self.CreateBlankCsv(filepath= f'data/ExcelFiles/SingleGames/{fileName}.csv')
         df = pd.DataFrame({
         'Player1Name': game[3][0],
         'Player1Deck': self.mapDeckToDeckName(game[3][2]),
@@ -28,36 +22,34 @@ class ExcelGenerator:
         'Second': game[3][7],
         'Winner': game[1],
         'NumberOfTurns': len(game[0]),
-        'FileName': f'{fileName}.xlsx',
+        'FileName': f'{fileName}',
         'Traceback': "" if game[4] is None else game[4]
         },index=[0])
 
-        writer = pd.ExcelWriter(f'data/ExcelFiles/SingleGames/{fileName}-{index}.xlsx')
-        df.to_excel(writer)
-        writer.save()
-        print(f"Saved {fileName}.xlsx")
+        df.to_csv(f'data/ExcelFiles/SingleGames/{fileName}.csv', mode='a', index=False,header=False)
+
+    def CreateBlankCsv(self,filepath,merge=False):
+        if not os.path.exists(filepath):
+            df = pd.DataFrame(columns=['Player1Name','Player1Deck','Player2Name','Player2Deck','First','Second','Winner','NumberOfTurns','FileName','Traceback'])
+            if not merge:
+                df.to_csv(filepath,header=True)
+            else:
+                df.to_csv(filepath,header=True)
 
     def CreateDirectoryIfMissing(self,path):
         if not os.path.exists(path):
             os.makedirs(path)
 
-    def mergeExcels(self):
-        baseExcel = None
-        pathToDirectory = f'data/ExcelFiles/MergedExcels'
-        self.CreateDirectoryIfMissing(path=f'data/ExcelFiles/MergedExcels')
-        for filepath in glob.iglob(f'data/ExcelFiles/SingleGames/*'):
-            if baseExcel is None:
-                baseExcelFilename = pathToDirectory + "/" +filepath.split("\\")[-1]
-                baseExcel = pd.read_excel(filepath)
-                continue
-            nextExcel = pd.read_excel(filepath,engine="openpyxl")
-            baseExcel = self.mergeTwoExcels(baseExcel,nextExcel,baseFilepath=baseExcelFilename)
-
-
-    def mergeTwoExcels(self,df1,df2,baseFilepath):
-        df1 = df1.append(df2)
-        df1.to_excel(baseFilepath,index=[0])
-        return df1
+    def Merge(self):
+        resultCSV = f'data/ExcelFiles/MergedExcels/result.csv'
+        self.CreateBlankCsv(filepath = resultCSV, merge=True)
+        filenames = glob.iglob(f'data/ExcelFiles/SingleGames/*')
+        with open(resultCSV, "a+") as target:
+            for filename in filenames :
+                with open(filename, "r") as f:
+                    next(f)
+                    for line in f:
+                        target.write(line)
 
     def mapDeckToDeckName(self,deck):
         for key in PlayerDecks.decks:
@@ -65,7 +57,6 @@ class ExcelGenerator:
                 return key
 
     def generateExcelStatistics(self):
-
         for filepath in glob.iglob(f'{self.data_provider.directory_path}/*'):
             with open(filepath,"rb") as file_stream:
                 try:
