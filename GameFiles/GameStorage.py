@@ -1,21 +1,23 @@
 import os
 import pickle
 import glob
+import random
 import traceback
-
+import tensorflow as tf
 import Configuration
 import numpy as np
+
+from GameFiles.ExcelGenerator import ExcelGenerator
 from GameInterface.GameCreator import *
 from datetime import datetime
 
-
+excel_gen = ExcelGenerator()
 def dumpGames():
     model_name = Configuration.OUTPUT_FOLDER
     path = f"data/{model_name}"
     if not os.path.exists(path):
         os.makedirs(path)
     fileName = datetime.now().strftime("%d-%m-%YT%H%M%S")
-
     with open(f"data/{model_name}/{fileName}.txt", "wb") as fp:  # dumpuję aktualny(pierwszy) stan randoma jako pierwszy obiekt przed zrobieniem czegokolwiek
         pickle.dump((random.getstate()), fp)
         np.random.seed(random.randrange(999999999))
@@ -34,6 +36,8 @@ def dumpGames():
             print(traceback.format_exc())
         with open(f"data/{model_name}/{fileName}.txt", "ab") as fp:
             pickle.dump(output, fp)
+        excel_gen.append_to_csv(game=output, fileName=fileName)
+
 
 
 ####FUNCTIONS TO CHECK (depreciated?)
