@@ -25,7 +25,7 @@ class DataProvider:
                 fun = arg
         if fun is None:
             return
-        for filepath in glob.iglob(f'data/{self.data_folder}/*'):
+        for filepath in glob.iglob(f'../data/{self.data_folder}/*'):
             with open(filepath, "rb") as rb:
                 # METADATA AND DECK TO BE IGNORED
                 try:
