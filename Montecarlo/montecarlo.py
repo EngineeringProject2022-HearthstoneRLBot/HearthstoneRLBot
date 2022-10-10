@@ -72,7 +72,7 @@ class MonteCarlo:
             self.expand(current_node)
 
     def expand(self, node):
-        self.child_finder(node, self)
+        self.child_finder.find(node, self)
         if len(node.children):
             node.expanded = True
 
@@ -81,14 +81,14 @@ class MonteCarlo:
         currInput = InputBuilder.convToInput(game, self.player_number)
         for x in self.root_node.children:
             child_input = InputBuilder.convToInput(x.game, self.player_number)
-            if (currInput == child_input).all():
+            if False and (currInput == child_input).all():
                 self.root_node = x
                 if self.root_node.expanded and self.root_node.visits != 0:
                     self.root_node.visits -= 1
                 found = True
                 break
         if not found:
-            child = Node(deepcopy(game))
+            child = Node(game)
             child.state = move
             child.player_number = 1 if child.game.current_player is child.game.player1 else 2
             self.root_node.add_child(child)

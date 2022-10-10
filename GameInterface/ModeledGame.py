@@ -6,6 +6,9 @@ from hearthstone.enums import CardClass, PlayState
 
 from GameState import InputBuilder
 
+from timeit import default_timer as timer
+from datetime import timedelta
+import Configuration
 
 class ModeledGame:
     def __init__(self, player1, player2, log = False):
@@ -31,13 +34,23 @@ class ModeledGame:
 
     def start(self):
         self.startGame()
+        totalTurn = 0
         while True:
+            start = timer()
             self.startTurn()
             data = InputBuilder.convToInput(self.game)
             player = 1 if self.game.current_player is self.game.player1 else 2
             action, probabilities, isRandom = self.playTurn()
             self.sync(action, isRandom)
             self.data.append((data, probabilities, player, action))
+
+            end = timer()
+            totalTurn = totalTurn + (end-start)
+            print('Full turn: ', totalTurn)
+            print('Total CF: ', Configuration.total)
+            print('Total IN: ', Configuration.totalInput)
+            print('Total Mod: ', Configuration.totalModel)
+            print('Total DC: ', Configuration.totalDC)
 
             if self.gameFinished():
                 break

@@ -2,7 +2,6 @@ import math
 import pickle
 import random
 from math import log, sqrt
-
 import Configuration
 
 
@@ -27,6 +26,7 @@ class Node:
         ### below code is added by us
         self.finished = False
         self.stateText = ''
+        self.propagate = True
         ###
 
     def update_win_value(self, value):
@@ -98,3 +98,16 @@ class Node:
         score = win_operand + discovery_operand
         return score
         ###
+
+    def get_nodes_from_level(self):
+        i = 0
+        node = self
+        while node.parent is not None:
+            node = node.parent
+            i += 1
+        children = [node]
+        for i in range(i):
+            children = [arrNode.children for arrNode in children]
+            children = sum(children, [])
+        return children
+

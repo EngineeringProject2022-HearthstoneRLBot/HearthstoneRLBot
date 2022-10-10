@@ -19,9 +19,15 @@ WINVALUE_WEIGHT = 1
 CALLBACKS = 1
 CALLBACK_FREQ = 2000
 
+#TESTS
+total = 0
+totalInput = 0
+totalModel = 0
+totalDC = 0
+
 # Game creation
 def GAME_CREATION():
-    return GameCreator.createDefaultGame(PlayerType.Modeled)
+    return GameCreator.createHunterTestGame(typep1=PlayerType.Modeled, modelp1='19200games')
     #return GameCreator.createCustomGame()
 
 def CUSTOM_GAME():
