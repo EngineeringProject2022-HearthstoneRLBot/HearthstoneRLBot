@@ -81,7 +81,7 @@ class MonteCarlo:
         currInput = InputBuilder.convToInput(game, self.player_number)
         for x in self.root_node.children:
             child_input = InputBuilder.convToInput(x.game, self.player_number)
-            if False and (currInput == child_input).all():
+            if (currInput == child_input).all():
                 self.root_node = x
                 if self.root_node.expanded and self.root_node.visits != 0:
                     self.root_node.visits -= 1
