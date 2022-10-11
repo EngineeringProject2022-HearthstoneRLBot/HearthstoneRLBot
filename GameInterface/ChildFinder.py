@@ -6,24 +6,20 @@ import Configuration
 from GameInterface import checkValidActionsSparse, interpretDecodedAction, decodeAction, playTurnSparse
 from GameState import InputBuilder
 from Montecarlo.node import Node
-
-from timeit import default_timer as timer
+from Benchmark import tt
 
 class ChildFinder:
 
     def predict(self, node, montecarlo):
         if node.cached_network_value:
             return [], node.cached_network_value
-        t1 = timer()
+
+        tt('Input', 1)
         x = InputBuilder.convToInput(node.game)
-        t2 = timer()
-        Configuration.totalInput += (t2-t1)
-        #
-        t1 = timer()
+        tt('Input')
+        tt('Model', 1)
         expert_policy_values, network_value = montecarlo.model(x)
-        t2 = timer()
-        #
-        Configuration.totalModel += (t2-t1)
+        tt('Model')
         node.cached_network_value = network_value
         return expert_policy_values, network_value
 
@@ -31,15 +27,16 @@ class ChildFinder:
         node.player_number = 1 if node.game.current_player is node.game.player1 else 2
         if node.state is None or node.parent is None: #jesli node parent to none to znaczy ze sync byl wiec nie gramy tej tury
             return
-        t1 = timer()
+        tt('Deepcopy', 1)
         node.game = deepcopy(node.game)
-        t2 = timer()
-        Configuration.totalDC += (t2-t1)
+        tt('Deepcopy')
         is_random = 0
+        tt('Play turn', 1)
         try:
             is_random = playTurnSparse(node.game, node.state)
         except GameOver:
             node.finished = True
+        tt('Play turn')
         node.player_number = 1 if node.game.current_player is node.game.player1 else 2
 
         if is_random and node.propagate:
@@ -55,7 +52,7 @@ class ChildFinder:
 
 
     def find(self, node, montecarlo):
-        t1 = timer()
+        tt('Total CF', 1)
         self.makeMove(node)
         expert_policy_values, win_value = self.predict(node, montecarlo)
         if montecarlo.player_number != node.player_number:
@@ -72,5 +69,4 @@ class ChildFinder:
 
         if node.parent is not None:
             node.update_win_value(float(win_value))
-        t2 = timer()
-        Configuration.total += (t2-t1)
+        tt('Total CF')

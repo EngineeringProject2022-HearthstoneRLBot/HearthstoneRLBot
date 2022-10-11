@@ -19,12 +19,6 @@ WINVALUE_WEIGHT = 1
 CALLBACKS = 1
 CALLBACK_FREQ = 2000
 
-#TESTS
-total = 0
-totalInput = 0
-totalModel = 0
-totalDC = 0
-
 # Game creation
 def GAME_CREATION():
     return GameCreator.createDefaultGame(typep1=PlayerType.Modeled, p1=HeroDecks.BasicHunter, modelp1='19200games')
