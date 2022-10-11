@@ -1,7 +1,7 @@
 from GameInterface import *
 
 # MonteCarlo
-WIN_MULTIPLIER = 0
+WIN_MULTIPLIER = 1
 RANDOM_MOVE_SAMPLES = 5
 
 # DumpGames

@@ -18,9 +18,11 @@ class ChildFinder:
         x = InputBuilder.convToInput(node.game)
         t2 = timer()
         Configuration.totalInput += (t2-t1)
+        #
         t1 = timer()
         expert_policy_values, network_value = montecarlo.model(x)
         t2 = timer()
+        #
         Configuration.totalModel += (t2-t1)
         node.cached_network_value = network_value
         return expert_policy_values, network_value
@@ -46,7 +48,7 @@ class ChildFinder:
                 child = Node(node.parent.game)
                 child.state = node.state
                 child.stateText = (
-                        "Action:" + str(child.state) + " - " + interpretDecodedAction(decodeAction(child.state), child.game))
+                        "Duplicate Random Action:" + str(child.state) + " - " + interpretDecodedAction(decodeAction(child.state), child.game))
                 child.policy_value = node.policy_value
                 child.propagate = False
                 node.parent.add_child(child)
@@ -65,8 +67,9 @@ class ChildFinder:
                 child.stateText = (
                         "Action:" + str(action) + " - " + interpretDecodedAction(decodeAction(action), node.game))
                 child.policy_value = expert_policy_values[0, action]
-                child.player_number = node.player_number if child.state != 251 else (not (node.player_number-1))+1
+                child.player_number = 1 if node.game.current_player is node.game.player1 else 2
                 node.add_child(child)
+
         if node.parent is not None:
             node.update_win_value(float(win_value))
         t2 = timer()
