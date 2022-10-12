@@ -2,7 +2,7 @@ fireplace2==1.0.0
 PySide6
 
 tensorflow~=2.9.1
-
+sparse == 0.13.0
 hearthstone~=5.56.0
 numpy~=1.22.3
 waiting
