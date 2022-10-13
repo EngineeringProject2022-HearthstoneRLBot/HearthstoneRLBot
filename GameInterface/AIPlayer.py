@@ -87,6 +87,6 @@ class AIPlayer(PlayerInterface):
                         child.policy_value = expert_policy_values[0, action] / Configuration.RANDOM_MOVE_SAMPLES
                         node.add_child(child)
         if node.parent is not None:
-            node.update_win_value(float(win_value))
+            node.update_win_value(win_value)
 
 
