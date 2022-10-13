@@ -36,9 +36,9 @@ class ExcelGenerator:
         if not os.path.exists(filepath):
             df = pd.DataFrame(columns=['Player1Name','Player1Deck','Player2Name','Player2Deck','First','Second','Winner','NumberOfTurns','FileName','Traceback'])
             if not merge:
-                df.to_csv(filepath,header=True)
+                df.to_csv(filepath,index_label=False,header=True)
             else:
-                df.to_csv(filepath,header=True)
+                df.to_csv(filepath,index_label=False,header=True)
 
     def create_missing_dir(self, path):
         if not os.path.exists(path):
