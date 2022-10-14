@@ -9,7 +9,7 @@ import Configuration
 
 class DataProvider:
     def __init__(self,init_data = True):
-        self.data_folder=Configuration.OUTPUT_FOLDER
+        self.data_folder = Configuration.OUTPUT_FOLDER
         self.data = []
         if init_data:
             self.initialize_data()
@@ -40,19 +40,25 @@ class DataProvider:
                 except EOFError:
                     print(f"EOF {filepath}")
 
+    def __get_sparse_matrix(self,matrix):
+        if isinstance(matrix,np.ndarray):
+            return sparse.COO(matrix)
+        return matrix
+
     def __get_info_for_games(self, *args):
         game = args[0]
         winner = args[1]
         singleGameTurns = len(game[0])
         for turnNo in range(singleGameTurns):
-            if game[0][turnNo][2] == winner:
+            game_result = game[0][turnNo][2]
+            game_state = self.__get_sparse_matrix(game[0][turnNo][0])
+            if game_result == winner:
                 value = 1
-            elif game[0][turnNo][2] < 3:
+            elif game_result < 3:
                 value = -1
             else:
                 value = 0
-
-            X = sparse.COO(np.asarray(game[0][turnNo][0])) # tutaj bez sparse bo bedzie zapisywane sparsowane
+            X = game_state
             Y = [np.asarray(game[0][turnNo][1]),np.asarray(value)]
             self.data.append([X,Y])
 
