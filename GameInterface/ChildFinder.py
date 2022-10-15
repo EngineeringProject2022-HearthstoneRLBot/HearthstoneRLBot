@@ -25,11 +25,13 @@ class ChildFinder:
 
     def makeMove(self, node):
         node.player_number = 1 if node.game.current_player is node.game.player1 else 2
-        if node.state is None or node.parent is None: #jesli node parent to none to znaczy ze sync byl wiec nie gramy tej tury
+        if node.state is None or node.parent is None or node.finished: #jesli node parent to none to znaczy ze sync byl wiec nie gramy tej tury
             return
-        tt('Deepcopy', 1)
-        node.game = deepcopy(node.game)
-        tt('Deepcopy')
+        if not node.realGame:
+            tt('Deepcopy', 1)
+            node.game = deepcopy(node.game)
+            tt('Deepcopy')
+            node.realGame = True
         is_random = 0
         tt('Play turn', 1)
         try:

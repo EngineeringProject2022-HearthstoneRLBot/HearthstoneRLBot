@@ -27,6 +27,7 @@ class Node:
         self.finished = False
         self.stateText = ''
         self.propagate = True
+        self.realGame = False
         ###
 
     def update_win_value(self, value):

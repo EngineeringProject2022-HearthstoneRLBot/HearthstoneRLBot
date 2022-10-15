@@ -21,7 +21,7 @@ CALLBACK_FREQ = 2000
 
 # Game creation
 def GAME_CREATION():
-    return GameCreator.createDefaultGame(typep1=PlayerType.Modeled, p1=HeroDecks.BasicHunter, modelp1='19200games')
+    return GameCreator.createDefaultGame(PlayerType.Modeled, modelp1='Model-TEST')
     #return GameCreator.createCustomGame()
 
 def CUSTOM_GAME():
