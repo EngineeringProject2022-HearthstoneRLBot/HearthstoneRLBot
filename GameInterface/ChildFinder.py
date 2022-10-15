@@ -70,5 +70,5 @@ class ChildFinder:
                 node.add_child(child)
 
         if node.parent is not None:
-            node.update_win_value(float(win_value))
+            node.update_win_value(win_value)
         tt('Total CF')

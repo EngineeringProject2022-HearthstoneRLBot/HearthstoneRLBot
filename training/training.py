@@ -13,7 +13,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 # os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 def trainNetwork(model):
-    trainingGenerator = DataGenerator(data_folder=Configuration.DATA_FOLDER, batch_size=1)
+    trainingGenerator = DataGenerator(batch_size=1)
     # validationGenerator = DataGenerator(model_name='TRAINED_MODEL3', batch_size=1)
     # model.fit(trainingGenerator, validation_data = validationGenerator, epochs=1)
     checkpoint_dir = f"checkpoints/{Configuration.OUTPUT_MODEL_NAME}"

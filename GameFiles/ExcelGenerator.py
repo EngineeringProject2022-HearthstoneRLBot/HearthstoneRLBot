@@ -1,84 +1,71 @@
-import datetime
 import glob
 import os
 import pickle
 
-from pandas import DataFrame
-
-from GameInterface.GameData import PlayerDecks
+import Configuration
 from GameFiles.DataProvider import DataProvider
+from GameInterface.GameData import PlayerDecks
 import pandas as pd
 
 class ExcelGenerator:
 
-    def __init__(self, data_provider:DataProvider):
-        self.data_provider = data_provider
+    def __init__(self):
+        self.data_provider = DataProvider(init_data = False)
         self.cols = {'Player1Name','Player1Deck','Player2Name','Winner','NumberOfTurns','StartPlayer','SecondPlayer','FileName'}
 
-    def generateExcelForGame(self,game,fileName,index):
+    def append_to_csv(self, game, fileName):
 
-        self.CreateDirectoryIfMissing(path = f'data/ExcelFiles/SingleGames')
-
+        self.create_missing_dir(path ='data/ExcelFiles/SingleGames')
+        self.create_blank_csv(filepath=f'data/ExcelFiles/SingleGames/{fileName}.csv')
         df = pd.DataFrame({
         'Player1Name': game[3][0],
-        'Player1Deck': self.mapDeckToDeckName(game[3][2]),
+        'Player1Deck': self.map_deck_to_deck_name(game[3][2]),
         'Player2Name': game[3][3],
-        'Player2Deck': self.mapDeckToDeckName(game[3][5]),
+        'Player2Deck': self.map_deck_to_deck_name(game[3][5]),
         'First': game[3][6],
         'Second': game[3][7],
         'Winner': game[1],
         'NumberOfTurns': len(game[0]),
-        'FileName': f'{fileName}.xlsx',
+        'FileName': f'{fileName}',
         'Traceback': "" if game[4] is None else game[4]
         },index=[0])
 
-        writer = pd.ExcelWriter(f'data/ExcelFiles/SingleGames/{fileName}-{index}.xlsx')
-        df.to_excel(writer)
-        writer.save()
-        print(f"Saved {fileName}.xlsx")
+        df.to_csv(f'data/ExcelFiles/SingleGames/{fileName}.csv', mode='a', index=False,header=False)
 
-    def CreateDirectoryIfMissing(self,path):
+    def create_blank_csv(self, filepath, merge=False):
+        if not os.path.exists(filepath):
+            df = pd.DataFrame(columns=['Player1Name','Player1Deck','Player2Name','Player2Deck','First','Second','Winner','NumberOfTurns','FileName','Traceback'])
+            if not merge:
+                df.to_csv(filepath,index_label=False,header=True)
+            else:
+                df.to_csv(filepath,index_label=False,header=True)
+
+    def create_missing_dir(self, path):
         if not os.path.exists(path):
             os.makedirs(path)
 
-    def mergeExcels(self):
-        baseExcel = None
-        pathToDirectory = f'data/ExcelFiles/MergedExcels'
-        self.CreateDirectoryIfMissing(path=f'data/ExcelFiles/MergedExcels')
-        for filepath in glob.iglob(f'data/ExcelFiles/SingleGames/*'):
-            if baseExcel is None:
-                baseExcelFilename = pathToDirectory + "/" +filepath.split("\\")[-1]
-                baseExcel = pd.read_excel(filepath)
-                continue
-            nextExcel = pd.read_excel(filepath,engine="openpyxl")
-            baseExcel = self.mergeTwoExcels(baseExcel,nextExcel,baseFilepath=baseExcelFilename)
+    def merge_csv_files(self):
+        resultCSV = f'data/ExcelFiles/MergedExcels/result.csv'
+        self.create_blank_csv(filepath = resultCSV, merge=True)
+        filenames = glob.iglob(f'data/ExcelFiles/SingleGames/*')
+        with open(resultCSV, "a+") as target:
+            for filename in filenames :
+                with open(filename, "r") as f:
+                    next(f)
+                    for line in f:
+                        target.write(line)
 
-
-    def mergeTwoExcels(self,df1,df2,baseFilepath):
-        df1 = df1.append(df2)
-        df1.to_excel(baseFilepath,index=[0])
-        return df1
-
-    def mapDeckToDeckName(self,deck):
+    def map_deck_to_deck_name(self, deck):
         for key in PlayerDecks.decks:
             if PlayerDecks.decks[key] == deck:
                 return key
 
-    def generateExcelStatistics(self):
+    def __convert_txt_to_csv(self, *args):
+        game = args[0]
+        filepath = args[2]
+        tmp_path = filepath.replace('\\','/').split('/')
+        self.append_to_csv(game, tmp_path[-1])
 
-        for filepath in glob.iglob(f'{self.data_provider.directory_path}/*'):
-            with open(filepath,"rb") as file_stream:
-                try:
-                    i = 0
-                    x = pickle.load(file_stream)
-                    while True:
-                        i += 1
-                        game = pickle.load(file_stream)
-                        winner = game[1]
-                        if winner > 3:
-                            continue
-                        tmp_path = filepath.replace('\\','/').split('/')
-                        self.generateExcelForGame(game,tmp_path[-1],i)
-                except EOFError:
-                    print(f"Successfuly generated excels for {filepath}")
+    def generate_game_csv_from_txt(self):
+        self.data_provider.iterate_through_files(self.__convert_txt_to_csv)
 

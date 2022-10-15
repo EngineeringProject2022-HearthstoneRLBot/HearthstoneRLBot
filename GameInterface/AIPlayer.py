@@ -36,4 +36,4 @@ class AIPlayer(PlayerInterface):
     def sync(self, game, action, isRandom):
         self.montecarlo.sync_tree(game, action)
         self.montecarlo.root_node.parent = None
-
+        
