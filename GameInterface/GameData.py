@@ -220,6 +220,14 @@ class HeroDecks:
                 ControlPaladin, ControlPriest, OilRogue, MidrangeShaman, DemonZoo, MidrangeWarrior, FastDruid,
                 FaceHunter, FlamewalkerTempoMage, MurlocPaladin, DragonPriest]
 
+    @staticmethod
+    def HeroDeck(hero):
+        heroDecks = []
+        for deck in HeroDecks.AllDecks:
+            if deck[1] == hero:
+                heroDecks.append(deck)
+        return heroDecks
+
 
 class PlayerType:
     Random = 1

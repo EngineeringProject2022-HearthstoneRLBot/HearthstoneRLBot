@@ -1,3 +1,4 @@
+import Benchmark
 from GameInterface import *
 from fireplace.game import Game
 from fireplace.player import Player
@@ -6,6 +7,7 @@ from hearthstone.enums import CardClass, PlayState
 
 from GameState import InputBuilder
 
+from Benchmark import tt
 
 class ModeledGame:
     def __init__(self, player1, player2, log = False):
@@ -31,7 +33,9 @@ class ModeledGame:
 
     def start(self):
         self.startGame()
+        totalTurn = 0
         while True:
+            tt('Full turn', 1)
             self.startTurn()
             data = InputBuilder.convToInput(self.game)
             player = 1 if self.game.current_player is self.game.player1 else 2
@@ -39,11 +43,17 @@ class ModeledGame:
             self.sync(action, isRandom)
             self.data.append((data, probabilities, player, action))
 
+            tt('Full turn')
+
+            Benchmark.printTimers()
+
             if self.gameFinished():
                 break
 
+
         self.data.append((InputBuilder.convToInput(self.game), np.zeros(252),
                           1 if self.game.current_player is self.game.player1 else 2, None))
+
         if self.winner == 1:
             print(f'Game Finished! :) Player {self.game.player1.name} won!')
         elif self.winner == 2:

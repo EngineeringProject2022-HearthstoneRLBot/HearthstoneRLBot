@@ -1,8 +1,10 @@
 from Model import Resnet
 from Model.Resnet import Network
 from Model.Resnet50Ref import Resnet50Ref
-INIT_MODEL_NAME = "Model-INIT"
+from Model.TestModel import TestModel
 
-myNetwork = Network()
+INIT_MODEL_NAME = "Model-TEST"
+
+myNetwork = TestModel()
 model = myNetwork.getModel()
 model.save(f'models/{INIT_MODEL_NAME}')

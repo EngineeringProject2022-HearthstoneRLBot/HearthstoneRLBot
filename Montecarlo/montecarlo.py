@@ -64,15 +64,20 @@ class MonteCarlo:
             probabilities_already_counted += probability
 
     def simulate(self, expansion_count=1):
-        for i in range(expansion_count):
+
+        i = 0
+        while i < expansion_count:
             current_node = self.root_node
             while current_node.expanded:
                 current_node = current_node.get_preferred_child(self.player_number)
-
             self.expand(current_node)
+            i += 1
+
+            if expansion_count < 2 * len(self.root_node.children):
+                expansion_count = 2 * len(self.root_node.children)
 
     def expand(self, node):
-        self.child_finder(node, self)
+        self.child_finder.find(node, self)
         if len(node.children):
             node.expanded = True
 
@@ -80,6 +85,8 @@ class MonteCarlo:
         found = False
         currInput = InputBuilder.convToInput(game, self.player_number)
         for x in self.root_node.children:
+            if x.visits == 0:
+                continue
             child_input = InputBuilder.convToInput(x.game, self.player_number)
             if (currInput == child_input).all():
                 self.root_node = x
@@ -88,7 +95,7 @@ class MonteCarlo:
                 found = True
                 break
         if not found:
-            child = Node(deepcopy(game))
+            child = Node(game)
             child.state = move
             child.player_number = 1 if child.game.current_player is child.game.player1 else 2
             self.root_node.add_child(child)
