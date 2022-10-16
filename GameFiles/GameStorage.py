@@ -42,7 +42,7 @@ def dumpGames():
             sparse_data = convert_to_sparse(game.data)
             output = (sparse_data, game.winner,   state, game.prepareGamersData(), None)
         except Exception:
-            output = (sparse_data, 4,             state, game.prepareGamersData(), traceback.format_exc())
+            output = (game.data, 4,             state, game.prepareGamersData(), traceback.format_exc())
             print(traceback.format_exc())
         with open(f"data/{model_name}/{fileName}.txt", "ab") as fp:
             pickle.dump(output, fp)
