@@ -76,12 +76,12 @@ class GameCreator:
         return game
 
     @staticmethod
-    def createHunterTestGame(typep1=PlayerType.Modeled, typep2=None, modelp1="Model-INIT", modelp2=None):
+    def createHunterTestGame(typep1=PlayerType.Modeled, typep2=None, modelp1="Model-INIT", modelp2=None,simulationsp1=10,simulationsp2=10):
         if typep2 is None:
             typep2 = typep1
         if modelp2 is None:
             modelp2 = modelp1
-        game = GameCreator.createDefaultGame(typep1=typep1, typep2=typep2, modelp1=modelp1, modelp2=modelp2,
+        game = GameCreator.createDefaultGame(typep1=typep1, typep2=typep2, modelp1=modelp1, modelp2=modelp2,simulationsp1=simulationsp1,
                                              p1=("HUNTER_TEST", Hero.Hunter, PlayerDecks.BasicHunter), p2=("HUNTER_TEST", Hero.Hunter, PlayerDecks.BasicHunter))
         startGameEffs = [GESetMaxMana(10), GEDealDmg(28), GEEndTurn(), GERemoveDeck(), GEDiscard()]
         startTurnEffs = [GEDiscard()]
@@ -90,28 +90,28 @@ class GameCreator:
         return game
 
     @staticmethod
-    def createFireballTest(typep1=PlayerType.Modeled, typep2=None, modelp1="Model-INIT", modelp2=None):
+    def createFireballTest(typep1=PlayerType.Modeled, typep2=None, modelp1="Model-INIT", modelp2=None,simulationsp1=10,simulationsp2=10):
         if typep2 is None:
             typep2 = typep1
         if modelp2 is None:
             modelp2 = modelp1
 
-        game = GameCreator.createDefaultGame(typep1=typep1, typep2=typep2, modelp1=modelp1, modelp2=modelp2,
+        game = GameCreator.createDefaultGame(typep1=typep1, typep2=typep2, modelp1=modelp1, modelp2=modelp2,simulationsp1=simulationsp1,
                                              p1=("FIREBALL_TEST", Hero.Mage, PlayerDecks.BasicMage), p2=("FIREBALL_TEST", Hero.Mage, PlayerDecks.BasicMage))
-        startGameEffs = [GESetStarterPlayer(1), GESetMaxMana(10), GEDealDmg(24), GEPlayMinionTimes([('CS2_231', 7)]), GEEndTurn(), GERemoveDeck(), GEDiscard(), GEGiveCards([], [('CS2_029', 1)])]
+        startGameEffs = [GESetStarterPlayer(1), GESetMaxMana(10), GEDealDmg(24), GEPlayMinionTimes([('CS2_231', 7)]), GEEndTurn(), GERemoveDeck(), GEDiscard(), GEGiveCards([('CS2_029', 1)], [('CS2_029', 1)])]
         startTurnEffs = []
         game.startGameEffs = startGameEffs
         game.startTurnEffs = startTurnEffs
         return game
 
     @staticmethod
-    def createWeaponTest(typep1=PlayerType.Modeled, typep2=None, modelp1="Model-INIT", modelp2=None):
+    def createWeaponTest(typep1=PlayerType.Modeled, typep2=None, modelp1="Model-INIT", modelp2=None,simulationsp1=10,simulationsp2=10):
         if typep2 is None:
             typep2 = typep1
         if modelp2 is None:
             modelp2 = modelp1
 
-        game = GameCreator.createDefaultGame(typep1=typep1, typep2=typep2, modelp1=modelp1, modelp2=modelp2,
+        game = GameCreator.createDefaultGame(typep1=typep1, typep2=typep2, modelp1=modelp1, modelp2=modelp2,simulationsp1=simulationsp1,
                                              p1=("WEAPON_TEST", Hero.Warlock, PlayerDecks.BasicWarlock), p2=("WEAPON_TEST", Hero.Warlock, PlayerDecks.BasicWarlock))
         startGameEffs = [GESetStarterPlayer(1), GESetMaxMana(10), GEDealDmg(27, 29), GEPlayMinionTimes([('CS2_231', 7)]), GEEndTurn(), GERemoveDeck(), GEDiscard(), GEPlayMinionTimes([('CS2_106', 1)])]
         startTurnEffs = []
@@ -120,12 +120,12 @@ class GameCreator:
         return game
 
     @staticmethod
-    def createDruidTestGame(typep1=PlayerType.Modeled, typep2=None, modelp1="Model-INIT", modelp2=None):
+    def createDruidTestGame(typep1=PlayerType.Modeled, typep2=None, modelp1="Model-INIT", modelp2=None,simulationsp1=10,simulationsp2=10):
         if typep2 is None:
             typep2 = typep1
         if modelp2 is None:
             modelp2 = modelp1
-        game = GameCreator.createDefaultGame(typep1=typep1, typep2=typep2, modelp1=modelp1, modelp2=modelp2,
+        game = GameCreator.createDefaultGame(typep1=typep1, typep2=typep2, modelp1=modelp1, modelp2=modelp2,simulationsp1=simulationsp1,
                                              p1=("DRUID_TEST", Hero.Druid, PlayerDecks.BasicDruid), p2=("DRUID_TEST", Hero.Druid, PlayerDecks.BasicDruid))
         startGameEffs = [GESetStarterPlayer(1), GESetMaxMana(10), GEDealDmg(29), GEEndTurn(), GERemoveDeck(), GEDiscard()]
         startTurnEffs = [GEDiscard()]
@@ -134,14 +134,14 @@ class GameCreator:
         return game
 
     @staticmethod
-    def createMageTestGame(typep1=PlayerType.Modeled, typep2=None, modelp1="Model-INIT", modelp2=None):
+    def createMageTestGame(typep1=PlayerType.Modeled, typep2=None, modelp1="Model-INIT", modelp2=None,simulationsp1=10,simulationsp2=10):
         if typep2 is None:
             typep2 = typep1
         if modelp2 is None:
             modelp2 = modelp1
-        game = GameCreator.createDefaultGame(typep1=typep1, typep2=typep2, modelp1=modelp1, modelp2=modelp2,
+        game = GameCreator.createDefaultGame(typep1=typep1, typep2=typep2, modelp1=modelp1, modelp2=modelp2,simulationsp1=simulationsp1,
                                              p1=("MAGE_TEST", Hero.Mage, PlayerDecks.BasicMage), p2=("MAGE_TEST", Hero.Mage, PlayerDecks.BasicMage))
-        startGameEffs = [GESetStarterPlayer(1), GESetMaxMana(10), GEDealDmg(29), GEEndTurn(), GERemoveDeck(), GEDiscard()]
+        startGameEffs = [GESetStarterPlayer(1), GESetMaxMana(10), GEDealDmg(29), GEEndTurn(), GERemoveDeck(p2=False), GEDiscard()]
         startTurnEffs = [GEDiscard()]
         game.startGameEffs = startGameEffs
         game.startTurnEffs = startTurnEffs
@@ -149,42 +149,42 @@ class GameCreator:
 
     #5/2 and 2/3 vs. 3/5 taunt
     @staticmethod
-    def createSmartTradeTest(typep1=PlayerType.Modeled, typep2=None, modelp1="Model-INIT", modelp2=None):
+    def createSmartTradeTest(typep1=PlayerType.Modeled, typep2=None, modelp1="Model-INIT", modelp2=None,simulationsp1=10,simulationsp2=10):
         if typep2 is None:
             typep2 = typep1
         if modelp2 is None:
             modelp2 = modelp1
-        game = GameCreator.createDefaultGame(typep1=typep1, typep2=typep2, modelp1=modelp1, modelp2=modelp2,
+        game = GameCreator.createDefaultGame(typep1=typep1, typep2=typep2, modelp1=modelp1, modelp2=modelp2,simulationsp1=simulationsp1,
                                              p1=("SMART_TRADE_TEST", Hero.Warlock, PlayerDecks.BasicWarlock), p2=("SMART_TRADE_TEST", Hero.Warlock, PlayerDecks.BasicWarlock))
-        startGameEffs = [GESetStarterPlayer(1), GESetMaxMana(10), GEDealDmg(29), GEPlayMinionTimes([('CS2_213', 1), ('CS2_120', 1)]), GEEndTurn(), GEPlayMinionTimes([('CS2_179', 1)]), GEEndTurn(), GERemoveDeck(), GEDiscard()]
+        startGameEffs = [GESetStarterPlayer(1), GESetMaxMana(10), GEDealDmg(29), GEPlayMinionTimes([('CS2_213', 1), ('CS2_120', 1)]), GEEndTurn(), GEPlayMinionTimes([('CS2_179', 1)]), GEEndTurn(), GERemoveDeck(p2=False), GEDiscard()]
         startTurnEffs = [GEDiscard()]
         game.startGameEffs = startGameEffs
         game.startTurnEffs = startTurnEffs
         return game
 
     @staticmethod
-    def createWindfuryWeaponTest(typep1=PlayerType.Modeled, typep2=None, modelp1="Model-INIT", modelp2=None):
+    def createWindfuryWeaponTest(typep1=PlayerType.Modeled, typep2=None, modelp1="Model-INIT", modelp2=None,simulationsp1=10,simulationsp2=10):
         if typep2 is None:
             typep2 = typep1
         if modelp2 is None:
             modelp2 = modelp1
-        game = GameCreator.createDefaultGame(typep1=typep1, typep2=typep2, modelp1=modelp1, modelp2=modelp2,
+        game = GameCreator.createDefaultGame(typep1=typep1, typep2=typep2, modelp1=modelp1, modelp2=modelp2,simulationsp1=simulationsp1,
                                              p1=("WINDFURY_WEAPON_TEST", Hero.Warlock, PlayerDecks.BasicWarlock), p2=("WINDFURY_WEAPON_TEST", Hero.Warlock, PlayerDecks.BasicWarlock))
-        startGameEffs = [GESetStarterPlayer(1), GESetMaxMana(10), GEDealDmg(26), GEPlayMinionTimes([('CS2_231', 7)]), GEEndTurn(), GEPlayMinionTimes([('EX1_567', 1)]), GERemoveDeck(), GEDiscard()]
+        startGameEffs = [GESetStarterPlayer(1), GESetMaxMana(10), GEDealDmg(dmg2=29,dmg=26), GEPlayMinionTimes([('CS2_231', 3)]), GEEndTurn(), GEPlayMinionTimes([('EX1_567', 1)]), GERemoveDeck(p2=False), GEDiscard()]
         startTurnEffs = [GEDiscard()]
         game.startGameEffs = startGameEffs
         game.startTurnEffs = startTurnEffs
         return game
 
     @staticmethod
-    def createLeperGnomeTest(typep1=PlayerType.Modeled, typep2=None, modelp1="Model-INIT", modelp2=None):
+    def createLeperGnomeTest(typep1=PlayerType.Modeled, typep2=None, modelp1="Model-INIT", modelp2=None,simulationsp1=10,simulationsp2=10):
         if typep2 is None:
             typep2 = typep1
         if modelp2 is None:
             modelp2 = modelp1
-        game = GameCreator.createDefaultGame(typep1=typep1, typep2=typep2, modelp1=modelp1, modelp2=modelp2,
+        game = GameCreator.createDefaultGame(typep1=typep1, typep2=typep2, modelp1=modelp1, modelp2=modelp2,simulationsp1=simulationsp1,
                                              p1=("LEPERGNOME_TEST", Hero.Mage, PlayerDecks.BasicMage), p2=("LEPERGNOME_TEST", Hero.Hunter, PlayerDecks.BasicHunter))
-        startGameEffs = [GESetStarterPlayer(1), GESetMaxMana(10), GEDealDmg(28, 26), GEPlayMinionTimes([('EX1_029', 1)]), GEEndTurn(), GEEndTurn(), GERemoveDeck(), GEDiscard()]
+        startGameEffs = [GESetStarterPlayer(1), GESetMaxMana(10), GEDealDmg(28, 26), GEPlayMinionTimes([('EX1_029', 1)]), GEEndTurn(), GEEndTurn(), GERemoveDeck(p2=False), GEDiscard()]
         startTurnEffs = [GEDiscard()]
         game.startGameEffs = startGameEffs
         game.startTurnEffs = startTurnEffs
