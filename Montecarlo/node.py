@@ -2,11 +2,11 @@ import math
 import pickle
 import random
 from math import log, sqrt
-import tensorflow as tf
-import numpy as np
-CONST_NEGATIVE_INF = tf.cast(float('-inf'), tf.float32)
-CONST_INF = tf.cast(float('inf'), tf.float32)
 
+# CONST_NEGATIVE_INF = tf.cast(float('-inf'), tf.float32)
+# CONST_INF = tf.cast(float('inf'), tf.float32)
+CONST_NEGATIVE_INF = float('-inf')
+CONST_INF = float('inf')
 import Configuration
 
 
