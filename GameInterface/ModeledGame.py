@@ -1,3 +1,4 @@
+import Benchmark
 from GameInterface import *
 from fireplace.game import Game
 from fireplace.player import Player
@@ -6,7 +7,7 @@ from hearthstone.enums import CardClass, PlayState
 
 from GameState import InputBuilder
 
-from Benchmark import tt, globalDict
+from Benchmark import tt
 
 class ModeledGame:
     def __init__(self, player1, player2, log = False):
@@ -44,8 +45,7 @@ class ModeledGame:
 
             tt('Full turn')
 
-            for key, value in globalDict.items():
-                print(f'Timer: {key} {value[1]}')
+            Benchmark.printTimers()
 
             if self.gameFinished():
                 break

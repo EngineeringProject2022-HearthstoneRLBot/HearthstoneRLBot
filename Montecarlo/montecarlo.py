@@ -64,12 +64,17 @@ class MonteCarlo:
             probabilities_already_counted += probability
 
     def simulate(self, expansion_count=1):
-        for i in range(expansion_count):
+
+        i = 0
+        while i < expansion_count:
             current_node = self.root_node
             while current_node.expanded:
                 current_node = current_node.get_preferred_child(self.player_number)
-
             self.expand(current_node)
+            i += 1
+
+            if expansion_count < 2 * len(self.root_node.children):
+                expansion_count = 2 * len(self.root_node.children)
 
     def expand(self, node):
         self.child_finder.find(node, self)

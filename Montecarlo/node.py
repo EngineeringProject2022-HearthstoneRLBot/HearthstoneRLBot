@@ -90,7 +90,7 @@ class Node:
         # this node is already recognised as finished, but hasn't been explored once, so it's unfair to not give it
         # a chance.
         if not self.expanded and not self.cached_network_value:
-            discovery_operand = CONST_NEGATIVE_INF
+            discovery_operand = float('inf')
             win_operand = 0
         else:
             win_value = self.win_value

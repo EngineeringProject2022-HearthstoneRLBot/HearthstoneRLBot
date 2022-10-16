@@ -5,10 +5,12 @@ from collections import OrderedDict
 class GameCreator:
 
     @staticmethod
-    def drawRandomDeck():
-        randomDeck = random.choice(HeroDecks.AllDecks)
+    def drawRandomDeck(hero = None):
+        if hero is None:
+            randomDeck = random.choice(HeroDecks.AllDecks)
+        else:
+            randomDeck = random.choice(HeroDecks.HeroDeck(hero))
         return randomDeck
-
 
     @staticmethod
     def createDefaultGame(typep1=PlayerType.Modeled, typep2=None, modelp1="Model-INIT", modelp2=None,
