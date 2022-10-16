@@ -5,6 +5,7 @@ from math import log, sqrt
 import tensorflow as tf
 import numpy as np
 CONST_NEGATIVE_INF = tf.cast(float('-inf'), tf.float32)
+CONST_INF = tf.cast(float('inf'), tf.float32)
 
 import Configuration
 
@@ -90,7 +91,7 @@ class Node:
         # this node is already recognised as finished, but hasn't been explored once, so it's unfair to not give it
         # a chance.
         if not self.expanded and not self.cached_network_value:
-            discovery_operand = float('inf')
+            discovery_operand = CONST_INF
             win_operand = 0
         else:
             win_value = self.win_value
