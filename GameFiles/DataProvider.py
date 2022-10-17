@@ -34,6 +34,7 @@ class DataProvider:
                     while True:
                         game = pickle.load(rb)
                         winner = game[1]
+
                         if winner > 3:
                             continue
                         fun(game,winner,filepath)
@@ -51,9 +52,12 @@ class DataProvider:
                 value = -1
             else:
                 value = 0
-
+            if game[0][turnNo][2] == 1:
+                name = game[3][0][1:]
+            elif game[0][turnNo][2] == 2:
+                name = game[3][3][1:]
             X = sparse.COO(np.asarray(game[0][turnNo][0])) # tutaj bez sparse bo bedzie zapisywane sparsowane
-            Y = [np.asarray(game[0][turnNo][1]),np.asarray(value)]
+            Y = [np.asarray(game[0][turnNo][1]),np.asarray(value),name]
             self.data.append([X,Y])
 
 
