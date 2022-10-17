@@ -17,9 +17,13 @@ excel_gen = ExcelGenerator()
 
 def convert_to_sparse(game_output):
     y = []
-    for x in game_output:
-        y.append((sparse.COO(x[0]),x[1],x[2],x[3]))
-    return y
+    try:
+        for x in game_output:
+            y.append((sparse.COO(x[0]),x[1],x[2],x[3]))
+        return y
+    except Exception:
+        print(traceback.format_exc())
+        raise Exception
 
 def dumpGames():
     model_name = Configuration.OUTPUT_FOLDER
@@ -42,7 +46,8 @@ def dumpGames():
             sparse_data = convert_to_sparse(game.data)
             output = (sparse_data, game.winner,   state, game.prepareGamersData(), None)
         except Exception:
-            output = (game.data, 4,             state, game.prepareGamersData(), traceback.format_exc())
+            sparse_data = convert_to_sparse(game.data)
+            output = (sparse_data, 4,             state, game.prepareGamersData(), traceback.format_exc())
             print(traceback.format_exc())
         with open(f"data/{model_name}/{fileName}.txt", "ab") as fp:
             pickle.dump(output, fp)
