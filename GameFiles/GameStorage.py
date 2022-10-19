@@ -13,12 +13,12 @@ from datetime import datetime
 
 excel_gen = ExcelGenerator()
 def dumpGames():
-    model_name = Configuration.OUTPUT_FOLDER
-    path = f"data/{model_name}"
+    output_folder = Configuration.OUTPUT_FOLDER
+    path = f"data/{output_folder}"
     if not os.path.exists(path):
         os.makedirs(path)
     fileName = datetime.now().strftime("%d-%m-%YT%H%M%S")
-    with open(f"data/{model_name}/{fileName}.txt", "wb") as fp:  # dumpuję aktualny(pierwszy) stan randoma jako pierwszy obiekt przed zrobieniem czegokolwiek
+    with open(f"data/{output_folder}/{fileName}.txt", "wb") as fp:  # dumpuję aktualny(pierwszy) stan randoma jako pierwszy obiekt przed zrobieniem czegokolwiek
         pickle.dump((random.getstate()), fp)
         np.random.seed(random.randrange(999999999))
         tf.random.set_seed(random.randrange(999999999))
@@ -34,7 +34,7 @@ def dumpGames():
         except Exception:
             output = (game.data, 4,             state, game.prepareGamersData(), traceback.format_exc())
             print(traceback.format_exc())
-        with open(f"data/{model_name}/{fileName}.txt", "ab") as fp:
+        with open(f"data/{output_folder}/{fileName}.txt", "ab") as fp:
             pickle.dump(output, fp)
         excel_gen.append_to_csv(game=output, fileName=fileName)
 

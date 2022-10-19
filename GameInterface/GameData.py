@@ -228,6 +228,13 @@ class HeroDecks:
                 heroDecks.append(deck)
         return heroDecks
 
+    @staticmethod
+    def HeroFromDeckName(deckname):
+        for deck in HeroDecks.AllDecks:
+            if deck[0] == deckname:
+                return deck[1]
+        return None
+
 
 class PlayerType:
     Random = 1
