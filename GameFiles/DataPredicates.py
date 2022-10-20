@@ -18,12 +18,12 @@ class P:
     def WINS(self):
         tempFunc = self.func
         self.func = lambda winner, h, model, sim, deck: \
-                        winner in (1,2) and (self.p == 2 or (winner-1 == self.p) and tempFunc(winner, h, model, sim, deck))
+                        winner in (1,2) and (self.p == 2 or (winner-1 == self.p) and (tempFunc(winner, h, model, sim, deck) if tempFunc else True))
         return self
     def LOSES(self):
         tempFunc = self.func
         self.func = lambda winner, h, model, sim, deck: \
-                        winner in (1,2) and (self.p == 2 or (winner-1 == (not self.p)) and tempFunc(winner, h, model, sim, deck))
+                        winner in (1,2) and (self.p == 2 or (winner-1 == (not self.p)) and (tempFunc(winner, h, model, sim, deck) if tempFunc else True))
         return self
     def __call__(self, *args):
         return self.func(*args)
@@ -119,6 +119,7 @@ class PPlayer(P):
     def __init__(self, num):
         super().__init__()
         self.p = num
+        self.func = None
     def HAS(self, func):
         func.PLAYER(self.p)
         self.func = func
