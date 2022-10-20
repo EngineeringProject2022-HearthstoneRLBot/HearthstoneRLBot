@@ -37,7 +37,7 @@ class DataGenerator(keras.utils.Sequence):
                 turn = self.dp.turn(id)
                 X.append(turn.sparseData)
                 yPolicy.append(turn.probs)
-                yValue.append(turn.pRef.winner)
+                yValue.append(turn.pRef.winner-turn.pRef.loser)
             except Exception:
                 print(listIdsTmp)
         return np.asarray(X).squeeze(1), [np.asarray(yPolicy), np.asarray(yValue)]
