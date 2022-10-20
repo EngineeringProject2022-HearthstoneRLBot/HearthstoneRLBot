@@ -5,6 +5,7 @@ from math import log, sqrt
 import tensorflow as tf
 import numpy as np
 CONST_NEGATIVE_INF = tf.cast(float('-inf'), tf.float32)
+CONST_INF = tf.cast(float('inf'), tf.float32)
 
 import Configuration
 
@@ -30,6 +31,8 @@ class Node:
         ### below code is added by us
         self.finished = False
         self.stateText = ''
+        self.propagate = True
+        self.realGame = False
         ###
 
     def update_win_value(self, value):
@@ -88,7 +91,7 @@ class Node:
         # this node is already recognised as finished, but hasn't been explored once, so it's unfair to not give it
         # a chance.
         if not self.expanded and not self.cached_network_value:
-            discovery_operand = CONST_NEGATIVE_INF
+            discovery_operand = CONST_INF
             win_operand = 0
         else:
             win_value = self.win_value
@@ -101,3 +104,16 @@ class Node:
         score = win_operand + discovery_operand
         return score
         ###
+
+    def get_nodes_from_level(self):
+        i = 0
+        node = self
+        while node.parent is not None:
+            node = node.parent
+            i += 1
+        children = [node]
+        for i in range(i):
+            children = [arrNode.children for arrNode in children]
+            children = sum(children, [])
+        return children
+

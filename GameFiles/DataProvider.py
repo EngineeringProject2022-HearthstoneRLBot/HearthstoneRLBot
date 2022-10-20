@@ -9,7 +9,7 @@ import Configuration
 
 class DataProvider:
     def __init__(self,init_data = True):
-        self.data_folder = Configuration.OUTPUT_FOLDER
+        self.data_folder = Configuration.DATA_FOLDER
         self.data = []
         if init_data:
             self.initialize_data()

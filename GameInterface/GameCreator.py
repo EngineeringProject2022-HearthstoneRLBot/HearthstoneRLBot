@@ -5,10 +5,12 @@ from collections import OrderedDict
 class GameCreator:
 
     @staticmethod
-    def drawRandomDeck():
-        randomDeck = random.choice(HeroDecks.AllDecks)
+    def drawRandomDeck(hero = None):
+        if hero is None:
+            randomDeck = random.choice(HeroDecks.AllDecks)
+        else:
+            randomDeck = random.choice(HeroDecks.HeroDeck(hero))
         return randomDeck
-
 
     @staticmethod
     def createDefaultGame(typep1=PlayerType.Modeled, typep2=None, modelp1="Model-INIT", modelp2=None,
@@ -81,7 +83,7 @@ class GameCreator:
             modelp2 = modelp1
         game = GameCreator.createDefaultGame(typep1=typep1, typep2=typep2, modelp1=modelp1, modelp2=modelp2,
                                              p1=("HUNTER_TEST", Hero.Hunter, PlayerDecks.BasicHunter), p2=("HUNTER_TEST", Hero.Hunter, PlayerDecks.BasicHunter))
-        startGameEffs = [GESetStarterPlayer(1), GESetMaxMana(10), GEDealDmg(28), GEEndTurn(), GERemoveDeck(), GEDiscard()]
+        startGameEffs = [GESetMaxMana(10), GEDealDmg(28), GEEndTurn(), GERemoveDeck(), GEDiscard()]
         startTurnEffs = [GEDiscard()]
         game.startGameEffs = startGameEffs
         game.startTurnEffs = startTurnEffs
