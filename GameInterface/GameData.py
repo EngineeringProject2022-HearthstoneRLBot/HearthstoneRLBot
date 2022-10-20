@@ -9,6 +9,8 @@ class Hero:
     Warlock = 9
     Warrior = 10
 
+    AllHeros = [Druid, Hunter, Mage, Paladin, Priest, Rogue, Shaman, Warlock, Warrior]
+
 
 class PlayerDecks:
     decks = {'BasicDruid': ['EX1_169', 'EX1_169', 'CS2_005', 'CS2_005', 'CS2_189', 'CS2_189', 'CS2_120', 'CS2_120',
