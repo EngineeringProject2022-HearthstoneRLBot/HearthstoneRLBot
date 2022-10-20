@@ -1,6 +1,8 @@
 import glob
 import pickle
 import random
+
+from GameInterface import GameData
 from GameInterface.GameData import HeroDecks, Hero
 from DataPredicates import *
 
@@ -176,21 +178,27 @@ class DataProvider:
 
 
 
-
 dp = DataProvider.DataFromFolder('DEFAULT_OUTPUT')
 
-g0 = dp.getGamesWithPredicate(PPlayer(P.FIRST).HAS(PHero(Hero.Hunter).WINS())
+for deck in GameData.HeroDecks.AllDecks:
+    g = dp.getGamesWithPredicate(PPlayer(P.FIRST).HAS(PDeck(deck[0]).WINS()))
+    g2 = dp.getGamesWithPredicate(PPlayer(P.FIRST).HAS(PDeck(deck[0]).LOSES()))
+    print(len(g), len(g2))
+
+x = dp.balancedIds()
+
+g0 = dp.getGamesWithPredicate(PPlayer(P.FIRST).HAS(PHero(Hero.Hunter))
                               .AND(PNoMirrorDeck())
                               .AND(PValid())
-                              .AND(PNot(PDraws())))
+                              .AND(PNot(PDraws()))
+                              .AND(PPlayer(P.SECOND).HAS(PHero(Hero.Mage))))
 print(len(g0))
-g1 = dp.getGamesWithPredicate(PPlayer(P.ANY).HAS(PHero(Hero.Hunter)))
-print(len(g1))
-g1 = dp.getGamesWithPredicate(  PPlayer(P.FIRST).HAS(PHero(Hero.Hunter).WINS())
+g1 = dp.getGamesWithPredicate(  PPlayer(P.FIRST).HAS(PHero(Hero.Hunter))
                                 .OR(
-                                PPlayer(P.SECOND).HAS(PHero(Hero.Hunter).WINS())
-))
-print(len(g1))
+                                PPlayer(P.SECOND).HAS(PHero(Hero.Hunter))).AND(PNoMirrorHero()))
+g2 = dp.getGamesWithPredicate(  PPlayer(P.FIRST).HAS(PHero(Hero.Hunter)).AND(PNoMirrorHero()))
+g3 = dp.getGamesWithPredicate(  PPlayer(P.SECOND).HAS(PHero(Hero.Hunter)).AND(PNoMirrorHero()))
+print(len(g1), ' ', len(g2), ' ', len(g3))
 print(len(dp.games))
 # g0 = dp.getGamesWithPredicate(PNot(PHero(Hero.Warlock)).AND(
 #                               PNot(PHero(Hero.Mage))).AND(

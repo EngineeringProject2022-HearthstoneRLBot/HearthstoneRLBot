@@ -18,7 +18,12 @@ class P:
     def WINS(self):
         tempFunc = self.func
         self.func = lambda winner, h, model, sim, deck: \
-                        self.p == 2 or winner == (self.p + 1) and tempFunc(winner, h, model, sim, deck)
+                        winner in (1,2) and (self.p == 2 or (winner-1 == self.p) and tempFunc(winner, h, model, sim, deck))
+        return self
+    def LOSES(self):
+        tempFunc = self.func
+        self.func = lambda winner, h, model, sim, deck: \
+                        winner in (1,2) and (self.p == 2 or (winner-1 == (not self.p)) and tempFunc(winner, h, model, sim, deck))
         return self
     def __call__(self, *args):
         return self.func(*args)
