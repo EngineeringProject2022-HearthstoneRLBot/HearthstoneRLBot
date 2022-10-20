@@ -3,6 +3,8 @@ import pickle
 import glob
 import random
 import traceback
+
+import sparse
 import tensorflow as tf
 import Configuration
 import numpy as np
@@ -12,6 +14,17 @@ from GameInterface.GameCreator import *
 from datetime import datetime
 
 excel_gen = ExcelGenerator()
+
+def convert_to_sparse(game_output):
+    y = []
+    try:
+        for x in game_output:
+            y.append((sparse.COO(x[0]),x[1],x[2],x[3]))
+        return y
+    except Exception:
+        print(traceback.format_exc())
+        raise Exception
+
 def dumpGames():
     output_folder = Configuration.OUTPUT_FOLDER
     path = f"data/{output_folder}"
@@ -30,9 +43,11 @@ def dumpGames():
         output = None
         try:
             game.start()
-            output = (game.data, game.winner,   state, game.prepareGamersData(), None)
+            sparse_data = convert_to_sparse(game.data)
+            output = (sparse_data, game.winner,   state, game.prepareGamersData(), None)
         except Exception:
-            output = (game.data, 4,             state, game.prepareGamersData(), traceback.format_exc())
+            sparse_data = convert_to_sparse(game.data)
+            output = (sparse_data, 4,             state, game.prepareGamersData(), traceback.format_exc())
             print(traceback.format_exc())
         with open(f"data/{output_folder}/{fileName}.txt", "ab") as fp:
             pickle.dump(output, fp)
