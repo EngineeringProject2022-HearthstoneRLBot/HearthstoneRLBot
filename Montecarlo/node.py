@@ -34,7 +34,6 @@ class Node:
         ### below code is added by us
         self.finished = False
         self.stateText = ''
-        self.propagate = True
         self.realGame = False
         ###
 

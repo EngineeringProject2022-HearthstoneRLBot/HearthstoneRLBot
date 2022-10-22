@@ -48,9 +48,7 @@ class ChildFinder:
         tt('Play turn')
         node.player_number = 1 if node.game.current_player is node.game.player1 else 2
 
-        # is_random = int(input())
-        is_random = True
-        if is_random == 1 and type(parent) is not RandomNode:
+        if is_random and type(parent) is not RandomNode:
 
             randomNode = RandomNode(node, parent.game)
             node.stateText = "RANDOM MOVE SAMPLE: " + node.stateText
@@ -67,11 +65,7 @@ class ChildFinder:
                 child.state = node.state
                 child.stateText = node.stateText
                 child.player_number = node.player_number
-                #child.propagate = False
                 randomNode.add_sample(child)
-            pass
-
-
 
     def find(self, node, montecarlo):
         tt('Total CF', 1)
