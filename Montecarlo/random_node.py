@@ -1,82 +1,62 @@
-# import random
-# from copy import deepcopy
-#
-# from GameCommunication import playTurnSparse
-# from Montecarlo.node import Node
-#
-#
-# class RandomNode(Node):
-#
-#     def __init__(self, game, node, action):
-#         super().__init__(game)
-#         self.samples = []
-#         self.samples.append(node)
-#         self.player_number = node.player_number
-#         self.policy_value = node.policy_value
-#         for i in range(4):
-#             child = Node(deepcopy(game))
-#             child.state = action
-#             playTurnSparse(child.game, action)
-#             self.samples.append(child)
-#
-#     @property
-#     def children(self):
-#         child = random.choice(self.samples)
-#         return child.children
-#
-#     def update_win_value(self, value, callingPlayer):
-#         ### below code is modified by us
-#         newValue=value
-#         multiplier = 1
-#         if self.visits[callingPlayer-1] != 0:
-#             sum = self.win_value * self.visits[callingPlayer-1]
-#             sum += (newValue * multiplier)
-#             newValue = sum / (self.visits[callingPlayer-1] + 1)
-#
-#         self.win_value = newValue
-#         self.visits[callingPlayer-1] += 1
-#         if self.parent:
-#             if self.parent.original_player != self.original_player:
-#                 value *= -1
-#             self.parent.update_win_value(value, callingPlayer)
-#         ###
-#
-#     def update_policy_value(self, value):
-#         self.policy_value = value
-#
-#     def add_child(self, child):
-#         self.children.append(child)
-#         child.parent = self
-#
-#     def add_children(self, children):
-#         for child in children:
-#             self.add_child(child)
-#
-#     def get_preferred_child(self, callingPlayer):
-#         best_children = []
-#         best_score = float('-inf')
-#         for child in self.children:
-#             score = child.get_score(callingPlayer)
-#
-#             if score > best_score:
-#                 best_score = score
-#                 best_children = [child]
-#             elif score == best_score:
-#                 best_children.append(child)
-#         return random.choice(best_children)
-#
-#
-#     def get_score(self, callingPlayer):
-#         ###Below code is modified by us
-#         if self.original_player is None:
-#                 #or self.visits[callingPlayer -1] < 6:
-#             discovery_operand = float('inf')
-#             win_operand = 0
-#         else:
-#             discovery_operand = self.discovery_factor * (self.policy_value or 1) * ((sqrt(self.parent.visits[callingPlayer-1]))/(1 + self.visits[callingPlayer-1]))
-#             win_multiplier = 1 if self.original_player == callingPlayer else -1
-#             win_operand = win_multiplier * self.win_value
-#         self.score = win_operand + discovery_operand
-#         return self.score
-#
-#
+import random
+from copy import deepcopy
+
+from Benchmark import tt
+from Montecarlo.node import Node
+
+
+class RandomNode(Node):
+
+    def __init__(self, node: Node, game):
+        super().__init__(game)
+        self.player_number = node.player_number
+        self.policy_value = node.policy_value
+        self.state = node.state
+        self.stateText = "Random Node for: " + node.stateText
+        self.parent = node.parent
+        # node, cached input, probability multiplier
+        self.samples = [[node, None, 1]]
+        self.children = []
+
+    def add_sample(self, node: Node):
+        self.samples.append([node, None, 1])
+
+    def update_win_value(self, value):
+        total_win = 0.0
+        total_weight = 0.0
+        for sample in self.samples:
+            total_win += (sample[0].win_value * sample[2]) if sample[0].visits > 0 else 0
+            total_weight += sample[2] if sample[0].visits > 0 else 0
+        self.win_value = total_win / total_weight
+        self.visits += 1
+        if self.parent:
+            self.parent.update_win_value(value)
+
+    def get_preferred_child(self, callingPlayer):
+
+        probs = [x[2] for x in self.samples]
+        chance = sum(probs)
+        p_dist = [x / chance for x in probs]
+        child = random.choices(population=self.samples, weights=p_dist, k=1)[0][0]
+        if child.expanded:
+            return child.get_preferred_child(callingPlayer)
+        else:
+            return child
+
+    def merge(self, node, encoded_state):
+        merged = None
+        found_self = None
+        for x in self.samples:
+            if not found_self and x[0] is node:
+                x[1] = encoded_state
+                found_self = x
+            elif not merged and (x[1] == encoded_state).all():
+                x[2] = x[2] + 1
+                merged = x
+
+        if merged:
+            merged[0].visits += found_self[0].visits
+            self.samples.remove(found_self)
+            return merged
+        else:
+            return None
