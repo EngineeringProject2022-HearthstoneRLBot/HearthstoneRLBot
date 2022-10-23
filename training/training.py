@@ -1,8 +1,8 @@
 import os
 import tensorflow as tf
 import Configuration
-import keras
-from tensorflow.keras import backend as k
+import tensorflow.keras as keras
+from tensorflow.keras import backend as K
 
 from tensorflow.compat.v1 import ConfigProto
 from tensorflow.compat.v1 import InteractiveSession
