@@ -1,4 +1,5 @@
-from GameInterface import *
+from GameFiles.DataProvider import DataProvider
+from GameInterface.GameCreator import *
 
 # MonteCarlo
 WIN_MULTIPLIER = 1
@@ -12,16 +13,17 @@ GAME_NUM = 200
 INPUT_MODEL_NAME = 'Model-Init'
 OUTPUT_MODEL_NAME = 'exp'
 LEARNING_RATE = 0.00001
-DATA_FOLDER = "rand_data_1"
+DATA_PROVIDER = DataProvider.DataFromFolder("DEFAULT_OUTPUT")
 POLICY_WEIGHT = 1
 WINVALUE_WEIGHT = 1
+BALANCED_GAMES = True
 #set to 0 to disable
 CALLBACKS = 1
 CALLBACK_FREQ = 2000
 
 # Game creation
 def GAME_CREATION():
-    return GameCreator.createDefaultGame(PlayerType.Modeled, p1 = GameCreator.drawRandomDeck(Hero.Hunter), modelp1='Model-TEST', simulationsp1 = 2)
+    return GameCreator.createDefaultGame(PlayerType.Random, p1 = GameCreator.drawRandomDeck(Hero.Warlock), modelp1='Model-TEST', simulationsp1 = 2)
     #return GameCreator.createCustomGame()
 
 def CUSTOM_GAME():
