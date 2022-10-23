@@ -66,7 +66,7 @@ class ChildFinder:
     def find(self, node, montecarlo):
         tt('Total CF', 1)
         self.makeMove(node)
-        if node.parent is not None: # ROOT NODE
+        if node.parent is not None and not node.finished: # ROOT NODE
             self.predictHand(node, montecarlo)
         expert_policy_values, win_value = self.predict(node, montecarlo)
         if montecarlo.player_number != node.player_number:
