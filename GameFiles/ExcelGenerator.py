@@ -10,13 +10,13 @@ import pandas as pd
 class ExcelGenerator:
 
     def __init__(self):
-        self.data_provider = DataProvider(init_data = False)
+        self.files = [filepath for filepath in glob.iglob(f'./data/{Configuration.OUTPUT_FOLDER}/*')]
         self.cols = {'Player1Name','Player1Deck','Player2Name','Winner','NumberOfTurns','StartPlayer','SecondPlayer','FileName'}
 
     def append_to_csv(self, game, fileName):
 
-        self.create_missing_dir(path ='data/ExcelFiles/SingleGames')
-        self.create_blank_csv(filepath=f'data/ExcelFiles/SingleGames/{fileName}.csv')
+        self.create_missing_dir(path ='./data/ExcelFiles/SingleGames')
+        self.create_blank_csv(filepath=f'./data/ExcelFiles/SingleGames/{fileName}.csv')
         df = pd.DataFrame({
         'Player1Name': game[3][0],
         'Player1Deck': self.map_deck_to_deck_name(game[3][2]),
@@ -30,7 +30,7 @@ class ExcelGenerator:
         'Traceback': "" if game[4] is None else game[4]
         },index=[0])
 
-        df.to_csv(f'data/ExcelFiles/SingleGames/{fileName}.csv', mode='a', index=False,header=False)
+        df.to_csv(f'./data/ExcelFiles/SingleGames/{fileName}.csv', mode='a', index=False,header=False)
 
     def create_blank_csv(self, filepath, merge=False):
         if not os.path.exists(filepath):
@@ -60,12 +60,20 @@ class ExcelGenerator:
             if PlayerDecks.decks[key] == deck:
                 return key
 
-    def __convert_txt_to_csv(self, *args):
-        game = args[0]
-        filepath = args[2]
-        tmp_path = filepath.replace('\\','/').split('/')
-        self.append_to_csv(game, tmp_path[-1])
-
     def generate_game_csv_from_txt(self):
-        self.data_provider.iterate_through_files(self.__convert_txt_to_csv)
+        for filepath in self.files:
+            with open(filepath, "rb") as rb:
+                # METADATA AND DECK TO BE IGNORED
+                try:
+                    # SKIP METADATA
+                    pickle.load(rb)
+                    while True:
+                        game = pickle.load(rb)
+                        winner = game[1]
+                        if winner > 3:
+                            continue
+                        tmp_path = filepath.replace('\\','/').split('/')
+                        self.append_to_csv(game, tmp_path[-1])
+                except EOFError:
+                    print(f"EOF {filepath}")
 
