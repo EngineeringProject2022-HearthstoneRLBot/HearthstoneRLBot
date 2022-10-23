@@ -67,9 +67,21 @@ class ChildFinder:
                 child.player_number = node.player_number
                 randomNode.add_sample(child)
 
+    def predictHand(self, node, montecarlo):
+        if montecarlo.player_number == node.player_number:
+            toMask = node.game.current_player.opponent
+        else:
+            toMask = node.game.current_player
+        cardCount = len(toMask.hand)
+        toMask.discard_hand()
+        for i in range(cardCount):
+            toMask.give("FP1_012")
+
     def find(self, node, montecarlo):
         tt('Total CF', 1)
         self.makeMove(node)
+        if node.parent is not None: # ROOT NODE
+            self.predictHand(node, montecarlo)
         expert_policy_values, win_value = self.predict(node, montecarlo)
         if expert_policy_values is None:
             return False
