@@ -1,13 +1,11 @@
+from GameFiles.DataGenerator import DataGenerator
 import os
-import tensorflow as tf
 import Configuration
 import keras
+import tensorflow as tf
 from tensorflow.keras import backend as k
-
 from tensorflow.compat.v1 import ConfigProto
 from tensorflow.compat.v1 import InteractiveSession
-
-from GameFiles.DataGenerator import DataGenerator
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 # os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
@@ -28,13 +26,14 @@ def trainNetwork(model):
         model.fit(trainingGenerator, epochs=1, callbacks=callbacks)
     else:
         model.fit(trainingGenerator, epochs=1)
-    model.save(f'../Model/models/{Configuration.OUTPUT_MODEL_NAME}')
+    model.save(f'Model/models/{Configuration.OUTPUT_MODEL_NAME}')
 
 config = ConfigProto()
 config.gpu_options.allow_growth = True
 session = InteractiveSession(config=config)
 
-model = tf.keras.models.load_model(f"../Model/models/{Configuration.INPUT_MODEL_NAME}")
+model = tf.keras.models.load_model(f"Model/models/{Configuration.INPUT_MODEL_NAME}")
+print(model.summary())
 model.compile(loss=['categorical_crossentropy', 'mean_squared_error'],
               loss_weights = [Configuration.POLICY_WEIGHT, Configuration.WINVALUE_WEIGHT], optimizer=tf.keras.optimizers.Adam(Configuration.LEARNING_RATE))
 # model.optimizer = tf.keras.optimizers.Adam(
