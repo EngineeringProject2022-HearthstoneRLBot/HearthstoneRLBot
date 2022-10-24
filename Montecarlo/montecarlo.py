@@ -67,27 +67,28 @@ class MonteCarlo:
 
     def simulate(self, expansion_count=1):
         i = 0
+
         while i < expansion_count:
-            while True:
+            failure = True
+            while failure:
                 current_node = self.root_node
                 while current_node.expanded:
                     current_node = current_node.get_preferred_child(self.player_number)
 
-                success = self.expand(current_node)
-                if not success:
-                    continue
-                i += 1
+                failure = self.expand(current_node)
 
-                if expansion_count < Configuration.MCTS_CHILD_MULTIPLIER * len(self.root_node.children):
-                    expansion_count = Configuration.MCTS_CHILD_MULTIPLIER * len(self.root_node.children)
-                break
+            i += 1
+
+            if expansion_count < Configuration.MCTS_CHILD_MULTIPLIER * len(self.root_node.children):
+                expansion_count = Configuration.MCTS_CHILD_MULTIPLIER * len(self.root_node.children)
+
 
     def expand(self, node):
 
-        success = self.child_finder.find(node, self)
+        failure = self.child_finder.find(node, self)
         if len(node.children):
             node.expanded = True
-        return success
+        return failure
 
     def sync_tree(self, game, move):
         found = False

@@ -55,8 +55,9 @@ class RandomNode(Node):
                 merged = x
 
         if merged:
-            merged[0].visits += found_self[0].visits
+            # merged[0].visits += found_self[0].visits
+
             self.samples.remove(found_self)
-            return merged
+            return True
         else:
-            return None
+            return False

@@ -11,20 +11,22 @@ from Montecarlo.random_node import RandomNode
 
 
 class ChildFinder:
-
-    def predict(self, node, montecarlo):
-        if node.cached_network_value:
-            return [], node.cached_network_value
-
+    def createInput(self, node):
         tt('Input', 1)
         x = InputBuilder.convToInput(node.game)
         tt('Input')
+        return x
+
+    def merge(self, node, input):
         if node.randomSample:
-            merged = node.parent.merge(node, x)
-            if merged is not None:
-                return None, None
+            merged = node.parent.merge(node, input)
+            if merged:
+                return True
+        return False
+
+    def predict(self, node, montecarlo, input):
         tt('Model', 1)
-        expert_policy_values, network_value = montecarlo.model(x)
+        expert_policy_values, network_value = montecarlo.model(input)
         tt('Model')
         node.cached_network_value = network_value
         return expert_policy_values, network_value
@@ -48,7 +50,7 @@ class ChildFinder:
         tt('Play turn')
         node.player_number = 1 if node.game.current_player is node.game.player1 else 2
 
-        if is_random and type(parent) is not RandomNode:
+        if True and type(parent) is not RandomNode:
 
             randomNode = RandomNode(node, parent.game)
             node.stateText = "RANDOM MOVE SAMPLE: " + node.stateText
@@ -70,9 +72,16 @@ class ChildFinder:
     def find(self, node, montecarlo):
         tt('Total CF', 1)
         self.makeMove(node)
-        expert_policy_values, win_value = self.predict(node, montecarlo)
+        if node.cached_network_value:
+            expert_policy_values, win_value = [], node.cached_network_value
+        else:
+            nn_input = self.createInput(node)
+            merged = self.merge(node, nn_input)
+            if merged:
+                return True
+            expert_policy_values, win_value = self.predict(node, montecarlo,nn_input)
         if expert_policy_values is None:
-            return False
+            return True
         if montecarlo.player_number != node.player_number:
             win_value *= -1
         if not node.finished:
@@ -92,4 +101,4 @@ class ChildFinder:
             node.update_win_value(win_value)
 
         tt('Total CF')
-        return True
+        return False
