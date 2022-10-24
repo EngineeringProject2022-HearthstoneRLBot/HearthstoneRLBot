@@ -50,7 +50,7 @@ class ChildFinder:
         tt('Play turn')
         node.player_number = 1 if node.game.current_player is node.game.player1 else 2
 
-        if True and type(parent) is not RandomNode:
+        if is_random and type(parent) is not RandomNode:
 
             randomNode = RandomNode(node, parent.game)
             node.stateText = "RANDOM MOVE SAMPLE: " + node.stateText
@@ -80,8 +80,7 @@ class ChildFinder:
             if merged:
                 return True
             expert_policy_values, win_value = self.predict(node, montecarlo,nn_input)
-        if expert_policy_values is None:
-            return True
+
         if montecarlo.player_number != node.player_number:
             win_value *= -1
         if not node.finished:
