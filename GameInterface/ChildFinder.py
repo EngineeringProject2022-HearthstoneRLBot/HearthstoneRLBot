@@ -7,18 +7,26 @@ from GameInterface import checkValidActionsSparse, interpretDecodedAction, decod
 from GameState import InputBuilder
 from Montecarlo.node import Node
 from Benchmark import tt
+from Montecarlo.random_node import RandomNode
+
 
 class ChildFinder:
-
-    def predict(self, node, montecarlo):
-        if node.cached_network_value:
-            return [], node.cached_network_value
-
+    def createInput(self, node):
         tt('Input', 1)
         x = InputBuilder.convToInput(node.game)
         tt('Input')
+        return x
+
+    def merge(self, node, input):
+        if node.randomSample:
+            merged = node.parent.merge(node, input)
+            if merged:
+                return True
+        return False
+
+    def predict(self, node, montecarlo, input):
         tt('Model', 1)
-        expert_policy_values, network_value = montecarlo.model(x)
+        expert_policy_values, network_value = montecarlo.model(input)
         tt('Model')
         node.cached_network_value = network_value
         return expert_policy_values, network_value
@@ -27,9 +35,10 @@ class ChildFinder:
         node.player_number = 1 if node.game.current_player is node.game.player1 else 2
         if node.state is None or node.parent is None or node.finished: #jesli node parent to none to znaczy ze sync byl wiec nie gramy tej tury
             return
+        parent = node.parent
         if not node.realGame:
             tt('Deepcopy', 1)
-            node.game = deepcopy(node.game)
+            node.game = deepcopy(parent.game)
             tt('Deepcopy')
             node.realGame = True
         is_random = 0
@@ -41,22 +50,37 @@ class ChildFinder:
         tt('Play turn')
         node.player_number = 1 if node.game.current_player is node.game.player1 else 2
 
-        if is_random and node.propagate:
-            node.policy_value /= Configuration.RANDOM_MOVE_SAMPLES
-            for i in range(Configuration.RANDOM_MOVE_SAMPLES - 1):
-                child = Node(node.parent.game)
-                child.state = node.state
-                child.stateText = (
-                        "Duplicate Random Action:" + str(child.state) + " - " + interpretDecodedAction(decodeAction(child.state), child.game))
-                child.policy_value = node.policy_value
-                child.propagate = False
-                node.parent.add_child(child)
+        if is_random and type(parent) is not RandomNode:
 
+            randomNode = RandomNode(node, parent.game)
+            node.stateText = "RANDOM MOVE SAMPLE: " + node.stateText
+            parent.randomChildren.append(randomNode)
+            node.randomSample = True
+            node.parent = randomNode
+            parent.children.remove(node)
+            parent.add_child(randomNode)
+            randomNode.expanded = True
+            for i in range(Configuration.RANDOM_MOVE_SAMPLES - 1):
+                child = Node(parent.game)
+                child.randomSample = True
+                child.parent = randomNode
+                child.state = node.state
+                child.stateText = node.stateText
+                child.player_number = node.player_number
+                randomNode.add_sample(child)
 
     def find(self, node, montecarlo):
         tt('Total CF', 1)
         self.makeMove(node)
-        expert_policy_values, win_value = self.predict(node, montecarlo)
+        if node.cached_network_value:
+            expert_policy_values, win_value = [], node.cached_network_value
+        else:
+            nn_input = self.createInput(node)
+            merged = self.merge(node, nn_input)
+            if merged:
+                return True
+            expert_policy_values, win_value = self.predict(node, montecarlo,nn_input)
+
         if montecarlo.player_number != node.player_number:
             win_value *= -1
         if not node.finished:
@@ -65,10 +89,15 @@ class ChildFinder:
                 child.state = action
                 child.stateText = (
                         "Action:" + str(action) + " - " + interpretDecodedAction(decodeAction(action), node.game))
+
                 child.policy_value = expert_policy_values[0, action]
+
                 child.player_number = 1 if node.game.current_player is node.game.player1 else 2
                 node.add_child(child)
 
         if node.parent is not None:
+            node.cached_initial_win_value = win_value
             node.update_win_value(win_value)
+
         tt('Total CF')
+        return False
