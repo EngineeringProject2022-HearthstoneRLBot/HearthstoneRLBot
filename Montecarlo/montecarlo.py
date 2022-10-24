@@ -1,9 +1,11 @@
 import random
 from copy import deepcopy
 
+import Configuration
 from GameState import InputBuilder
 from Montecarlo.node import Node
 import numpy as np
+
 
 class MonteCarlo:
 
@@ -64,27 +66,37 @@ class MonteCarlo:
             probabilities_already_counted += probability
 
     def simulate(self, expansion_count=1):
-
         i = 0
+
         while i < expansion_count:
-            current_node = self.root_node
-            while current_node.expanded:
-                current_node = current_node.get_preferred_child(self.player_number)
-            self.expand(current_node)
+            failure = True
+            while failure:
+                current_node = self.root_node
+                while current_node.expanded:
+                    current_node = current_node.get_preferred_child(self.player_number)
+
+                failure = self.expand(current_node)
+
             i += 1
 
-            if expansion_count < 2 * len(self.root_node.children):
-                expansion_count = 2 * len(self.root_node.children)
+            if expansion_count < Configuration.MCTS_CHILD_MULTIPLIER * len(self.root_node.children):
+                expansion_count = Configuration.MCTS_CHILD_MULTIPLIER * len(self.root_node.children)
+
 
     def expand(self, node):
-        self.child_finder.find(node, self)
+
+        failure = self.child_finder.find(node, self)
         if len(node.children):
             node.expanded = True
+        return failure
 
     def sync_tree(self, game, move):
         found = False
         currInput = InputBuilder.convToInput(game, self.player_number)
-        for x in self.root_node.children:
+        children = [x for x in self.root_node.children if x not in self.root_node.randomChildren]
+        for randomChild in self.root_node.randomChildren:
+            children.extend([x[0] for x in randomChild.samples])
+        for x in children:
             if x.visits == 0:
                 continue
             child_input = InputBuilder.convToInput(x.game, self.player_number)
