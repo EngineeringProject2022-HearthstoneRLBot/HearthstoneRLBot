@@ -33,7 +33,6 @@ class ModeledGame:
 
     def start(self):
         self.startGame()
-        totalTurn = 0
         while True:
             tt('Full turn', 1)
             self.startTurn()

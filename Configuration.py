@@ -20,6 +20,7 @@ BALANCED_GAMES = True
 #set to 0 to disable
 CALLBACKS = 1
 CALLBACK_FREQ = 2000
+BATCH_SIZE = 2
 
 # Game creation
 def GAME_CREATION():

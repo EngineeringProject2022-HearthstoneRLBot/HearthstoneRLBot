@@ -10,7 +10,7 @@ import pandas as pd
 class ExcelGenerator:
 
     def __init__(self):
-        self.data_provider = DataProvider(init_data = False)
+        #self.data_provider = DataProvider(init_data = False)
         self.cols = {'Player1Name','Player1Deck','Player2Name','Winner','NumberOfTurns','StartPlayer','SecondPlayer','FileName'}
 
     def append_to_csv(self, game, fileName):
@@ -66,6 +66,6 @@ class ExcelGenerator:
         tmp_path = filepath.replace('\\','/').split('/')
         self.append_to_csv(game, tmp_path[-1])
 
-    def generate_game_csv_from_txt(self):
-        self.data_provider.iterate_through_files(self.__convert_txt_to_csv)
+    #def generate_game_csv_from_txt(self):
+        #self.data_provider.iterate_through_files(self.__convert_txt_to_csv)
 

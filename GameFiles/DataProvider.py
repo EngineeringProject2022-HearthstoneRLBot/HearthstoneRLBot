@@ -25,7 +25,7 @@ class SPlayer:
         splitted = name[1:].split('_')
         deckname = splitted[0]
         modelname = splitted[1]
-        simulations = int(splitted[2][11:]) if len(splitted) > 2 else -1
+        simulations = int(splitted[2][11:]) if len(splitted) > 2 and len(splitted[2])>11 else -1
         return deckname, HeroDecks.HeroFromDeckName(deckname), modelname, simulations
 
 class SGame:

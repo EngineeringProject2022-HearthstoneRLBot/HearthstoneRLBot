@@ -219,8 +219,6 @@ def mapBattlecrySpells(card):
         None
     return currentBattlecryEffect
 
-    # TODO
-
 
 def getTargetedActionDetails(x, currentBattlecryEffect, card):
     while hasattr(x, "_if"):
@@ -414,7 +412,6 @@ def getSummonDetails(x, card, currentEffect):
     try:
         toSummonID = x.get_args(card)[1]
         if type(toSummonID) is RandomEntourage:
-            # TODO hmmm
             currentEffect["SummonFromEntourage"] = 1
             sum_health = 0
             sum_atk = 0
@@ -555,7 +552,6 @@ def mapConditional(card):
             getTargetedActionDetails(x.actions[0], conditionalEffect, card)
 
     return conditionalEffect
-    # TODO
 
 
 def mapStartOfTurn(card):

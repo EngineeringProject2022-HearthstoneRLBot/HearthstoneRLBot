@@ -74,13 +74,13 @@ class PDeck(P):
             return self.deck in deck
         return deck[self.p] == self.deck
 
-class PNoMirrorDeck(P):
+class PMirrorDeck(P):
     def func(self, winner, h, model, sim, deck):
-        return deck[0] != deck[1]
+        return deck[0] == deck[1]
 
-class PNoMirrorHero(P):
+class PMirrorHero(P):
     def func(self, winner, h, model, sim, deck):
-        return h[0] != h[1]
+        return h[0] == h[1]
 
 class PSimulations(P):
     def __init__(self, value = None):
