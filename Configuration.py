@@ -1,6 +1,9 @@
 from GameFiles.DataProvider import DataProvider
 from GameInterface.GameCreator import *
 
+# Threads
+NUM_THREADS = 10
+
 # MonteCarlo
 WIN_MULTIPLIER = 1
 RANDOM_MOVE_SAMPLES = 5
@@ -24,7 +27,7 @@ CALLBACK_FREQ = 2000
 
 # Game creation
 def GAME_CREATION():
-    return GameCreator.createDefaultGame(PlayerType.Random, p1 = GameCreator.drawRandomDeck(Hero.Warlock), modelp1='Model-TEST', simulationsp1 = 2)
+    return GameCreator.createDefaultGame(PlayerType.Modeled, p1 = GameCreator.drawRandomDeck(Hero.Warlock), modelp1='19200games', simulationsp1 = 2)
     #return GameCreator.createCustomGame()
 
 def CUSTOM_GAME():
