@@ -8,9 +8,7 @@ import tensorflow as tf
 from GameFiles.GameStorage import dumpGames
     #, loadGame
 
-
 def main():
-    tf.config.experimental.enable_tensor_float_32_execution(False)
     cards.db.initialize()
     dumpGames()
 

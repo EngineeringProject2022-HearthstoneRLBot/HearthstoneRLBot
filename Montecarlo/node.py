@@ -2,9 +2,11 @@ import math
 import pickle
 import random
 from math import log, sqrt
+import tensorflow as tf
 
-# CONST_NEGATIVE_INF = tf.cast(float('-inf'), tf.float32)
-# CONST_INF = tf.cast(float('inf'), tf.float32)
+#CONST_NEGATIVE_INF = tf.cast(float('-inf'), tf.float32)
+#CONST_INF = tf.cast(float('inf'), tf.float32)
+
 CONST_NEGATIVE_INF = float('-inf')
 CONST_INF = float('inf')
 import Configuration
@@ -34,6 +36,7 @@ class Node:
         self.propagate = True
         self.realGame = False
         ###
+
 
     def update_win_value(self, value):
         ### below code is modified by us
@@ -74,9 +77,11 @@ class Node:
                 if child_2.state == child.state:
                     score += child.get_score(flip)
                     numbers += 1
-            # score = child.get_score(callingPlayer)
+            # score = child.get_score(flip)
             score = score / numbers
-            if score > best_score:
+            if score < best_score:
+                pass
+            elif score > best_score:
                 best_score = score
                 best_children = [child]
             elif score == best_score:
@@ -87,7 +92,6 @@ class Node:
             raise NoChildException
 
     def get_score(self, flipWinValue: bool):
-
         # this node is already recognised as finished, but hasn't been explored once, so it's unfair to not give it
         # a chance.
         if not self.expanded and not self.cached_network_value:

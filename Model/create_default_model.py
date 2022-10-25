@@ -5,6 +5,6 @@ from Model.TestModel import TestModel
 
 INIT_MODEL_NAME = "Model-TEST"
 
-myNetwork = TestModel()
+myNetwork = Network()
 model = myNetwork.getModel()
 model.save(f'models/{INIT_MODEL_NAME}')

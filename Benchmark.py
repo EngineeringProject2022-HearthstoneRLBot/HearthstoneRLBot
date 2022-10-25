@@ -1,6 +1,6 @@
 from timeit import default_timer as timer
 
-disable = True
+disable = False
 
 globalTimers = {}
 globalTimersConfig = {
@@ -9,15 +9,15 @@ globalTimersConfig = {
     'Input': True,
     'Model': True,
     'Deepcopy': True,
-    'Play turn': False
+    'Play turn': True
 }
 
 
-def tt(name, on=0):
+def tt(name, on=0, padding=0):
     if disable:
         return
     if not (name in globalTimers):
-        globalTimers[name] = [0, 0, 0]
+        globalTimers[name] = [0, 0, 0, padding]
 
     if not (name in globalTimersConfig):
         globalTimersConfig[name] = True
@@ -38,6 +38,7 @@ def printTimers():
         return
     for key, value in globalTimers.items():
         if globalTimersConfig[key]:
-            print(f'Timer: {key} {value[1]} times: {value[2]}')
+            padding = '\t'*value[3]
+            print(f'Timer: {padding}{key} {value[1]} times: {value[2]}')
 
 

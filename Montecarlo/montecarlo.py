@@ -1,6 +1,7 @@
 import random
 from copy import deepcopy
 
+from Benchmark import tt
 from GameState import InputBuilder
 from Montecarlo.node import Node
 import numpy as np
@@ -67,10 +68,14 @@ class MonteCarlo:
 
         i = 0
         while i < expansion_count:
+            tt('Searching for node', 1, 4)
             current_node = self.root_node
             while current_node.expanded:
                 current_node = current_node.get_preferred_child(self.player_number)
+            tt('Searching for node')
+            tt('Expansion', 1, 4)
             self.expand(current_node)
+            tt('Expansion')
             i += 1
 
             if expansion_count < 2 * len(self.root_node.children):
