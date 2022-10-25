@@ -4,6 +4,7 @@ from GameInterface.GameCreator import *
 # MonteCarlo
 WIN_MULTIPLIER = 0
 RANDOM_MOVE_SAMPLES = 5
+MCTS_CHILD_MULTIPLIER = 2
 
 # DumpGames
 OUTPUT_FOLDER = 'DEFAULT_OUTPUT'

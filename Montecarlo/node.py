@@ -20,20 +20,22 @@ class Node:
 
     def __init__(self, game):
         self.state = None
+        self.randomChildren = []
         self.game = game
         self.cached_network_value = None
+        self.cached_initial_win_value = None
         self.win_value = 0
         self.policy_value = None
         self.visits = 0
         self.parent = None
         self.children = []
         self.expanded = False
+        self.randomSample = False
         self.player_number = None
         self.discovery_factor = 1
         ### below code is added by us
         self.finished = False
         self.stateText = ''
-        self.propagate = True
         self.realGame = False
         ###
 
@@ -59,10 +61,6 @@ class Node:
     def add_child(self, child):
         self.children.append(child)
         child.parent = self
-
-    def add_children(self, children):
-        for child in children:
-            self.add_child(child)
 
     def get_preferred_child(self, treePlayerNumber: int):
         best_children = []
