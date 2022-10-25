@@ -34,6 +34,10 @@ session = InteractiveSession(config=config)
 
 model = tf.keras.models.load_model(f"Model/models/{Configuration.INPUT_MODEL_NAME}")
 print(model.summary())
+# boundaries = [100000, 110000]
+# values = [1.0, 0.5, 0.1]
+# learning_rate_fn = keras.optimizers.schedules.PiecewiseConstantDecay(
+#     boundaries, values)
 model.compile(loss=['categorical_crossentropy', 'mean_squared_error'],
               loss_weights = [Configuration.POLICY_WEIGHT, Configuration.WINVALUE_WEIGHT], optimizer=tf.keras.optimizers.Adam(Configuration.LEARNING_RATE))
 # model.optimizer = tf.keras.optimizers.Adam(

@@ -68,10 +68,28 @@ class DataProvider:
                     while True:
                         game = pickle.load(rb)
                         sGame = SGame(len(self.games), game)
-                        self.turns.extend(sGame.turns)
+                        self.adjust_probs(self.turns, sGame.turns)
+                        #self.turns.extend(sGame.turns)
                         self.games.append(sGame)
                 except EOFError:
                     print(f"EOF {filepath}")
+
+    def adjust_probs(self, turns,to_add):
+        for x in to_add:
+            probs = x.probs
+            if probs[-1] == 1:
+                continue
+
+            diff = probs[-1] - 0.05
+            if diff > 0:
+                probs[-1] -= diff
+                toAdd = diff / len([y for y in probs[:-1] if y != 0])
+                for index, y in enumerate(probs[:-1]):
+                    if y != 0:
+                        y += toAdd
+                        probs[index] = y
+            turns.append(x)
+
 
     def getGamesWithPredicate(self, predicate):
         output = []

@@ -35,7 +35,7 @@ class DataGenerator(keras.utils.Sequence):
         for id in listIdsTmp:
             try:
                 turn = self.dp.turn(id)
-                X.append(turn.sparseData)
+                X.append(turn.sparseData.todense())
                 yPolicy.append(turn.probs)
                 yValue.append(turn.pRef.winner-turn.pRef.loser)
             except Exception:

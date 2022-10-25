@@ -7,15 +7,15 @@ RANDOM_MOVE_SAMPLES = 5
 MCTS_CHILD_MULTIPLIER = 2
 
 # DumpGames
-OUTPUT_FOLDER = 'DEFAULT_OUTPUT'
-GAME_NUM = 200
+OUTPUT_FOLDER = 'rand_1'
+GAME_NUM = 3000
 
 # Training
-INPUT_MODEL_NAME = 'Model-Init'
-OUTPUT_MODEL_NAME = 'exp'
+INPUT_MODEL_NAME = 'Model-INIT'
+OUTPUT_MODEL_NAME = 'ReducedWin_RemoveEndTurns_1'
 LEARNING_RATE = 0.00001
-DATA_PROVIDER = DataProvider.DataFromFolder("DEFAULT_OUTPUT")
-POLICY_WEIGHT = 1
+DATA_PROVIDER = DataProvider.DataFromFolder("rand_1")
+POLICY_WEIGHT = 1.5
 WINVALUE_WEIGHT = 1
 BALANCED_GAMES = True
 #set to 0 to disable
@@ -24,7 +24,7 @@ CALLBACK_FREQ = 2000
 
 # Game creation
 def GAME_CREATION():
-    return GameCreator.createDefaultGame(PlayerType.Random, p1 = GameCreator.drawRandomDeck(Hero.Warlock), modelp1='Model-TEST', simulationsp1 = 2)
+    return GameCreator.createDefaultGame(PlayerType.Random, printLogs=False)
     #return GameCreator.createCustomGame()
 
 def CUSTOM_GAME():

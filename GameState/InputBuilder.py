@@ -92,6 +92,6 @@ class InputBuilder:
         MegaFinalMatrix = np.moveaxis(MegaFinalMatrix,[1,2],[1,0])
         # dummy dimension needed for model
         MegaFinalMatrix = MegaFinalMatrix[None, :]
-        return MegaFinalMatrix
+        return MegaFinalMatrix / 30
 
 #Symulujacy to 0 i 1 to on, dalej 2 3 przeciwnik i potem currentPlayer Matrix
