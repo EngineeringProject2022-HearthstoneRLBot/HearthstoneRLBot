@@ -18,12 +18,6 @@ class ChildFinder:
         tt('Input', 1, 6)
         x = InputBuilder.convToInput(node.game)
         tt('Input')
-        nodes = node.get_nodes_from_level()
-        for i in nodes:
-            if node is not i:
-                tt('Model', 1, 6)
-                tt('Model')
-                x = np.append(x, InputBuilder.convToInput(i.game), axis=0)
         tt('Model', 1, 6)
         expert_policy_values, network_value = montecarlo.model(x)
         tt('Model')

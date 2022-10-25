@@ -11,7 +11,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 # os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 def trainNetwork(model):
-    trainingGenerator = DataGenerator(batch_size=1)
+    trainingGenerator = DataGenerator(batch_size=4)
     # validationGenerator = DataGenerator(model_name='TRAINED_MODEL3', batch_size=1)
     # model.fit(trainingGenerator, validation_data = validationGenerator, epochs=1)
     checkpoint_dir = f"checkpoints/{Configuration.OUTPUT_MODEL_NAME}"
@@ -34,7 +34,7 @@ session = InteractiveSession(config=config)
 
 model = tf.keras.models.load_model(f"Model/models/{Configuration.INPUT_MODEL_NAME}")
 print(model.summary())
-model.compile(loss=['categorical_crossentropy', 'mean_squared_error'],
+model.compile(loss=['kl_divergence', 'mean_squared_error'],
               loss_weights = [Configuration.POLICY_WEIGHT, Configuration.WINVALUE_WEIGHT], optimizer=tf.keras.optimizers.Adam(Configuration.LEARNING_RATE))
 # model.optimizer = tf.keras.optimizers.Adam(
 #     learning_rate=0.001,
