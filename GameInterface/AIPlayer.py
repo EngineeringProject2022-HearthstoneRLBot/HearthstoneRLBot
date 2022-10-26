@@ -28,7 +28,7 @@ class AIPlayer(PlayerInterface):
 
     def getPreferredAction(self):
         self.montecarlo.simulate(self.simulations)
-        return self.montecarlo.make_exploratory_choice().state
+        return self.montecarlo.make_choice().state
 
     def getProbabilities(self):
         return self.montecarlo.get_probabilities()

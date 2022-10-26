@@ -6,6 +6,7 @@ import Configuration
 from GameFiles.DataProvider import DataProvider
 from GameInterface.GameData import PlayerDecks
 import pandas as pd
+from Depreciated.DataProvider import DataProvider
 
 class ExcelGenerator:
 
