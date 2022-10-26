@@ -1,18 +1,18 @@
 from copy import deepcopy
 
 from GameInterface import *
-import tensorflow as tf
 
 from GameInterface import ChildFinder
 from GameState import InputBuilder
 import Configuration
 from Montecarlo.montecarlo import MonteCarlo
 from Montecarlo.node import Node
+from MultiThreading.ModelFW import ModelFW
 
 class AIPlayer(PlayerInterface):
     def __init__(self, name, hero, deck, model_name, simulations, print=True):
         super().__init__(name, hero, deck, print)
-        model = tf.keras.models.load_model(f"./Model/models/{model_name}")
+        model = ModelFW.getModel(model_name)
         self.model = model
         self.simulations = simulations
 
