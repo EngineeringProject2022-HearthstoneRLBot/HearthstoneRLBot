@@ -14,6 +14,8 @@ GAME_NUM = 2000
 INPUT_MODEL_NAME = 'ckpt-loss=1.10'
 OUTPUT_MODEL_NAME = 'exp'
 LEARNING_RATE = 0.00001
+#Provide correct filepath to excel files directory if different
+#CSV_PROVIDER = DataProvider.CSVFromFolder("ExcelFiles/SingleGames")
 DATA_PROVIDER = DataProvider.DataFromFolder("DEFAULT_OUTPUT")
 POLICY_WEIGHT = 0.33
 WINVALUE_WEIGHT = 1
