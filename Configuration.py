@@ -14,6 +14,8 @@ GAME_NUM = 200
 INPUT_MODEL_NAME = 'Model-Init'
 OUTPUT_MODEL_NAME = 'exp'
 LEARNING_RATE = 0.00001
+#Provide correct filepath to excel files directory if different
+#CSV_PROVIDER = DataProvider.CSVFromFolder("ExcelFiles/SingleGames")
 DATA_PROVIDER = DataProvider.DataFromFolder("DEFAULT_OUTPUT")
 POLICY_WEIGHT = 1
 WINVALUE_WEIGHT = 1
