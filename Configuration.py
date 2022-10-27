@@ -8,14 +8,14 @@ MCTS_CHILD_MULTIPLIER = 2
 
 # DumpGames
 OUTPUT_FOLDER = 'DEFAULT_OUTPUT'
-GAME_NUM = 200
+GAME_NUM = 2000
 
 # Training
-INPUT_MODEL_NAME = 'Model-Init'
+INPUT_MODEL_NAME = 'ckpt-loss=1.10'
 OUTPUT_MODEL_NAME = 'exp'
 LEARNING_RATE = 0.00001
 DATA_PROVIDER = DataProvider.DataFromFolder("DEFAULT_OUTPUT")
-POLICY_WEIGHT = 1
+POLICY_WEIGHT = 0.33
 WINVALUE_WEIGHT = 1
 BALANCED_GAMES = True
 #set to 0 to disable
@@ -49,3 +49,56 @@ def CUSTOM_GAME():
 # createDefaultGame(player1Type=PlayerType.Modeled, modelp1="NAZWA_MODELU", depthp1=25) #both players on same model->NAZWA_MODELU and on the same depth=25
 # createDefaultGame(player1Type=PlayerType.Modeled, modelp1="NAZWA_MODELU", depthp1=25 ,p1=(HeroDecks.BasicDruid), player2Type=PlayerType.Random, p2=(HeroDecks.FastDruid), printLogs=True)
 # createCustomGame() zwraca CUSTOM_GAME z konfiguracji ( to jest miejsce jeżeli się chce dodać własny test i go popróbować )
+
+
+# dp = DATA_PROVIDER
+# from GameFiles.DataPredicates import *
+# games = dp.getGamesWithPredicate(
+#     PPlayer(P.FIRST).HAS(PDeck('BasicHunter').WINS())
+#                                  .AND(
+#     PPlayer(P.SECOND).HAS(PDeck('BasicMage'))))
+#
+# dp = DataProvider.DataFromFolder('DEFAULT_OUTPUT')
+#
+# print(len(dp.games))
+# sum0 = 0
+# sum1 = 0
+# for deck in GameData.HeroDecks.AllDecks:
+#     g = dp.getGamesWithPredicate(PPlayer(P.FIRST).HAS(PDeck(deck[0])).WINS()
+#                                  .OR(
+#                                  PPlayer(P.SECOND).HAS(PDeck(deck[0])).WINS()
+#     ))
+#     g2 = dp.getGamesWithPredicate(PPlayer(P.FIRST).HAS(PDeck(deck[0]).LOSES())
+#                                   .OR(
+#                                   PPlayer(P.SECOND).HAS(PDeck(deck[0]).LOSES())
+#     ))
+#     print(deck[0], len(g), len(g2))
+#     sum0 += len(g)
+#     sum1 += len(g2)
+# print(sum0, sum1)
+# dp.getGamesWithPredicate(PPlayer(P.FIRST).WINS())
+# x = dp.balancedIds()
+#
+# g0 = dp.getGamesWithPredicate(PPlayer(P.FIRST).HAS(PHero(Hero.Hunter))
+#                               .AND(PNoMirrorDeck())
+#                               .AND(PValid())
+#                               .AND(PNot(PDraws()))
+#                               .AND(PPlayer(P.SECOND).HAS(PHero(Hero.Mage))))
+# print(len(g0))
+# g1 = dp.getGamesWithPredicate(  PPlayer(P.FIRST).HAS(PHero(Hero.Hunter))
+#                                 .OR(
+#                                 PPlayer(P.SECOND).HAS(PHero(Hero.Hunter))).AND(PNoMirrorHero()))
+# g2 = dp.getGamesWithPredicate(  PPlayer(P.FIRST).HAS(PHero(Hero.Hunter)).AND(PNoMirrorHero()))
+# g3 = dp.getGamesWithPredicate(  PPlayer(P.SECOND).HAS(PHero(Hero.Hunter)).AND(PNoMirrorHero()))
+# print(len(g1), ' ', len(g2), ' ', len(g3))
+# print(len(dp.games))
+# # g0 = dp.getGamesWithPredicate(PNot(PHero(Hero.Warlock)).AND(
+# #                               PNot(PHero(Hero.Mage))).AND(
+# #                               PNot(PHero(Hero.Druid))).AND(
+# #                               PNot(PHero(Hero.Paladin))).AND(
+# #                               PNot(PHero(Hero.Priest))).AND(
+# #                               PNot(PHero(Hero.Rogue))).AND(
+# #                               PNot(PHero(Hero.Shaman))).AND(
+# #                               PNot(PHero(Hero.Warrior))))
+#
+# a = 1

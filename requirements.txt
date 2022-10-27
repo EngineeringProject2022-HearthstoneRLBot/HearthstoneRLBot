@@ -6,3 +6,4 @@ sparse == 0.13.0
 hearthstone~=5.56.0
 numpy~=1.22.3
 waiting
+sparse

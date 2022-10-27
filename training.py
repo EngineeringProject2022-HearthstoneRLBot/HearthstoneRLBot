@@ -11,10 +11,10 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 # os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 def trainNetwork(model):
-    trainingGenerator = DataGenerator(batch_size=1)
+    trainingGenerator = DataGenerator(batch_size=4)
     # validationGenerator = DataGenerator(model_name='TRAINED_MODEL3', batch_size=1)
     # model.fit(trainingGenerator, validation_data = validationGenerator, epochs=1)
-    checkpoint_dir = f"checkpoints/{Configuration.OUTPUT_MODEL_NAME}"
+    checkpoint_dir = f"Model/checkpoints/{Configuration.OUTPUT_MODEL_NAME}"
     callbacks = [
         # This callback saves a SavedModel every 100 batches.
         # We include the training loss in the saved model name.
