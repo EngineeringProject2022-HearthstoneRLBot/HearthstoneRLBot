@@ -8,7 +8,13 @@ class DataGenerator(keras.utils.Sequence):
         self.dp = Configuration.DATA_PROVIDER
         self.dim = dim
         self.batch_size = batch_size
-        self.list_IDs = self.dp.balancedIds() if Configuration.BALANCED_GAMES else self.dp.validIds()
+        if not Configuration.BALANCED_GAMES:
+            self.list_IDs = self.dp.validIds()
+        else:
+            if Configuration.BALANCED_BY_DECK:
+                self.list_IDs = self.dp.balancedIdsByDeck()
+            else:
+                self.list_IDs = self.dp.balancedIds()
         self.n_channels = n_channels
         self.shuffle = shuffle
         self.on_epoch_end()

@@ -6,18 +6,17 @@ import tensorflow as tf
 from tensorflow.keras import backend as k
 from tensorflow.compat.v1 import ConfigProto
 from tensorflow.compat.v1 import InteractiveSession
-
+import Model.DataFunctions
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 # os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 def trainNetwork(model):
-    trainingGenerator = DataGenerator(batch_size=4)
+    trainingGenerator = DataGenerator(batch_size=Configuration.BATCH_SIZE)
+    #trainingGenerator.set_wv_func(Model.DataFunctions.diminishingValue)
     # validationGenerator = DataGenerator(model_name='TRAINED_MODEL3', batch_size=1)
     # model.fit(trainingGenerator, validation_data = validationGenerator, epochs=1)
     checkpoint_dir = f"Model/checkpoints/{Configuration.OUTPUT_MODEL_NAME}"
     callbacks = [
-        # This callback saves a SavedModel every 100 batches.
-        # We include the training loss in the saved model name.
         keras.callbacks.ModelCheckpoint(
             filepath=checkpoint_dir + "/ckpt-loss={loss:.2f}", save_freq=Configuration.CALLBACK_FREQ
         )

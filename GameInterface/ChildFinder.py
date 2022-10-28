@@ -29,12 +29,8 @@ class ChildFinder:
         tt('Model', 1, 6)
         expert_policy_values, network_value = montecarlo.model(input)
         tt('Model')
-        tt('Casting arr to numpy',1,6)
-        arr = expert_policy_values.numpy()
-        tt('Casting arr to numpy')
-        tt('Casting WV to float',1,6)
-        node.cached_network_value = network_value.numpy()[0]
-        tt('Casting WV to float')
+        arr = expert_policy_values
+        node.cached_network_value = network_value
         return arr, node.cached_network_value
 
     def makeMove(self, node):
