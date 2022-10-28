@@ -48,8 +48,6 @@ class SGame:
     def analyzeCsvGameElement(self,gameElement):
         winner = int(gameElement[6])
         traceback = gameElement[9]
-        if gameElement[4] != gameElement[0] and winner == 1:
-            winner = 2
         p1 = SPlayer(gameElement[4], winner == 1, winner == 2, self)
         p2 = SPlayer(gameElement[5], winner == 2, winner == 1, self)
         turns = []
