@@ -73,6 +73,14 @@ class MonteCarlo:
             failure = True
 
             while failure:
+                if self.root_node.expanded and len(self.root_node.children) == 1:
+                    # value of visits doesn't matter here(and for training we save distribution which will always be the
+                    # same because 100% to one child. No matter how many visits, it will always be selected
+                    # the one visit to parent is just cosmetic(parent 0 visits child 1 visit would look strange)
+                    self.root_node.children[0].visits = 1
+                    self.root_node.visits = 1
+                    print("shortcut")
+                    return
                 tt('Searching for node', 1, 4)
                 current_node = self.root_node
                 while current_node.expanded:
@@ -81,13 +89,7 @@ class MonteCarlo:
                 tt('Expansion', 1, 4)
                 failure = self.expand(current_node)
                 tt('Expansion')
-                if current_node is self.root_node and len(current_node.children) == 1:
-                    # value of visits doesn't matter here(and for training we save distribution which will always be the
-                    # same because 100% to one child. No matter how many visits, it will always be selected
-                    # the one visit to parent is just cosmetic(parent 0 visits child 1 visit would look strange)
-                    current_node.children[0].visits = 1
-                    current_node.visits = 1
-                    return
+
             i += 1
 
             if expansion_count < Configuration.MCTS_CHILD_MULTIPLIER * len(self.root_node.children):
