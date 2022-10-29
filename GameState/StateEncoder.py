@@ -172,7 +172,8 @@ def encode_complex_plane(dictionary):
             else:
                 arr[161] = 1
         arr[163] = dictionary.get("UnknownAmountMana", 0)
-
+    arr[164] = dictionary.get("Exhausted", 0)
+    arr[165] = dictionary.get("HeroPowerActivations", 0)
     return arr
 
 

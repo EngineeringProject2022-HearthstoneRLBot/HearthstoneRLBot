@@ -124,6 +124,8 @@ class Hero:
 
 
         #Hero Power features
+        self.heroPower["Exhausted"] = 1 if hero.power.exhausted else 0
+        self.heroPower["HeroPowerActivations"] = hero.power.activations_this_turn
         if str(hero.power) != "Totemic Call":
             for x in hero.power.data.scripts.activate:
                 self.heroPower["AlwaysGet"] = 1
