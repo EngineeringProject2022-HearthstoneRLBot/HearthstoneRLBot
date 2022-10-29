@@ -20,12 +20,13 @@ class SPlayer:
         self.winner = winner
         self.loser = loser
         self.game = game
+        self.enemy = None
 
     def parseName(self, name):
         splitted = name[1:].split('_')
         deckname = splitted[0]
         modelname = splitted[1]
-        simulations = int(splitted[2][11:]) if len(splitted) > 2 else -1
+        simulations = int(splitted[2][11:]) if len(splitted) > 2 and len(splitted[2]) > 11 else -1
         return deckname, HeroDecks.HeroFromDeckName(deckname), modelname, simulations
 
 class SGame:
@@ -40,6 +41,8 @@ class SGame:
         traceback = gameElement[4]
         p1 = SPlayer(player_data[6], winner == 1, winner == 2, self)
         p2 = SPlayer(player_data[7], winner == 2, winner == 1, self)
+        p1.enemy = p2
+        p2.enemy = p1
         turns = []
         for turnElement in turnElements:
             turns.append(self.analyzeTurnElement(len(turns), turnElement, p1, p2))
@@ -145,6 +148,37 @@ class DataProvider:
                 list.append(id)
         return list
 
+    def balancedIdsByDeck(self):
+        deckCnt = len(GameData.HeroDecks.AllDecks)
+        list = [[{'wins': 0, 'loses': 0, 'wonTurns': [], 'lostTurns': []} for i in range(deckCnt)] for i in range(deckCnt)]
+        decksToId = {}
+        for i, deck in enumerate(GameData.HeroDecks.AllDecks):
+            decksToId[deck[0]] = i
+        for id, turn in enumerate(self.turns):
+            player = turn.pRef
+            enemy = turn.pRef.enemy
+            cell = list[decksToId[player.deckname]][decksToId[enemy.deckname]]
+            if player.winner:
+                cell['wins'] += 1
+                cell['wonTurns'].append(id)
+            if player.loser:
+                cell['loses'] += 1
+                cell['lostTurns'].append(id)
+        minv = float('inf')
+        for id1, row in enumerate(list):
+            for id2, cell in enumerate(row):
+                minv = min(cell['wins'], cell['loses'], minv)
+                if cell['wins'] == 0:
+                    print(GameData.HeroDecks.AllDecks[id1][0], ' never wins vs ', GameData.HeroDecks.AllDecks[id2][0])
+                #if cell['loses'] == 0:
+                #    print(GameData.HeroDecks.AllDecks[id1][0], ' never loses vs ', GameData.HeroDecks.AllDecks[id2][0])
+        print('Min value: ', minv)
+        balancedOutput = []
+        for row in list:
+            for cell in row:
+                balancedOutput.extend(random.sample(cell['wonTurns'], minv))
+                balancedOutput.extend(random.sample(cell['lostTurns'], minv))
+        return balancedOutput
 
     def balancedIds(self):
         counter = {}

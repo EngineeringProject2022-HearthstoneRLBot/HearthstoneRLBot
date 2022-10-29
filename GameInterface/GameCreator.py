@@ -8,8 +8,10 @@ class GameCreator:
     def drawRandomDeck(hero = None):
         if hero is None:
             randomDeck = random.choice(HeroDecks.AllDecks)
-        else:
+        elif isinstance(hero, int):
             randomDeck = random.choice(HeroDecks.HeroDeck(hero))
+        else:
+            randomDeck = HeroDecks.Deck(hero)
         return randomDeck
 
     @staticmethod

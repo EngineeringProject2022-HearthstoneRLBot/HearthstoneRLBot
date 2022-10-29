@@ -1,6 +1,9 @@
 from GameFiles.DataProvider import DataProvider
 from GameInterface.GameCreator import *
 
+# Threads
+NUM_THREADS = 6
+
 # MonteCarlo
 WIN_MULTIPLIER = 1
 RANDOM_MOVE_SAMPLES = 5
@@ -17,16 +20,22 @@ LEARNING_RATE = 0.00001
 #Provide correct filepath to excel files directory if different
 #CSV_PROVIDER = DataProvider.CSVFromFolder("ExcelFiles/SingleGames")
 DATA_PROVIDER = DataProvider.DataFromFolder("DEFAULT_OUTPUT")
-POLICY_WEIGHT = 0.33
+POLICY_WEIGHT = 0.2
 WINVALUE_WEIGHT = 1
 BALANCED_GAMES = True
+BALANCED_BY_DECK = True
+BATCH_SIZE = 1
 #set to 0 to disable
 CALLBACKS = 1
 CALLBACK_FREQ = 2000
 
 # Game creation
 def GAME_CREATION():
-    return GameCreator.createDefaultGame(PlayerType.Random, p1 = GameCreator.drawRandomDeck(Hero.Warlock), modelp1='Model-TEST', simulationsp1 = 2)
+    return GameCreator.createDefaultGame(PlayerType.Modeled,
+                                         #p1 = GameCreator.drawRandomDeck('OilRogue'),
+                                         #p2 = GameCreator.drawRandomDeck('MurlocPaladin'),
+                                         modelp1='Model-TEST',
+                                         simulationsp1 = 50)
     #return GameCreator.createCustomGame()
 
 def CUSTOM_GAME():

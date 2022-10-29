@@ -25,8 +25,7 @@ def convert_to_sparse(game_output):
         print(traceback.format_exc())
         raise Exception
 
-def dumpGames():
-    output_folder = Configuration.OUTPUT_FOLDER
+def dumpGames(output_folder = Configuration.OUTPUT_FOLDER):
     path = f"data/{output_folder}"
     if not os.path.exists(path):
         os.makedirs(path)

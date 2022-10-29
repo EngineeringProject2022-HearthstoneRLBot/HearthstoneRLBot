@@ -2,6 +2,7 @@ from fireplace.exceptions import GameOver
 
 from Benchmark import tt
 from GameInterface import *
+from MultiThreading.PrintQueue import PrintQueue
 
 class PlayerInterface:
     def __init__(self, name, hero, deck, print = True):
@@ -20,8 +21,8 @@ class PlayerInterface:
         tt('Probs')
         tt('Print&Play', 1, 2)
         if self.print:
-            print(self.name + " Turn: " + str(self.game.turn) + ", Action:" + str(action) + " - ",
-                  (interpretDecodedAction(decodeAction(action), self.game)))
+            PrintQueue.add(self.name + " Turn: " + str(self.game.turn) + ", Action:" + str(action) + " - "+
+                  interpretDecodedAction(decodeAction(action), self.game))
         isRandom = False
         try:
             isRandom = playTurnSparse(self.game, action)
