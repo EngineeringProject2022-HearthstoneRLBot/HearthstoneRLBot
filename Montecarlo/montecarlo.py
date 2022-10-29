@@ -97,11 +97,12 @@ class MonteCarlo:
     def sync_tree(self, game, move):
         found = False
         currInput = InputBuilder.convToInput(game, self.player_number)
+        currGamePlayer = 1 if game.current_player is game.player1 else 2
         children = [x for x in self.root_node.children if x not in self.root_node.randomChildren]
         for randomChild in self.root_node.randomChildren:
             children.extend([x[0] for x in randomChild.samples])
         for x in children:
-            if x.visits == 0:
+            if x.visits == 0 or currGamePlayer != x.player_number:
                 continue
             child_input = InputBuilder.convToInput(x.game, self.player_number)
             if (currInput == child_input).all():
