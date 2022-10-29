@@ -5,7 +5,7 @@ from GameInterface.GameCreator import *
 NUM_THREADS = 6
 
 # MonteCarlo
-WIN_MULTIPLIER = 0
+WIN_MULTIPLIER = 1
 RANDOM_MOVE_SAMPLES = 5
 MCTS_CHILD_MULTIPLIER = 2
 
@@ -14,9 +14,11 @@ OUTPUT_FOLDER = 'DEFAULT_OUTPUT'
 GAME_NUM = 2000
 
 # Training
-INPUT_MODEL_NAME = 'exp2epoch2'
-OUTPUT_MODEL_NAME = 'exp2epoch3'
-LEARNING_RATE = 0.00005
+INPUT_MODEL_NAME = 'ckpt-loss=1.10'
+OUTPUT_MODEL_NAME = 'exp'
+LEARNING_RATE = 0.00001
+#Provide correct filepath to excel files directory if different
+#CSV_PROVIDER = DataProvider.CSVFromFolder("ExcelFiles/SingleGames")
 DATA_PROVIDER = DataProvider.DataFromFolder("DEFAULT_OUTPUT")
 POLICY_WEIGHT = 0.2
 WINVALUE_WEIGHT = 1
