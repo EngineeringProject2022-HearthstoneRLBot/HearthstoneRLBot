@@ -1,11 +1,11 @@
-from GameFiles.DataProvider import DataProvider
 from GameInterface.GameCreator import *
 
 # Threads
 NUM_THREADS = 6
 
 # MonteCarlo
-WIN_MULTIPLIER = 0
+WIN_MULTIPLIER = 1
+DISCOVERY_FACTOR = 0
 RANDOM_MOVE_SAMPLES = 5
 MCTS_CHILD_MULTIPLIER = 2
 
@@ -14,10 +14,9 @@ OUTPUT_FOLDER = 'DEFAULT_OUTPUT'
 GAME_NUM = 2000
 
 # Training
-INPUT_MODEL_NAME = 'exp2epoch2'
+INPUT_MODEL_NAME = 'ckpt-loss=0.31'
 OUTPUT_MODEL_NAME = 'exp2epoch3'
-LEARNING_RATE = 0.00005
-DATA_PROVIDER = DataProvider.DataFromFolder("DEFAULT_OUTPUT")
+LEARNING_RATE = 0.000001
 POLICY_WEIGHT = 0.2
 WINVALUE_WEIGHT = 1
 BALANCED_GAMES = True
@@ -26,13 +25,13 @@ BATCH_SIZE = 1
 #set to 0 to disable
 CALLBACKS = 1
 CALLBACK_FREQ = 2000
-
 # Game creation
 def GAME_CREATION():
     return GameCreator.createDefaultGame(PlayerType.Modeled,
-                                         #p1 = GameCreator.drawRandomDeck('OilRogue'),
-                                         #p2 = GameCreator.drawRandomDeck('MurlocPaladin'),
-                                         modelp1='Model-TEST',
+                                         p1 = GameCreator.drawRandomDeck('BasicPriest'),
+                                         p2 = GameCreator.drawRandomDeck('BasicPriest'),
+                                         modelp2='exp2epoch3',
+                                         modelp1='Norm_Kacper',
                                          simulationsp1 = 50)
     #return GameCreator.createCustomGame()
 
@@ -46,6 +45,9 @@ def CUSTOM_GAME():
                          startTurnEffs=startTurnEffs)
     return game
 
+
+from GameFiles.DataProvider import DataProvider
+DATA_PROVIDER = DataProvider.DataFromFolder("DEFAULT_OUTPUT")
 
 # GameCreator.createDefaultGame() user Manual:
 # Arguments:

@@ -13,13 +13,21 @@ class ModelFW:
             if ModelFW.threads > 1:
                 ModelFW.models[modelName] = MultiThreadedModel(modelName)
             else:
-                ModelFW.models[modelName] = tf.keras.models.load_model(f"./Model/models/{modelName}")
+                ModelFW.models[modelName] = SingleThreadModel(modelName)
         ModelFW.lock.release()
         return ModelFW.models[modelName]
 
-class MultiThreadedModel:
+class SingleThreadModel:
     def __init__(self, name):
         self.model = tf.keras.models.load_model(f"./Model/models/{name}")
+        self.factor = 1 if len(name) < 4 or name[:4] != 'Norm' else 30
+    def __call__(self, x):
+        return self.model(x*self.factor)
+
+class MultiThreadedModel:
+    def __init__(self, name):
+        #self.model = tf.keras.models.load_model(f"./Model/models/{name}")
+        self.model = SingleThreadModel(name)
         self.insertLock = threading.Lock()
         self.outputLock = threading.Condition()
         self.inputs = None

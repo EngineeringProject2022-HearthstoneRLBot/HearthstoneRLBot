@@ -2,11 +2,10 @@ import glob
 import os
 import pickle
 
-import Configuration
-from GameFiles.DataProvider import DataProvider
 from GameInterface.GameData import PlayerDecks
 import pandas as pd
 
+import Configuration
 class ExcelGenerator:
 
     def __init__(self):

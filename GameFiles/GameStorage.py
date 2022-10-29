@@ -6,11 +6,12 @@ import traceback
 
 import sparse
 import tensorflow as tf
+from fireplace import cards
+
 import Configuration
 import numpy as np
 
 from GameFiles.ExcelGenerator import ExcelGenerator
-from GameInterface.GameCreator import *
 from datetime import datetime
 
 excel_gen = ExcelGenerator()
@@ -25,7 +26,9 @@ def convert_to_sparse(game_output):
         print(traceback.format_exc())
         raise Exception
 
-def dumpGames(output_folder = Configuration.OUTPUT_FOLDER):
+def dumpGames(output_folder = Configuration.OUTPUT_FOLDER,
+              game_num = Configuration.GAME_NUM,
+              game_creation = Configuration.GAME_CREATION):
     path = f"data/{output_folder}"
     if not os.path.exists(path):
         os.makedirs(path)
@@ -35,10 +38,11 @@ def dumpGames(output_folder = Configuration.OUTPUT_FOLDER):
         np.random.seed(random.randrange(999999999))
         tf.random.set_seed(random.randrange(999999999))
 
-    for i in range(Configuration.GAME_NUM):
+    cards.db.initialize()
+    for i in range(game_num):
         print("GAME " + str(i + 1))
         state = random.getstate()
-        game = Configuration.GAME_CREATION()
+        game = game_creation()
         output = None
         try:
             game.start()

@@ -3,7 +3,8 @@ import pickle
 import random
 
 from GameInterface import GameData
-from GameInterface.GameData import HeroDecks
+from GameInterface.GameCreator import GameCreator
+from GameInterface.GameData import HeroDecks, PlayerType
 
 
 class STurn:
@@ -140,8 +141,12 @@ class DataProvider:
         for id1, row in enumerate(list):
             for id2, cell in enumerate(row):
                 minv = min(cell['wins'], cell['loses'], minv)
-                if cell['wins'] == 0:
-                    print(GameData.HeroDecks.AllDecks[id1][0], ' never wins vs ', GameData.HeroDecks.AllDecks[id2][0])
+                if cell['wins'] < 50 or cell['loses'] < 50:
+                    print(GameData.HeroDecks.AllDecks[id1][0], ' wins or loses < 50 times ', GameData.HeroDecks.AllDecks[id2][0])
+                    print('Generating 30 random games!')
+                    #dumpGames(game_num = 30, game_creation = lambda: GameCreator.createDefaultGame(PlayerType.Random,
+                    #                     p1 = GameCreator.drawRandomDeck(GameData.HeroDecks.AllDecks[id1][0]),
+                    #                     p2 = GameCreator.drawRandomDeck(GameData.HeroDecks.AllDecks[id2][0])))
                 #if cell['loses'] == 0:
                 #    print(GameData.HeroDecks.AllDecks[id1][0], ' never loses vs ', GameData.HeroDecks.AllDecks[id2][0])
         print('Min value: ', minv)

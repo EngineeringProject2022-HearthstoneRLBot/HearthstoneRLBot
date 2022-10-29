@@ -32,7 +32,7 @@ class Node:
         self.expanded = False
         self.randomSample = False
         self.player_number = None
-        self.discovery_factor = 1
+        self.discovery_factor = Configuration.DISCOVERY_FACTOR
         ### below code is added by us
         self.finished = False
         self.stateText = ''
