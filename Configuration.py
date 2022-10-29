@@ -17,6 +17,10 @@ GAME_NUM = 2000
 INPUT_MODEL_NAME = 'ckpt-loss=0.31'
 OUTPUT_MODEL_NAME = 'exp2epoch3'
 LEARNING_RATE = 0.000001
+
+#Provide correct filepath to excel files directory if different
+#CSV_PROVIDER = DataProvider.CSVFromFolder("ExcelFiles/SingleGames")
+
 POLICY_WEIGHT = 0.2
 WINVALUE_WEIGHT = 1
 BALANCED_GAMES = True

@@ -1,7 +1,7 @@
 import glob
 import pickle
 import random
-
+import csv
 from GameInterface import GameData
 from GameInterface.GameCreator import GameCreator
 from GameInterface.GameData import HeroDecks, PlayerType
@@ -31,9 +31,9 @@ class SPlayer:
         return deckname, HeroDecks.HeroFromDeckName(deckname), modelname, simulations
 
 class SGame:
-    def __init__(self, id, gameElement):
+    def __init__(self, id, gameElement,csv=False):
         self.id = id
-        self.p1, self.p2, self.winner, self.turns, self.exception = self.analyzeGameElement(gameElement)
+        self.p1, self.p2, self.winner, self.turns, self.exception = self.analyzeGameElement(gameElement) if not csv else self.analyzeCsvGameElement(gameElement)
 
     def analyzeGameElement(self, gameElement):
         turnElements = gameElement[0]
@@ -49,6 +49,15 @@ class SGame:
             turns.append(self.analyzeTurnElement(len(turns), turnElement, p1, p2))
         return p1, p2, winner, turns, traceback
 
+    def analyzeCsvGameElement(self,gameElement):
+        winner = int(gameElement[6])
+        traceback = gameElement[9]
+        p1 = SPlayer(gameElement[0], winner == 1, winner == 2, self)
+        p2 = SPlayer(gameElement[2], winner == 2, winner == 1, self)
+        turns = []
+
+        return p1, p2, winner, turns, traceback
+
     def analyzeTurnElement(self, id, turnElement, p1, p2):
         input = turnElement[0]
         policy = turnElement[1]
@@ -60,10 +69,29 @@ class TODO(Exception):
     pass
 class DataProvider:
     def __init__(self, files, csv = False):
-        if csv:
-            raise TODO()
         self.games = []
         self.turns = []
+        if csv:
+            self.loadFromCSV(files)
+        else:
+            self.loadFromPickled(files)
+
+
+    def loadFromCSV(self,files):
+        for filepath in files:
+            with open(filepath, "r") as rb:
+                try:
+                    csvreader = csv.reader(rb)
+                    #SKIP HEADER
+                    header = next(csvreader)
+                    while True:
+                        row = next(csvreader)
+                        sGame = SGame(len(self.games),row,csv=True)
+                        self.games.append(sGame)
+                except:
+                    print(f"EOF {filepath}")
+
+    def loadFromPickled(self,files):
         for filepath in files:
             with open(filepath, "rb") as rb:
                 try:
