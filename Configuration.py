@@ -21,6 +21,7 @@ LEARNING_RATE = 0.00001
 #CSV_PROVIDER = DataProvider.CSVFromFolder("ExcelFiles/SingleGames")
 DATA_PROVIDER = DataProvider.DataFromFolder("DEFAULT_OUTPUT")
 POLICY_WEIGHT = 0.2
+LOG_TREE = False # change this value in training.py
 WINVALUE_WEIGHT = 1
 BALANCED_GAMES = True
 BALANCED_BY_DECK = True

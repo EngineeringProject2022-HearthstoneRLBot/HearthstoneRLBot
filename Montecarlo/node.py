@@ -53,7 +53,6 @@ class Node:
         self.visits += 1
         if self.parent:
             self.parent.update_win_value(value)
-        ###
 
     def update_policy_value(self, value):
         self.policy_value = value
@@ -62,12 +61,28 @@ class Node:
         self.children.append(child)
         child.parent = self
 
+    def print_values_info(self,padding = 0):
+        pad = '\t'*padding
+        print(f"{pad}State: {self.state}, Visits {self.visits}, "
+              f"Policy value: {self.policy_value}, Win value: {self.win_value},"
+              f" cached network value: {self.cached_network_value},"
+              f" cached initial win value: {self.cached_initial_win_value}"
+              f" Score: {self.get_score(False) if self.parent else 'Nan'}"
+              f" STATE TEXT - {self.stateText}")
+        for child in self.children:
+            child.print_values_info(padding+1)
+
+    def print_info(self):
+        if not Configuration.LOG_TREE:
+            return
+        if self.state is None:
+            self.print_values_info()
+
+
     def get_preferred_child(self, treePlayerNumber: int):
         best_children = []
         best_score = CONST_NEGATIVE_INF
-        flip = False
-        if treePlayerNumber != self.player_number:
-            flip = True
+        flip = treePlayerNumber != self.player_number
         for child in self.children:
             score = 0
             numbers = 0
