@@ -113,6 +113,14 @@ class MonteCarlo:
             if x.visits == 0:
                 continue
             child_input = InputBuilder.convToInput(x.game, self.player_number)
+
+            if move == 251 and x.state != 251:
+                continue
+
+            if x.state == 251 and move != 251:
+                continue
+
+
             if (currInput == child_input).all():
                 self.root_node = x
                 if self.root_node.expanded and self.root_node.visits != 0:
