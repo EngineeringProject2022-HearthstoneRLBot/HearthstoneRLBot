@@ -30,6 +30,7 @@ class AIPlayer(PlayerInterface):
         tt('Preferred->Simulate', 1, 3)
         self.montecarlo.simulate(self.simulations)
         tt('Preferred->Simulate')
+        self.montecarlo.root_node.print_info()
         return self.montecarlo.make_exploratory_choice().state
 
     def getProbabilities(self):

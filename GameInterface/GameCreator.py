@@ -1,9 +1,8 @@
+
 from GameInterface import *
 from collections import OrderedDict
 
-
 class GameCreator:
-
     @staticmethod
     def drawRandomDeck(hero = None):
         if hero is None:
@@ -78,7 +77,8 @@ class GameCreator:
         return game
 
     @staticmethod
-    def createHunterTestGame(typep1=PlayerType.Modeled, typep2=None, modelp1="Model-INIT", modelp2=None,simulationsp1=10,simulationsp2=None):
+    def createHunterTestGame(typep1=PlayerType.Modeled, typep2=None, modelp1="Model-Init", modelp2=None,simulationsp1=10,simulationsp2=None):
+        print("HUNTER TEST")
         if typep2 is None:
             typep2 = typep1
         if modelp2 is None:
@@ -95,6 +95,7 @@ class GameCreator:
 
     @staticmethod
     def createFireballTest(typep1=PlayerType.Modeled, typep2=None, modelp1="Model-INIT", modelp2=None,simulationsp1=10,simulationsp2=None):
+        print("FIREBALL TEST")
         if typep2 is None:
             typep2 = typep1
         if modelp2 is None:
@@ -111,6 +112,7 @@ class GameCreator:
 
     @staticmethod
     def createWeaponTest(typep1=PlayerType.Modeled, typep2=None, modelp1="Model-INIT", modelp2=None,simulationsp1=10,simulationsp2=None):
+        print("WEAPON TEST")
         if typep2 is None:
             typep2 = typep1
         if modelp2 is None:
@@ -127,6 +129,7 @@ class GameCreator:
 
     @staticmethod
     def createDruidTestGame(typep1=PlayerType.Modeled, typep2=None, modelp1="Model-INIT", modelp2=None,simulationsp1=10,simulationsp2=None):
+        print("DRUID TEST GAME")
         if typep2 is None:
             typep2 = typep1
         if modelp2 is None:
@@ -143,6 +146,7 @@ class GameCreator:
 
     @staticmethod
     def createMageTestGame(typep1=PlayerType.Modeled, typep2=None, modelp1="Model-INIT", modelp2=None,simulationsp1=10,simulationsp2=None):
+        print("MAGE TEST")
         if typep2 is None:
             typep2 = typep1
         if modelp2 is None:
@@ -160,6 +164,7 @@ class GameCreator:
     #5/2 and 2/3 vs. 3/5 taunt
     @staticmethod
     def createSmartTradeTest(typep1=PlayerType.Modeled, typep2=None, modelp1="Model-INIT", modelp2=None,simulationsp1=10,simulationsp2=None):
+        print("SMART TRADE TEST")
         if typep2 is None:
             typep2 = typep1
         if modelp2 is None:
@@ -176,6 +181,7 @@ class GameCreator:
 
     @staticmethod
     def createWindfuryWeaponTest(typep1=PlayerType.Modeled, typep2=None, modelp1="Model-INIT", modelp2=None,simulationsp1=10,simulationsp2=None):
+        print("WINDFURY WEAPON GAME")
         if typep2 is None:
             typep2 = typep1
         if modelp2 is None:
@@ -192,6 +198,7 @@ class GameCreator:
 
     @staticmethod
     def createLeperGnomeTest(typep1=PlayerType.Modeled, typep2=None, modelp1="Model-INIT", modelp2=None,simulationsp1=10,simulationsp2=None):
+        print("LEPER GNOME TEST")
         if typep2 is None:
             typep2 = typep1
         if modelp2 is None:
