@@ -4,7 +4,6 @@ import random
 import csv
 from enum import Enum
 
-
 from GameInterface import GameData
 from GameInterface.GameData import HeroDecks
 
@@ -157,24 +156,30 @@ class DataProvider:
     def validIds(self, filter_end_turns=False, balance_type=BalanceType.UNBALANCED):
         turns = self.turns
         if filter_end_turns:
-            turns = self.filterSingleChoiceTurns()
+            turns = self.filterSingleChoiceTurns(turns)
         id_list = []
         if balance_type == BalanceType.UNBALANCED:
-
-            for id, turn in enumerate(turns):
-                if turn.pRef.winner or turn.pRef.loser:
-                    id_list.append(id)
-
+            pass
         elif balance_type == BalanceType.BALANCED_DECKS:
-            id_list = self.balancedIds(turns)
+            turns = self.balancedIds(turns)
         elif balance_type == BalanceType.BALANCED_MATCHUPS:
-            id_list = self.balancedIdsByMatchup(turns)
+            turns = self.balancedIdsByMatchup(turns)
+
+        for id, turn in enumerate(turns):
+            if turn.pRef.winner or turn.pRef.loser:
+                id_list.append(id)
+        self.turns = turns
 
         return id_list
 
-    def filterSingleChoiceTurns(self):
+    def resetFilters(self):
+        self.turns = []
+        for game in self.games:
+            self.turns.extend(game.turns)
+
+    def filterSingleChoiceTurns(self, turns):
         filteredTurns = []
-        for turn in self.turns:
+        for turn in turns:
             if turn.probs[-1] != 1:
                 filteredTurns.append(turn)
         return filteredTurns
@@ -192,17 +197,17 @@ class DataProvider:
             cell = list[decksToId[player.deckname]][decksToId[enemy.deckname]]
             if player.winner:
                 cell['wins'] += 1
-                cell['wonTurns'].append(id)
+                cell['wonTurns'].append(turn)
             if player.loser:
                 cell['loses'] += 1
-                cell['lostTurns'].append(id)
+                cell['lostTurns'].append(turn)
         minv = float('inf')
         for id1, row in enumerate(list):
             for id2, cell in enumerate(row):
                 minv = min(cell['wins'], cell['loses'], minv)
                 if cell['wins'] == 0:
                     print(GameData.HeroDecks.AllDecks[id1][0], ' never wins vs ', GameData.HeroDecks.AllDecks[id2][0])
-                #if cell['loses'] == 0:
+                # if cell['loses'] == 0:
                 #    print(GameData.HeroDecks.AllDecks[id1][0], ' never loses vs ', GameData.HeroDecks.AllDecks[id2][0])
         print('Min value: ', minv)
         balancedOutput = []
@@ -221,10 +226,10 @@ class DataProvider:
                 counter[player.deckname] = [0, 0, [], []]
             if player.winner:
                 counter[player.deckname][0] += 1
-                counter[player.deckname][2].append(id)
+                counter[player.deckname][2].append(turn)
             if player.loser:
                 counter[player.deckname][1] += 1
-                counter[player.deckname][3].append(id)
+                counter[player.deckname][3].append(turn)
 
         globalMin = float('inf')
         for value in counter.values():
@@ -250,7 +255,6 @@ class DataProvider:
     #     for hero in Hero.AllHeros:
     #         for model in models:
     #             gamesByModel = self.getGamesWithPredicate(PHero(hero).AND(PModel(model)))
-
 
     @staticmethod
     def DataFromFolder(folder):
