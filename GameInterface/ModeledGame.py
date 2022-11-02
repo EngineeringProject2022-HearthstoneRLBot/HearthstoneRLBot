@@ -8,6 +8,7 @@ from hearthstone.enums import CardClass, PlayState
 from GameState import InputBuilder
 
 from Benchmark import tt
+from MultiThreading.PrintQueue import PrintQueue
 
 class ModeledGame:
     def __init__(self, player1, player2, log = False):
@@ -39,8 +40,12 @@ class ModeledGame:
             self.startTurn()
             data = InputBuilder.convToInput(self.game)
             player = 1 if self.game.current_player is self.game.player1 else 2
+            tt('RealPlay', 1, 1)
             action, probabilities, isRandom = self.playTurn()
+            tt('RealPlay')
+            tt('Sync', 1, 1)
             self.sync(action, isRandom)
+            tt('Sync')
             self.data.append((data, probabilities, player, action))
 
             tt('Full turn')
@@ -55,11 +60,11 @@ class ModeledGame:
                           1 if self.game.current_player is self.game.player1 else 2, None))
 
         if self.winner == 1:
-            print(f'Game Finished! :) Player {self.game.player1.name} won!')
+            PrintQueue.add(f'Game Finished! :) Player {self.game.player1.name} won!')
         elif self.winner == 2:
-            print(f'Game Finished! :) Player {self.game.player2.name} won!')
+            PrintQueue.add(f'Game Finished! :) Player {self.game.player2.name} won!')
         else:
-            print(f'Game Finished! :( Couldn\'t find a winner')
+            PrintQueue.add(f'Game Finished! :( Couldn\'t find a winner')
 
     def playTurn(self):
         if self.game.current_player.name == self.player1.name:

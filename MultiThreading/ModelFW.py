@@ -9,7 +9,7 @@ class ModelFW:
     @staticmethod
     def getModel(modelName):
         ModelFW.lock.acquire(True)
-        if not modelName in ModelFW.models:
+        if modelName not in ModelFW.models:
             if ModelFW.threads > 1:
                 ModelFW.models[modelName] = MultiThreadedModel(modelName)
             else:
@@ -25,6 +25,7 @@ class MultiThreadedModel:
         self.inputs = None
         self.policies = None
         self.wins = None
+        self.i = 1
 
     def getOutput(self, i):
         return self.policies[None, i], self.wins[None, i]
@@ -40,6 +41,7 @@ class MultiThreadedModel:
             self.inputs = np.append(self.inputs, x, axis = 0)
         self.insertLock.release()
         if level == ModelFW.threads-1:
+            self.i += 1
             self.outputLock.acquire()
             policies, wins = self.model(self.inputs)
             self.policies = policies.numpy()

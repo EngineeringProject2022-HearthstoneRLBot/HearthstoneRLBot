@@ -1,6 +1,7 @@
 import random
 from copy import deepcopy
 
+from Benchmark import tt
 import Configuration
 from GameState import InputBuilder
 from Montecarlo.node import Node
@@ -44,13 +45,14 @@ class MonteCarlo:
         # children_visits = map(lambda child:  child.visits[callingPlayer-1], self.root_node.children)
         # children_visit_probabilities = [visit / self.root_node.visits[callingPlayer-1] for visit in children_visits]
         return moves
+
     ###
 
     def make_exploratory_choice(self):
         self.root_node.active = False
         children_visits = map(lambda child: child.visits, self.root_node.children)
-        #l = list(map(lambda child: child.win_value, self.root_node.children))   ###
-        #return self.root_node.children[l.index(max(l))]                         ###
+        # l = list(map(lambda child: child.win_value, self.root_node.children))   ###
+        # return self.root_node.children[l.index(max(l))]                         ###
         children_visit_probabilities = [visit / self.root_node.visits for visit in children_visits]
         sum_probs = sum(children_visit_probabilities)
         if sum_probs != 1.0:
@@ -70,18 +72,28 @@ class MonteCarlo:
 
         while i < expansion_count:
             failure = True
+
             while failure:
+                if self.root_node.expanded and len(self.root_node.children) == 1 and self.root_node.children[
+                    0].expanded:
+                    # value of visits doesn't matter here(and for training we save distribution which will always be the
+                    # same because 100% to one child. No matter how many visits, it will always be selected
+                    # the one visit to parent is just cosmetic(parent 0 visits child 1 visit would look strange)
+                    print("shortcut")
+                    return
+                tt('Searching for node', 1, 4)
                 current_node = self.root_node
                 while current_node.expanded:
                     current_node = current_node.get_preferred_child(self.player_number)
-
+                tt('Searching for node')
+                tt('Expansion', 1, 4)
                 failure = self.expand(current_node)
+                tt('Expansion')
 
             i += 1
 
             if expansion_count < Configuration.MCTS_CHILD_MULTIPLIER * len(self.root_node.children):
                 expansion_count = Configuration.MCTS_CHILD_MULTIPLIER * len(self.root_node.children)
-
 
     def expand(self, node):
 
@@ -97,9 +109,15 @@ class MonteCarlo:
         for randomChild in self.root_node.randomChildren:
             children.extend([x[0] for x in randomChild.samples])
         for x in children:
-            if x.visits == 0:
+            if not x.realGame:
                 continue
+            if (1 if game.current_player is game.player1 else 2) != x.player_number:
+                # if (InputBuilder.convToInput(x.game, self.player_number) == currInput).all():
+                #     print("would have synced to enemy")
+                continue
+
             child_input = InputBuilder.convToInput(x.game, self.player_number)
+
             if (currInput == child_input).all():
                 self.root_node = x
                 if self.root_node.expanded and self.root_node.visits != 0:
@@ -112,5 +130,3 @@ class MonteCarlo:
             child.player_number = 1 if child.game.current_player is child.game.player1 else 2
             self.root_node.add_child(child)
             self.root_node = child
-
-

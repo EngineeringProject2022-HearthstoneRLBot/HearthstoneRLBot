@@ -2,9 +2,11 @@ import math
 import pickle
 import random
 from math import log, sqrt
+import tensorflow as tf
 
-# CONST_NEGATIVE_INF = tf.cast(float('-inf'), tf.float32)
-# CONST_INF = tf.cast(float('inf'), tf.float32)
+#CONST_NEGATIVE_INF = tf.cast(float('-inf'), tf.float32)
+#CONST_INF = tf.cast(float('inf'), tf.float32)
+
 CONST_NEGATIVE_INF = float('-inf')
 CONST_INF = float('inf')
 import Configuration
@@ -37,6 +39,7 @@ class Node:
         self.realGame = False
         ###
 
+
     def update_win_value(self, value):
         ### below code is modified by us
         newValue = value
@@ -50,7 +53,6 @@ class Node:
         self.visits += 1
         if self.parent:
             self.parent.update_win_value(value)
-        ###
 
     def update_policy_value(self, value):
         self.policy_value = value
@@ -59,12 +61,28 @@ class Node:
         self.children.append(child)
         child.parent = self
 
+    def print_values_info(self,padding = 0):
+        pad = '\t'*padding
+        print(f"{pad}State: {self.state}, Visits {self.visits}, "
+              f"Policy value: {self.policy_value}, Win value: {self.win_value},"
+              f" cached network value: {self.cached_network_value},"
+              f" cached initial win value: {self.cached_initial_win_value}"
+              f" Score: {self.get_score(False) if self.parent else 'Nan'}"
+              f" STATE TEXT - {self.stateText}")
+        for child in self.children:
+            child.print_values_info(padding+1)
+
+    def print_info(self):
+        if not Configuration.LOG_TREE:
+            return
+        if self.state is None:
+            self.print_values_info()
+
+
     def get_preferred_child(self, treePlayerNumber: int):
         best_children = []
         best_score = CONST_NEGATIVE_INF
-        flip = False
-        if treePlayerNumber != self.player_number:
-            flip = True
+        flip = treePlayerNumber != self.player_number
         for child in self.children:
             score = 0
             numbers = 0
@@ -72,9 +90,11 @@ class Node:
                 if child_2.state == child.state:
                     score += child.get_score(flip)
                     numbers += 1
-            # score = child.get_score(callingPlayer)
+            # score = child.get_score(flip)
             score = score / numbers
-            if score > best_score:
+            if score < best_score:
+                pass
+            elif score > best_score:
                 best_score = score
                 best_children = [child]
             elif score == best_score:
@@ -85,7 +105,6 @@ class Node:
             raise NoChildException
 
     def get_score(self, flipWinValue: bool):
-
         # this node is already recognised as finished, but hasn't been explored once, so it's unfair to not give it
         # a chance.
         if not self.expanded and not self.cached_network_value:

@@ -237,6 +237,13 @@ class HeroDecks:
                 return deck[1]
         return None
 
+    @staticmethod
+    def Deck(deckname):
+        for i in HeroDecks.AllDecks:
+            if i[0] == deckname:
+                return i
+        return None
+
 
 class PlayerType:
     Random = 1
