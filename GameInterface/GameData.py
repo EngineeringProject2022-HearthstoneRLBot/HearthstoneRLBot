@@ -28,8 +28,8 @@ class PlayerDecks:
                              'CS2_150',
                              'CS2_150', 'CS2_201', 'CS2_201'],
              'BasicMage': ['CFM_623', 'CFM_623', 'CS2_168', 'CS2_168', 'CS2_025', 'CS2_025', 'CS2_172', 'CS2_172',
-                           'EX1_050',
-                           'EX1_050', 'CS2_120', 'CS2_120', 'CS2_023', 'CS2_023', 'CS2_122', 'CS2_122', 'CS2_124',
+                           'EX1_015',
+                           'EX1_015', 'CS2_120', 'CS2_120', 'CS2_023', 'CS2_023', 'CS2_122', 'CS2_122', 'CS2_124',
                            'CS2_124',
                            'CS2_029', 'CS2_029', 'CS2_119', 'CS2_119', 'CS2_022', 'CS2_022', 'CS2_179', 'CS2_179',
                            'EX1_593',
@@ -42,14 +42,14 @@ class PlayerDecks:
                               'CS2_162', 'CS2_222', 'CS2_222'],
              'BasicPriest': ['CS2_189', 'CS2_189', 'CS1_130', 'CS1_130', 'CS2_235', 'CS2_235', 'CS2_004', 'CS2_004',
                              'EX1_011',
-                             'EX1_011', 'EX1_192', 'EX1_192', 'CS2_172', 'CS2_172', 'CS2_121', 'CS2_121', 'CS2_234',
+                             'EX1_011', 'AT_055', 'AT_055', 'CS2_172', 'CS2_172', 'CS2_121', 'CS2_121', 'CS2_234',
                              'CS2_234',
                              'EX1_019', 'EX1_019', 'CS2_127', 'CS2_127', 'CS2_182', 'CS2_182', 'CS2_179', 'CS2_179',
                              'EX1_399',
                              'EX1_399', 'CS2_201', 'CS2_201'],
              'BasicRogue': ['CS2_072', 'CS2_072', 'CS2_074', 'CS2_074', 'CS2_189', 'CS2_189', 'CS1_042', 'CS1_042',
                             'CS2_075',
-                            'CS2_075', 'CS2_172', 'CS2_172', 'EX1_050', 'EX1_050', 'EX1_581', 'EX1_581', 'CS2_141',
+                            'CS2_075', 'CS2_172', 'CS2_172', 'EX1_015', 'EX1_015', 'EX1_581', 'EX1_581', 'CS2_141',
                             'CS2_141',
                             'EX1_025', 'EX1_025', 'CS2_147', 'CS2_147', 'CS2_131', 'CS2_131', 'CS2_076', 'CS2_076',
                             'EX1_593',
@@ -79,12 +79,6 @@ class PlayerDecks:
                                'EX1_571',
                                'EX1_571', 'NEW1_008', 'NEW1_008', 'EX1_005', 'GVG_096', 'GVG_096', 'EX1_284', 'FP1_030',
                                'BRM_028', 'GVG_110', 'CS2_012', 'CS2_012'],
-             'AgroHunter': ['LOOT_222', 'LOOT_222', 'LOOT_258', 'LOOT_258', 'UNG_912', 'UNG_912', 'EX1_066', 'UNG_915',
-                            'UNG_915', 'LOOT_413', 'LOOT_413', 'NEW1_031', 'NEW1_031', 'ICC_419', 'ICC_419', 'EX1_539',
-                            'EX1_539',
-                            'EX1_538', 'GIL_828', 'GIL_828', 'LOOT_077', 'DS1_070', 'DS1_070', 'GIL_650', 'EX1_048',
-                            'EX1_048', 'DS1_178',
-                            'EX1_531', 'EX1_534', 'EX1_534'],
              'MechMage': ['NEW1_012', 'CS2_024', 'CS2_024', 'GVG_002', 'GVG_002', 'GVG_003', 'CS2_029', 'CS2_029',
                           'GVG_004',
                           'GVG_004', 'CS2_033', 'CS2_033', 'EX1_559', 'GVG_082', 'GVG_082', 'GVG_013', 'GVG_013',
@@ -178,7 +172,6 @@ class PlayerDecks:
     BasicWarlock = decks['BasicWarlock']
     BasicWarrior = decks['BasicWarrior']
     MidrangeDruid = decks['MidrangeDruid']
-    AgroHunter = decks['AgroHunter']
     MechMage = decks['MechMage']
     ControlPaladin = decks['ControlPaladin']
     ControlPriest = decks['ControlPriest']
@@ -204,7 +197,6 @@ class HeroDecks:
     BasicWarlock = "BasicWarlock", Hero.Warlock, PlayerDecks.BasicWarlock
     BasicWarrior = "BasicWarrior", Hero.Warrior, PlayerDecks.BasicWarrior
     MidrangeDruid = "MidrangeDruid", Hero.Druid, PlayerDecks.MidrangeDruid
-    AgroHunter = "AgroHunter", Hero.Hunter, PlayerDecks.AgroHunter
     MechMage = "MechMage", Hero.Mage, PlayerDecks.MechMage
     ControlPaladin = "ControlPaladin", Hero.Paladin, PlayerDecks.ControlPaladin
     ControlPriest = "ControlPriest", Hero.Priest, PlayerDecks.ControlPriest
@@ -218,7 +210,7 @@ class HeroDecks:
     MurlocPaladin = "MurlocPaladin", Hero.Paladin, PlayerDecks.MurlocPaladin
     DragonPriest = "DragonPriest", Hero.Priest, PlayerDecks.DragonPriest
     AllDecks = [BasicDruid, BasicHunter, BasicMage, BasicPaladin, BasicPriest, BasicRogue, BasicShaman, BasicWarlock,
-                BasicWarrior, MidrangeDruid, AgroHunter, MechMage,
+                BasicWarrior, MidrangeDruid, MechMage,
                 ControlPaladin, ControlPriest, OilRogue, MidrangeShaman, DemonZoo, MidrangeWarrior, FastDruid,
                 FaceHunter, FlamewalkerTempoMage, MurlocPaladin, DragonPriest]
 
