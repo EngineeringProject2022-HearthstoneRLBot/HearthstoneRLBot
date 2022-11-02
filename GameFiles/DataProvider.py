@@ -2,8 +2,16 @@ import glob
 import pickle
 import random
 import csv
+from enum import Enum
+
 from GameInterface import GameData
 from GameInterface.GameData import HeroDecks
+
+
+class BalanceType(Enum):
+    UNBALANCED = 1
+    BALANCED_DECKS = 2
+    BALANCED_MATCHUPS = 3
 
 
 class STurn:
@@ -13,6 +21,7 @@ class STurn:
         self.probs = probs
         self.action = action
         self.pRef = pRef
+
 
 class SPlayer:
     def __init__(self, name, winner, loser, game):
@@ -29,10 +38,12 @@ class SPlayer:
         simulations = int(splitted[2][11:]) if len(splitted) > 2 and len(splitted[2]) > 11 else -1
         return deckname, HeroDecks.HeroFromDeckName(deckname), modelname, simulations
 
+
 class SGame:
-    def __init__(self, id, gameElement,csv=False):
+    def __init__(self, id, gameElement, csv=False):
         self.id = id
-        self.p1, self.p2, self.winner, self.turns, self.exception = self.analyzeGameElement(gameElement) if not csv else self.analyzeCsvGameElement(gameElement)
+        self.p1, self.p2, self.winner, self.turns, self.exception = self.analyzeGameElement(
+            gameElement) if not csv else self.analyzeCsvGameElement(gameElement)
 
     def analyzeGameElement(self, gameElement):
         turnElements = gameElement[0]
@@ -48,7 +59,7 @@ class SGame:
             turns.append(self.analyzeTurnElement(len(turns), turnElement, p1, p2))
         return p1, p2, winner, turns, traceback
 
-    def analyzeCsvGameElement(self,gameElement):
+    def analyzeCsvGameElement(self, gameElement):
         winner = int(gameElement[6])
         traceback = gameElement[9]
         p1 = SPlayer(gameElement[0], winner == 1, winner == 2, self)
@@ -64,10 +75,13 @@ class SGame:
         action = turnElement[3]
         return STurn(id, input, policy, action, p1 if player == 1 else p2)
 
+
 class TODO(Exception):
     pass
+
+
 class DataProvider:
-    def __init__(self, files, csv = False):
+    def __init__(self, files, csv=False):
         self.games = []
         self.turns = []
         if csv:
@@ -75,22 +89,21 @@ class DataProvider:
         else:
             self.loadFromPickled(files)
 
-
-    def loadFromCSV(self,files):
+    def loadFromCSV(self, files):
         for filepath in files:
             with open(filepath, "r") as rb:
                 try:
                     csvreader = csv.reader(rb)
-                    #SKIP HEADER
+                    # SKIP HEADER
                     header = next(csvreader)
                     while True:
                         row = next(csvreader)
-                        sGame = SGame(len(self.games),row,csv=True)
+                        sGame = SGame(len(self.games), row, csv=True)
                         self.games.append(sGame)
                 except:
                     print(f"EOF {filepath}")
 
-    def loadFromPickled(self,files):
+    def loadFromPickled(self, files):
         for filepath in files:
             with open(filepath, "rb") as rb:
                 try:
@@ -120,14 +133,13 @@ class DataProvider:
                 output.append(game)
         return output
 
-
     def getFirstGamesForEachClass(self, game_count):
         gamesForClass = []
         for hero in GameData.AllHeros:
             gamesForClass.extend(self.getFirstXGamesForClass(hero, game_count))
         return gamesForClass
 
-    def getFirstXGamesForClass(self,hero,game_count):
+    def getFirstXGamesForClass(self, hero, game_count):
         first_x_games = []
         counter = 0
         for game in self.games:
@@ -141,36 +153,61 @@ class DataProvider:
     def turn(self, tId):
         return self.turns[tId]
 
-    def validIds(self):
-        list = []
-        for id, turn in enumerate(self.turns):
-            if turn.pRef.winner or turn.pRef.loser:
-                list.append(id)
-        return list
+    def validIds(self, filter_end_turns=False, balance_type=BalanceType.UNBALANCED):
+        turns = self.turns
+        if filter_end_turns:
+            turns = self.filterSingleChoiceTurns(turns)
+        id_list = []
+        if balance_type == BalanceType.UNBALANCED:
+            pass
+        elif balance_type == BalanceType.BALANCED_DECKS:
+            turns = self.balancedIds(turns)
+        elif balance_type == BalanceType.BALANCED_MATCHUPS:
+            turns = self.balancedIdsByMatchup(turns)
 
-    def balancedIdsByDeck(self):
+        for id, turn in enumerate(turns):
+            if turn.pRef.winner or turn.pRef.loser:
+                id_list.append(id)
+        self.turns = turns
+
+        return id_list
+
+    def resetFilters(self):
+        self.turns = []
+        for game in self.games:
+            self.turns.extend(game.turns)
+
+    def filterSingleChoiceTurns(self, turns):
+        filteredTurns = []
+        for turn in turns:
+            if turn.probs[-1] != 1:
+                filteredTurns.append(turn)
+        return filteredTurns
+
+    def balancedIdsByMatchup(self, turns):
         deckCnt = len(GameData.HeroDecks.AllDecks)
-        list = [[{'wins': 0, 'loses': 0, 'wonTurns': [], 'lostTurns': []} for i in range(deckCnt)] for i in range(deckCnt)]
+        list = [[{'wins': 0, 'loses': 0, 'wonTurns': [], 'lostTurns': []} for i in range(deckCnt)] for i in
+                range(deckCnt)]
         decksToId = {}
         for i, deck in enumerate(GameData.HeroDecks.AllDecks):
             decksToId[deck[0]] = i
-        for id, turn in enumerate(self.turns):
+        for id, turn in enumerate(turns):
             player = turn.pRef
             enemy = turn.pRef.enemy
             cell = list[decksToId[player.deckname]][decksToId[enemy.deckname]]
             if player.winner:
                 cell['wins'] += 1
-                cell['wonTurns'].append(id)
+                cell['wonTurns'].append(turn)
             if player.loser:
                 cell['loses'] += 1
-                cell['lostTurns'].append(id)
+                cell['lostTurns'].append(turn)
         minv = float('inf')
         for id1, row in enumerate(list):
             for id2, cell in enumerate(row):
                 minv = min(cell['wins'], cell['loses'], minv)
                 if cell['wins'] == 0:
                     print(GameData.HeroDecks.AllDecks[id1][0], ' never wins vs ', GameData.HeroDecks.AllDecks[id2][0])
-                #if cell['loses'] == 0:
+                # if cell['loses'] == 0:
                 #    print(GameData.HeroDecks.AllDecks[id1][0], ' never loses vs ', GameData.HeroDecks.AllDecks[id2][0])
         print('Min value: ', minv)
         balancedOutput = []
@@ -180,19 +217,19 @@ class DataProvider:
                 balancedOutput.extend(random.sample(cell['lostTurns'], minv))
         return balancedOutput
 
-    def balancedIds(self):
+    def balancedIds(self, turns):
         counter = {}
-        for id, turn in enumerate(self.turns):
+        for id, turn in enumerate(turns):
             player = turn.pRef
             if (player.winner or player.loser) \
                     and not player.deckname in counter:
-                counter[player.deckname] = [0, 0, [],[]]
+                counter[player.deckname] = [0, 0, [], []]
             if player.winner:
                 counter[player.deckname][0] += 1
-                counter[player.deckname][2].append(id)
+                counter[player.deckname][2].append(turn)
             if player.loser:
                 counter[player.deckname][1] += 1
-                counter[player.deckname][3].append(id)
+                counter[player.deckname][3].append(turn)
 
         globalMin = float('inf')
         for value in counter.values():
@@ -218,7 +255,6 @@ class DataProvider:
     #     for hero in Hero.AllHeros:
     #         for model in models:
     #             gamesByModel = self.getGamesWithPredicate(PHero(hero).AND(PModel(model)))
-
 
     @staticmethod
     def DataFromFolder(folder):

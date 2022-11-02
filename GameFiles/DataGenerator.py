@@ -1,6 +1,7 @@
 import numpy as np
 from tensorflow import keras
 import Configuration
+from GameFiles.DataProvider import BalanceType
 
 
 class DataGenerator(keras.utils.Sequence):
@@ -8,17 +9,24 @@ class DataGenerator(keras.utils.Sequence):
         self.dp = Configuration.DATA_PROVIDER
         self.dim = dim
         self.batch_size = batch_size
-        if not Configuration.BALANCED_GAMES:
-            self.list_IDs = self.dp.validIds()
+
+        if Configuration.REMOVE_ONE_CHOICE_TURNS:
+            filter_end_turns = True
         else:
-            if Configuration.BALANCED_BY_DECK:
-                self.list_IDs = self.dp.balancedIdsByDeck()
+            filter_end_turns = False
+
+        if not Configuration.BALANCED_GAMES:
+            balance_type = BalanceType.UNBALANCED
+        else:
+            if Configuration.BALANCED_BY_MATCHUP:
+                balance_type = BalanceType.BALANCED_MATCHUPS
             else:
-                self.list_IDs = self.dp.balancedIds()
+                balance_type = BalanceType.BALANCED_DECKS
+        self.list_IDs = self.dp.validIds(filter_end_turns, balance_type)
         self.n_channels = n_channels
         self.shuffle = shuffle
         self.on_epoch_end()
-        self.wvFunc = lambda turn: turn.pRef.winner-turn.pRef.loser
+        self.wvFunc = lambda turn: turn.pRef.winner - turn.pRef.loser
         self.probFunc = lambda turn: turn.probs
 
     def __len__(self):

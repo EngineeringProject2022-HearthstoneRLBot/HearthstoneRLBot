@@ -24,7 +24,8 @@ POLICY_WEIGHT = 0.2
 LOG_TREE = False # change this value in training.py
 WINVALUE_WEIGHT = 1
 BALANCED_GAMES = True
-BALANCED_BY_DECK = True
+BALANCED_BY_MATCHUP = True
+REMOVE_ONE_CHOICE_TURNS = True
 BATCH_SIZE = 1
 #set to 0 to disable
 CALLBACKS = 1
