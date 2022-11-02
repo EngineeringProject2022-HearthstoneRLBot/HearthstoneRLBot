@@ -104,7 +104,7 @@ class GameCreator:
             simulationsp2 = simulationsp1
         game = GameCreator.createDefaultGame(typep1=typep1, typep2=typep2, modelp1=modelp1, modelp2=modelp2,simulationsp1=simulationsp1,simulationsp2=simulationsp2,
                                              p1=("FIREBALL_TEST", Hero.Mage, PlayerDecks.BasicMage), p2=("FIREBALL_TEST", Hero.Mage, PlayerDecks.BasicMage))
-        startGameEffs = [GESetStarterPlayer(1), GESetMaxMana(10), GEDealDmg(24), GEPlayMinionTimes([('CS2_231', 7)]), GEEndTurn(), GERemoveDeck(), GEDiscard(), GEGiveCards([('CS2_029', 1)], [('CS2_029', 1)])]
+        startGameEffs = [GESetStarterPlayer(1), GESetMaxMana(10), GEDealDmg(24, 29), GEPlayMinionTimes([('CS2_231', 7)]), GEDiscard(), GEEndTurn(), GERemoveDeck(), GEDiscard(), GEGiveCards([('CS2_029', 1)])]
         startTurnEffs = []
         game.startGameEffs = startGameEffs
         game.startTurnEffs = startTurnEffs
@@ -209,6 +209,61 @@ class GameCreator:
                                              p1=("LEPERGNOME_TEST", Hero.Mage, PlayerDecks.BasicMage), p2=("LEPERGNOME_TEST", Hero.Hunter, PlayerDecks.BasicHunter))
         startGameEffs = [GESetStarterPlayer(1), GESetMaxMana(10), GEDealDmg(28, 26), GEPlayMinionTimes([('EX1_029', 1)]), GEEndTurn(), GEEndTurn(), GERemoveDeck(p2=False), GEDiscard()]
         startTurnEffs = [GEDiscard()]
+        game.startGameEffs = startGameEffs
+        game.startTurnEffs = startTurnEffs
+        return game
+
+    @staticmethod
+    def createRogueComplexTest(typep1=PlayerType.Modeled, typep2=None, modelp1="Model-INIT", modelp2=None,simulationsp1=50,simulationsp2=None):
+        if typep2 is None:
+            typep2 = typep1
+        if modelp2 is None:
+            modelp2 = modelp1
+        if simulationsp2 is None:
+            simulationsp2 = simulationsp1
+        game = GameCreator.createDefaultGame(typep1=typep1, typep2=typep2, modelp1=modelp1, modelp2=modelp2,simulationsp1=simulationsp1,simulationsp2=simulationsp2,
+                                             p1=("COMPLEX_ROGUE", Hero.Rogue, PlayerDecks.BasicRogue), p2=("COMPLEX_ROGUE", Hero.Rogue, PlayerDecks.BasicRogue))
+        startGameEffs = [GESetStarterPlayer(1), GESetMaxMana(10), GEDealDmg(21, 29), GEDiscard(), GEEndTurn(), GERemoveDeck(), GEDiscard(), GEGiveCards([('CS2_173', 1), ('CS2_073', 1), ('CS2_074', 1)])]
+        startTurnEffs = []
+        game.startGameEffs = startGameEffs
+        game.startTurnEffs = startTurnEffs
+        return game
+
+    @staticmethod
+    def createWindfuryBuffComplexTest(typep1=PlayerType.Modeled, typep2=None, modelp1="Model-INIT", modelp2=None,simulationsp1=50,simulationsp2=None):
+        if typep2 is None:
+            typep2 = typep1
+        if modelp2 is None:
+            modelp2 = modelp1
+        if simulationsp2 is None:
+            simulationsp2 = simulationsp1
+        game = GameCreator.createDefaultGame(typep1=typep1, typep2=typep2, modelp1=modelp1, modelp2=modelp2,
+                                             simulationsp1=simulationsp1, simulationsp2=simulationsp2,
+                                             p1=("BUFF_WINDFURY_COMPLEX", Hero.Shaman, PlayerDecks.BasicShaman),
+                                             p2=("BUFF_WINDFURY_COMPLEX", Hero.Shaman, PlayerDecks.BasicShaman))
+        startGameEffs = [GESetStarterPlayer(1), GESetMaxMana(6), GEDealDmg(18, 29), GEDiscard(), GEEndTurn(),
+                         GERemoveDeck(), GEDiscard(), GEGiveCards([('CS2_171', 1), ('CS2_188', 1), ('CS2_045', 2), ('CS2_039', 1)])]
+        startTurnEffs = []
+        game.startGameEffs = startGameEffs
+        game.startTurnEffs = startTurnEffs
+        return game
+
+    @staticmethod
+    def createSylvanaComplexTest(typep1=PlayerType.Modeled, typep2=None, modelp1="Model-INIT", modelp2=None,simulationsp1=50,simulationsp2=None):
+        if typep2 is None:
+            typep2 = typep1
+        if modelp2 is None:
+            modelp2 = modelp1
+        if simulationsp2 is None:
+            simulationsp2 = simulationsp1
+        game = GameCreator.createDefaultGame(typep1=typep1, typep2=typep2, modelp1=modelp1, modelp2=modelp2,
+                                             simulationsp1=simulationsp1, simulationsp2=simulationsp2,
+                                             p1=("SYLVANA_COMPLEX", Hero.Warlock, PlayerDecks.BasicWarlock),
+                                             p2=("SYLVANA_COMPLEX", Hero.Warlock, PlayerDecks.BasicWarlock))
+        startGameEffs = [GESetStarterPlayer(1), GESetMaxMana(6), GEDealDmg(12, 29), GEPlayMinionTimes([('CS2_121', 2), ('EX1_543', 1)]), GEDiscard(), GEEndTurn(),
+                         GEPlayMinionTimes([('EX1_016', 1)]), GEEndTurn(), GEEndTurn(),
+                         GERemoveDeck(), GEDiscard(), GEGiveCards([('CFM_603', 1), ('EX1_622', 1), ('DS1_233', 1)])]
+        startTurnEffs = []
         game.startGameEffs = startGameEffs
         game.startTurnEffs = startTurnEffs
         return game
