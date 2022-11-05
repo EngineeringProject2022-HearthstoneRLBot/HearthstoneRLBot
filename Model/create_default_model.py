@@ -7,4 +7,5 @@ INIT_MODEL_NAME = "Model-TEST"
 
 myNetwork = Network()
 model = myNetwork.getModel()
+print(model.summary())
 model.save(f'models/{INIT_MODEL_NAME}')

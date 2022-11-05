@@ -85,7 +85,7 @@ class GameCreator:
             modelp2 = modelp1
         if simulationsp2 is None:
             simulationsp2 = simulationsp1
-        game = GameCreator.createDefaultGame(typep1=typep1, typep2=typep2, modelp1=modelp1, modelp2=modelp2,simulationsp1=simulationsp1,simulationsp2=simulationsp2,
+        game = GameCreator.createDefaultGame(printLogs=True,typep1=typep1, typep2=typep2, modelp1=modelp1, modelp2=modelp2,simulationsp1=simulationsp1,simulationsp2=simulationsp2,
                                              p1=("HUNTER_TEST", Hero.Hunter, PlayerDecks.BasicHunter), p2=("HUNTER_TEST", Hero.Hunter, PlayerDecks.BasicHunter))
         startGameEffs = [GESetMaxMana(10), GEDealDmg(28), GEEndTurn(), GERemoveDeck(), GEDiscard()]
         startTurnEffs = [GEDiscard()]

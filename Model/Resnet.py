@@ -15,10 +15,10 @@ class Network:
         return self.theModel
 
     def build(self):
-        inputShape = (401, 41, 3)
+        inputShape = (117, 390, 2)
         inputs = Input(shape=inputShape)
         network = self.buildConvLayer(inputs)
-        for i in range(15):
+        for i in range(5):
             network = self.buildResLayer(network)
         network = self.buildResLayer(network)
         value_head = self.buildValueHead(network)
@@ -31,7 +31,7 @@ class Network:
         value = Conv2D(filters=1, kernel_size=1, strides=1)(inputs)
         value = self.bn_relu(value)
         value = Flatten()(value)
-        value = Dense(256)(value)
+        value = Dense(128)(value)
         value = ReLU()(value)
         #initializer = tf.keras.initializers.RandomNormal(mean=0.0, stddev=0.05, seed=None)
         value = Dense(1, activation='tanh', name = 'win')(value)

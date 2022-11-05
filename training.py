@@ -21,26 +21,43 @@ class TestCallbacks(Callback):
     def __init__(self):
         self.batch_number = -1
         Configuration.LOG_TREE = True
+
     def on_batch_end(self, batch, logs=None):
-        #checkpoint_dir = f"Model/checkpoints/{Configuration.OUTPUT_MODEL_NAME}"
+        # checkpoint_dir = f"Model/checkpoints/{Configuration.OUTPUT_MODEL_NAME}"
         if self.batch_number % Configuration.CALLBACK_FREQ == 0 and self.batch_number != 0:
             if not cards.db.initialized:
                 cards.db.initialize()
-            sep = lambda : print('\n',"#"*50,'\n')
-            GameCreator.createFireballTest(modelp1=f"../checkpoints/{Configuration.OUTPUT_MODEL_NAME}/ckpt-loss={logs['loss']:.2f}",simulationsp1=50).start()
+            sep = lambda: print('\n', "#" * 50, '\n')
+            GameCreator.createFireballTest(
+                modelp1=f"../checkpoints/{Configuration.OUTPUT_MODEL_NAME}/ckpt-loss={logs['loss']:.2f}",
+                simulationsp1=50).start()
             sep()
-            GameCreator.createDruidTestGame(modelp1=f"../checkpoints/{Configuration.OUTPUT_MODEL_NAME}/ckpt-loss={logs['loss']:.2f}",simulationsp1=50).start()
+            GameCreator.createDruidTestGame(
+                modelp1=f"../checkpoints/{Configuration.OUTPUT_MODEL_NAME}/ckpt-loss={logs['loss']:.2f}",
+                simulationsp1=50).start()
             sep()
-            GameCreator.createHunterTestGame(modelp1=f"../checkpoints/{Configuration.OUTPUT_MODEL_NAME}/ckpt-loss={logs['loss']:.2f}",simulationsp1=50).start()
+            GameCreator.createHunterTestGame(
+                modelp1=f"../checkpoints/{Configuration.OUTPUT_MODEL_NAME}/ckpt-loss={logs['loss']:.2f}",
+                simulationsp1=50).start()
             sep()
-            GameCreator.createLeperGnomeTest(modelp1=f"../checkpoints/{Configuration.OUTPUT_MODEL_NAME}/ckpt-loss={logs['loss']:.2f}",simulationsp1=50).start()
+            GameCreator.createLeperGnomeTest(
+                modelp1=f"../checkpoints/{Configuration.OUTPUT_MODEL_NAME}/ckpt-loss={logs['loss']:.2f}",
+                simulationsp1=50).start()
             sep()
-            GameCreator.createMageTestGame(modelp1=f"../checkpoints/{Configuration.OUTPUT_MODEL_NAME}/ckpt-loss={logs['loss']:.2f}",simulationsp1=50).start()
+            GameCreator.createMageTestGame(
+                modelp1=f"../checkpoints/{Configuration.OUTPUT_MODEL_NAME}/ckpt-loss={logs['loss']:.2f}",
+                simulationsp1=50).start()
             sep()
-            GameCreator.createSmartTradeTest(modelp1=f"../checkpoints/{Configuration.OUTPUT_MODEL_NAME}/ckpt-loss={logs['loss']:.2f}",simulationsp1=50).start()
+            GameCreator.createSmartTradeTest(
+                modelp1=f"../checkpoints/{Configuration.OUTPUT_MODEL_NAME}/ckpt-loss={logs['loss']:.2f}",
+                simulationsp1=50).start()
             sep()
-            GameCreator.createWeaponTest(modelp1=f"../checkpoints/{Configuration.OUTPUT_MODEL_NAME}/ckpt-loss={logs['loss']:.2f}",simulationsp1=50).start()
+            GameCreator.createWeaponTest(
+                modelp1=f"../checkpoints/{Configuration.OUTPUT_MODEL_NAME}/ckpt-loss={logs['loss']:.2f}",
+                simulationsp1=50).start()
         self.batch_number += 1
+
+
 def trainNetwork(model):
     trainingGenerator = DataGenerator(batch_size=Configuration.BATCH_SIZE)
     # trainingGenerator.set_wv_func(Model.DataFunctions.diminishingValue)
@@ -51,7 +68,7 @@ def trainNetwork(model):
         keras.callbacks.ModelCheckpoint(
             filepath=checkpoint_dir + "/ckpt-loss={loss:.2f}", save_freq=Configuration.CALLBACK_FREQ
         ),
-        TestCallbacks()
+        # TestCallbacks()
 
     ]
     if Configuration.CALLBACKS == 1:
@@ -67,7 +84,9 @@ session = InteractiveSession(config=config)
 
 model = tf.keras.models.load_model(f"Model/models/{Configuration.INPUT_MODEL_NAME}")
 print(model.summary())
-model.compile(loss=['categorical_crossentropy', 'mean_squared_error'],
+# categorical_crossentropy
+# kl_divergence
+model.compile(loss=['kl_divergence', 'mean_squared_error'],
               loss_weights=[Configuration.POLICY_WEIGHT, Configuration.WINVALUE_WEIGHT],
               optimizer=tf.keras.optimizers.Adam(Configuration.LEARNING_RATE))
 # model.optimizer = tf.keras.optimizers.Adam(
@@ -79,5 +98,5 @@ model.compile(loss=['categorical_crossentropy', 'mean_squared_error'],
 #     name='Adam',
 #     clipnorm=1
 # )
-k.set_value(model.optimizer.learning_rate, Configuration.LEARNING_RATE)
+# k.set_value(model.optimizer.learning_rate, Configuration.LEARNING_RATE)
 trainNetwork(model)

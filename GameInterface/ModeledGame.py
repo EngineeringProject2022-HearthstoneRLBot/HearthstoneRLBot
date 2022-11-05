@@ -10,8 +10,9 @@ from GameState import InputBuilder
 from Benchmark import tt
 from MultiThreading.PrintQueue import PrintQueue
 
+
 class ModeledGame:
-    def __init__(self, player1, player2, log = False):
+    def __init__(self, player1, player2, log=False):
         logger = logging.log
         logger.disabled = not log
         logger.propagate = log
@@ -28,7 +29,6 @@ class ModeledGame:
         self.player1.joinGame(game)
         self.player2.joinGame(game)
 
-
     def createPlayer(self, player):
         return Player(player.name, player.deck, CardClass(player.hero).default_hero)
 
@@ -38,8 +38,11 @@ class ModeledGame:
         while True:
             tt('Full turn', 1)
             self.startTurn()
-            data = InputBuilder.convToInput(self.game)
+
             player = 1 if self.game.current_player is self.game.player1 else 2
+            data = InputBuilder.convToInput(self.game, player)
+            player2 = 2 if player == 1 else 1
+            data2 = InputBuilder.convToInput(self.game, player2)
             tt('RealPlay', 1, 1)
             action, probabilities, isRandom = self.playTurn()
             tt('RealPlay')
@@ -48,16 +51,21 @@ class ModeledGame:
             tt('Sync')
             self.data.append((data, probabilities, player, action))
 
+            self.data.append((data2, np.zeros(252), player2, action))
             tt('Full turn')
 
             Benchmark.printTimers()
 
             if self.gameFinished():
                 break
-
-
-        self.data.append((InputBuilder.convToInput(self.game), np.zeros(252),
-                          1 if self.game.current_player is self.game.player1 else 2, None))
+        a = np.zeros(252)
+        #a[251] = 1.0
+        player = 1 if self.game.current_player is self.game.player1 else 2
+        self.data.append((InputBuilder.convToInput(self.game, player), a,
+                          player, None))
+        player2 = 2 if player == 1 else 1
+        self.data.append((InputBuilder.convToInput(self.game, player2), a,
+                          player2, None))
 
         if self.winner == 1:
             PrintQueue.add(f'Game Finished! :) Player {self.game.player1.name} won!')

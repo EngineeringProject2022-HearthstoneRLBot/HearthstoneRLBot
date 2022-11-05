@@ -10,13 +10,13 @@ class InputBuilder:
         playerHandDecode = []
         for i in range(0,10):
             counter = len(listOfCardsOnHand)
-            Res = np.zeros((41,40))
+            Res = np.zeros((39,39))
             if(i < counter):
                 test = HandCards.HandCard(listOfCardsOnHand[i])
                 Res = test.encode_state()
             playerHandDecode.append(Res)
         finalPlayerHand = np.hstack((playerHandDecode[0:]))
-        finalPlayerHand = np.c_[np.zeros(41), finalPlayerHand]
+       # finalPlayerHand = np.c_[np.zeros(41), finalPlayerHand]
         return finalPlayerHand
 
     def BoardFunction(listOfCardsOnBoard, listOfHeroFeatures):
@@ -24,7 +24,7 @@ class InputBuilder:
         playerBoardDecode = []
         for i in range(0,7):
             counter = len(listOfCardsOnBoard)
-            Res = np.zeros((41,40))
+            Res = np.zeros((39,39))
             if(i < counter):
                 test = HandCards.HandCard(listOfCardsOnBoard[i])
                 Res = test.encode_state()
@@ -35,7 +35,7 @@ class InputBuilder:
             playerBoardDecode.append(elem)
         #playerBoardDecode.append(listOfHeroFeatures[0:])
         finalPlayerBoard = np.hstack((playerBoardDecode[0:]))
-        finalPlayerBoard =  np.c_[np.zeros(41), finalPlayerBoard]
+ #       finalPlayerBoard =  np.c_[np.zeros(41), finalPlayerBoard]
         return finalPlayerBoard
 
     @staticmethod
@@ -79,19 +79,22 @@ class InputBuilder:
         FP1Board = InputBuilder.BoardFunction(boardPlayer1, res1)
         FP2Board = InputBuilder.BoardFunction(boardPlayer2, res2)
 
-        # if(str(currPlayer) == 'Player1'):
-        #     playerArr = np.zeros((41,401))
-        # elif(str(currPlayer) == 'Player2'):
-        #     playerArr = np.ones((41,401))
-        # remove opp hand
-        MegaFinalMatrix = array([FP1Hand, FP1Board, FP2Board,
-        #                         FP2Hand,
-        #                         playerArr
-                                 ])
+        if player_perspective == game.current_player:
+            playerArr = np.zeros((117, 390))
+        elif player_perspective == game.current_player.opponent:
+            playerArr = np.ones((117, 390))
+        else:
+            raise Exception
+        # remove opp hand?
+        MegaFinalMatrix = np.concatenate((FP2Board,FP1Board,FP1Hand
+        #                        FP2Hand,
+                                 #playerArr
+                                 ))
+        MegaFinalMatrix = np.array([MegaFinalMatrix,playerArr])
         # x y z order
-        MegaFinalMatrix = np.moveaxis(MegaFinalMatrix,[1,2],[1,0])
+        MegaFinalMatrix = np.moveaxis(MegaFinalMatrix,[0],[2])
         # dummy dimension needed for model
         MegaFinalMatrix = MegaFinalMatrix[None, :]
-        return MegaFinalMatrix/30
+        return MegaFinalMatrix
 
 #Symulujacy to 0 i 1 to on, dalej 2 3 przeciwnik i potem currentPlayer Matrix

@@ -114,7 +114,7 @@ class Node:
             win_value = self.win_value
             if flipWinValue:
                 win_value *= -1
-            discovery_operand = self.discovery_factor * (self.policy_value or 1) * (
+            discovery_operand = self.discovery_factor * (1) * (
                         (sqrt(self.parent.visits)) / (1 + self.visits))
             win_multiplier = Configuration.WIN_MULTIPLIER
             win_operand = win_multiplier * win_value

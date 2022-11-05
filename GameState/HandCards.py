@@ -75,8 +75,8 @@ class HandCard:
         row2 = np.hstack((matrices[3:6]))
         row3 = np.hstack((matrices[6:9]))
         full = np.concatenate((row1, row2, row3))
-        full = np.pad(full, 1, mode='constant')
-        full = np.delete(full, 0, 1)
+        #full = np.pad(full, 1, mode='constant')
+        #full = np.delete(full, 0, 1)
         return full
 
     def encode_state(self, debug=False):

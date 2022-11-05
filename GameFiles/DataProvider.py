@@ -112,7 +112,8 @@ class DataProvider:
                     while True:
                         game = pickle.load(rb)
                         sGame = SGame(len(self.games), game)
-                        self.turns.extend(sGame.turns)
+                        for i in range(50):
+                            self.turns.extend(sGame.turns)
                         self.games.append(sGame)
                 except EOFError:
                     print(f"EOF {filepath}")

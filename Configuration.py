@@ -10,22 +10,22 @@ RANDOM_MOVE_SAMPLES = 5
 MCTS_CHILD_MULTIPLIER = 2
 
 # DumpGames
-OUTPUT_FOLDER = 'DEFAULT_OUTPUT'
-GAME_NUM = 2000
+OUTPUT_FOLDER = 'test'
+GAME_NUM = 100
 
 # Training
-INPUT_MODEL_NAME = 'ckpt-loss=1.10'
-OUTPUT_MODEL_NAME = 'exp'
-LEARNING_RATE = 0.00001
+INPUT_MODEL_NAME = 'ttt'
+OUTPUT_MODEL_NAME = 'ttt2'
+LEARNING_RATE = 0.0000001
 #Provide correct filepath to excel files directory if different
 #CSV_PROVIDER = DataProvider.CSVFromFolder("ExcelFiles/SingleGames")
-DATA_PROVIDER = DataProvider.DataFromFolder("DEFAULT_OUTPUT")
-POLICY_WEIGHT = 0.2
+DATA_PROVIDER = DataProvider.DataFromFolder("test")
+POLICY_WEIGHT = 0.0
 LOG_TREE = False # change this value in training.py
 WINVALUE_WEIGHT = 1
-BALANCED_GAMES = True
-BALANCED_BY_MATCHUP = True
-REMOVE_ONE_CHOICE_TURNS = True
+BALANCED_GAMES = False
+BALANCED_BY_MATCHUP = False
+REMOVE_ONE_CHOICE_TURNS = False
 BATCH_SIZE = 1
 #set to 0 to disable
 CALLBACKS = 1
@@ -33,11 +33,9 @@ CALLBACK_FREQ = 2000
 
 # Game creation
 def GAME_CREATION():
-    return GameCreator.createDefaultGame(PlayerType.Modeled,
-                                         #p1 = GameCreator.drawRandomDeck('OilRogue'),
-                                         #p2 = GameCreator.drawRandomDeck('MurlocPaladin'),
-                                         modelp1='Model-TEST',
-                                         simulationsp1 = 50)
+    # return GameCreator.createDefaultGame(PlayerType.Random, printLogs=False)
+    # return GameCreator.createHunterTestGame(PlayerType.Random, modelp1="tttdouble", simulationsp1=50)
+    return GameCreator.createHunterTestGame(PlayerType.Random, modelp1="ttt", simulationsp1=50)
     #return GameCreator.createCustomGame()
 
 def CUSTOM_GAME():

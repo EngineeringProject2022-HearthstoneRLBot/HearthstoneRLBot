@@ -12,9 +12,9 @@ from Montecarlo.random_node import RandomNode
 
 
 class ChildFinder:
-    def createInput(self, node):
+    def createInput(self, node, player_number):
         tt('Input', 1)
-        x = InputBuilder.convToInput(node.game)
+        x = InputBuilder.convToInput(node.game, player_number)
         tt('Input')
         return x
 
@@ -30,8 +30,9 @@ class ChildFinder:
         expert_policy_values, network_value = montecarlo.model(input)
         tt('Model')
         arr = expert_policy_values
-        node.cached_network_value = network_value
-        return arr, node.cached_network_value
+        if not node.cached_network_value:
+            node.cached_network_value = network_value
+        return arr, network_value
 
     def makeMove(self, node):
         tt('Deepcopy', 1, 6)
@@ -86,17 +87,21 @@ class ChildFinder:
         if node.cached_network_value:
             expert_policy_values, win_value = [], node.cached_network_value
         else:
-            nn_input = self.createInput(node)
+            nn_input = self.createInput(node, montecarlo.player_number)
             merged = self.merge(node, nn_input)
             if merged:
                 return True
-            expert_policy_values, win_value = self.predict(node, montecarlo,nn_input)
+            expert_policy_values, win_value = self.predict(node, montecarlo, nn_input)
         tt('Predicting')
 
         tt('Adding node in CF', 1, 5)
-        if montecarlo.player_number != node.player_number:
-            win_value *= -1
+        # if montecarlo.player_number != node.player_number:
+        #     win_value *= -1
         if not node.finished:
+            if montecarlo.player_number != node.player_number:
+                nn_input = self.createInput(node, 1 if montecarlo.player_number == 2 else 2)
+                expert_policy_values, _ = self.predict(node, montecarlo, nn_input)
+
             for action in checkValidActionsSparse(node.game):
                 child = Node(node.game)
                 child.state = action
