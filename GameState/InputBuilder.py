@@ -90,8 +90,9 @@ class InputBuilder:
         #                        FP2Hand,
                                  #playerArr
                                  ))
-        MegaFinalMatrix = np.array([MegaFinalMatrix,playerArr])
+        #MegaFinalMatrix = np.array([MegaFinalMatrix,playerArr])
         # x y z order
+        MegaFinalMatrix = MegaFinalMatrix[None, :]
         MegaFinalMatrix = np.moveaxis(MegaFinalMatrix,[0],[2])
         # dummy dimension needed for model
         MegaFinalMatrix = MegaFinalMatrix[None, :]

@@ -24,8 +24,8 @@ class DataGenerator(keras.utils.Sequence):
                 balance_type = BalanceType.BALANCED_DECKS
         self.list_IDs = self.dp.validIds(filter_end_turns, balance_type)
         b = []
-        for a in self.dp.turns:
-            b.append(a.sparseData.todense())
+        # for a in self.dp.turns:
+        #     b.append(a.sparseData.todense())
         self.n_channels = n_channels
         self.shuffle = shuffle
         self.on_epoch_end()

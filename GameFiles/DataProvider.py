@@ -107,13 +107,16 @@ class DataProvider:
         for filepath in files:
             with open(filepath, "rb") as rb:
                 try:
+                    counter = 0
                     # SKIP METADATA
                     pickle.load(rb)
-                    while True:
+                    while counter < 2600:
+                        counter += 1
                         game = pickle.load(rb)
                         sGame = SGame(len(self.games), game)
-                        for i in range(50):
-                            self.turns.extend(sGame.turns)
+                        # for i in range(10):
+                        #     self.turns.extend(sGame.turns)
+                        self.turns.extend(sGame.turns)
                         self.games.append(sGame)
                 except EOFError:
                     print(f"EOF {filepath}")

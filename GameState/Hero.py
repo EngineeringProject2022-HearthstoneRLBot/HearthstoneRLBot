@@ -33,7 +33,7 @@ class Hero:
     def encode_state(self, dictionaries):
         basicFeatures = np.zeros(169)
         weaponFeatures = np.zeros(169)
-        basicFeatures[6:12] = [x for x in dictionaries[3].values()]
+        basicFeatures[6:13] = [x for x in dictionaries[3].values()]
         basicFeatures[52:88] = [x for x in dictionaries[0].values()]
         weaponFeatures[88:91] = [x for x in dictionaries[1].values()]
         heroPowerFeatures = encode_complex_plane(dictionaries[2])
@@ -70,6 +70,7 @@ class Hero:
         self.additionalBasicFeatures["overloadedManaCrystals"] = hero.controller.overload_locked
         self.additionalBasicFeatures["availableManaCrystals"] = hero.controller.mana
         self.additionalBasicFeatures["turnNumber"] = hero.controller.game.turn
+        self.additionalBasicFeatures["myTurn"] = 0 if hero.controller.game.current_player is hero.controller else 1
 
         self.currentHeroState["health"] = hero.health
         self.currentHeroState["attack"] = hero.atk

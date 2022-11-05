@@ -10,17 +10,17 @@ RANDOM_MOVE_SAMPLES = 5
 MCTS_CHILD_MULTIPLIER = 2
 
 # DumpGames
-OUTPUT_FOLDER = 'test'
-GAME_NUM = 100
+OUTPUT_FOLDER = 'test_full'
+GAME_NUM = 2500
 
 # Training
-INPUT_MODEL_NAME = 'ttt'
-OUTPUT_MODEL_NAME = 'ttt2'
-LEARNING_RATE = 0.0000001
+INPUT_MODEL_NAME = 'Model-INIT'
+OUTPUT_MODEL_NAME = '2d_1'
+LEARNING_RATE = 0.00001
 #Provide correct filepath to excel files directory if different
 #CSV_PROVIDER = DataProvider.CSVFromFolder("ExcelFiles/SingleGames")
-DATA_PROVIDER = DataProvider.DataFromFolder("test")
-POLICY_WEIGHT = 0.0
+DATA_PROVIDER = DataProvider.DataFromFolder("test_full")
+POLICY_WEIGHT = 0.2
 LOG_TREE = False # change this value in training.py
 WINVALUE_WEIGHT = 1
 BALANCED_GAMES = False
@@ -35,7 +35,7 @@ CALLBACK_FREQ = 2000
 def GAME_CREATION():
     # return GameCreator.createDefaultGame(PlayerType.Random, printLogs=False)
     # return GameCreator.createHunterTestGame(PlayerType.Random, modelp1="tttdouble", simulationsp1=50)
-    return GameCreator.createHunterTestGame(PlayerType.Random, modelp1="ttt", simulationsp1=50)
+    return GameCreator.createDefaultGame(typep1=PlayerType.Random, modelp1="2d_1", simulationsp1=50)
     #return GameCreator.createCustomGame()
 
 def CUSTOM_GAME():

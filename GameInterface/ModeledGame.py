@@ -35,6 +35,8 @@ class ModeledGame:
     def start(self):
         self.startGame()
         totalTurn = 0
+        a = np.zeros(252)
+        a.fill(1/252)
         while True:
             tt('Full turn', 1)
             self.startTurn()
@@ -51,15 +53,14 @@ class ModeledGame:
             tt('Sync')
             self.data.append((data, probabilities, player, action))
 
-            self.data.append((data2, np.zeros(252), player2, action))
+            self.data.append((data2, a, player2, action))
             tt('Full turn')
 
             Benchmark.printTimers()
 
             if self.gameFinished():
                 break
-        a = np.zeros(252)
-        #a[251] = 1.0
+
         player = 1 if self.game.current_player is self.game.player1 else 2
         self.data.append((InputBuilder.convToInput(self.game, player), a,
                           player, None))
