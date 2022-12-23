@@ -154,7 +154,9 @@ class DataProvider:
         return self.turns[tId]
 
     def validIds(self, filter_end_turns=False, balance_type=BalanceType.UNBALANCED):
+
         turns = self.turns
+
         if filter_end_turns:
             turns = self.filterSingleChoiceTurns(turns)
         id_list = []
@@ -164,7 +166,11 @@ class DataProvider:
             turns = self.balancedIds(turns)
         elif balance_type == BalanceType.BALANCED_MATCHUPS:
             turns = self.balancedIdsByMatchup(turns)
-
+        turns2 = []
+        for turn in turns:
+            if turn.pRef.modelname == "19200gamesV2":
+                turns2.append(turn)
+        turns = turns2
         for id, turn in enumerate(turns):
             if turn.pRef.winner or turn.pRef.loser:
                 id_list.append(id)

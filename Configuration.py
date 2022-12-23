@@ -1,5 +1,6 @@
 from GameFiles.DataProvider import DataProvider
 from GameInterface.GameCreator import *
+from tensorboard.plugins.hparams import api as hp
 
 # Threads
 NUM_THREADS = 6
@@ -11,32 +12,61 @@ MCTS_CHILD_MULTIPLIER = 2
 
 # DumpGames
 OUTPUT_FOLDER = 'DEFAULT_OUTPUT'
-GAME_NUM = 2000
+GAME_NUM = 1
 
 # Training
-INPUT_MODEL_NAME = 'ckpt-loss=1.10'
-OUTPUT_MODEL_NAME = 'exp'
-LEARNING_RATE = 0.00001
+INPUT_MODEL_NAME = 'Model-TEST'
+OUTPUT_MODEL_NAME = 'dnnB_05'
+OPTIMIZER = hp.HParam('optimizer', hp.Discrete(['adam', 'sgd']))
+LEARNING_RATE = hp.HParam('learning_rate')
+POLICY_WEIGHT = hp.HParam('policy_weight', hp.RealInterval(0.0, 1.0))
+WINVALUE_WEIGHT = hp.HParam('winvalue_weight', hp.RealInterval(0.0, 1.0))
+BATCH_SIZE = hp.HParam("batch_size", hp.IntInterval(1, 64))
+HPARAMS = [
+    OPTIMIZER,
+    LEARNING_RATE,
+    POLICY_WEIGHT,
+    WINVALUE_WEIGHT,
+    BATCH_SIZE
+]
+
+#METRIC_RMSE = 'RootMeanSquaredError'
+METRIC_ACCURACY = 'accuracy'
+
+hparams = {
+    OPTIMIZER: "adam",
+    LEARNING_RATE: 1e-6,
+    POLICY_WEIGHT: 1,
+    WINVALUE_WEIGHT: 1,
+    BATCH_SIZE: 1
+}
+
+# LEARNING_RATE = 0.00001
 #Provide correct filepath to excel files directory if different
 #CSV_PROVIDER = DataProvider.CSVFromFolder("ExcelFiles/SingleGames")
-DATA_PROVIDER = DataProvider.DataFromFolder("DEFAULT_OUTPUT")
-POLICY_WEIGHT = 0.2
+DATA_PROVIDER = DataProvider.DataFromFolder("dnn")
+# POLICY_WEIGHT = 1
+# WINVALUE_WEIGHT = 1
+
 LOG_TREE = False # change this value in training.py
-WINVALUE_WEIGHT = 1
-BALANCED_GAMES = True
-BALANCED_BY_MATCHUP = True
-REMOVE_ONE_CHOICE_TURNS = True
-BATCH_SIZE = 1
+
+BALANCED_GAMES = False
+BALANCED_BY_MATCHUP = False
+REMOVE_ONE_CHOICE_TURNS = False
+# BATCH_SIZE = 1
+
 #set to 0 to disable
 CALLBACKS = 1
 CALLBACK_FREQ = 2000
+
+
 
 # Game creation
 def GAME_CREATION():
     return GameCreator.createDefaultGame(PlayerType.Modeled,
                                          #p1 = GameCreator.drawRandomDeck('OilRogue'),
                                          #p2 = GameCreator.drawRandomDeck('MurlocPaladin'),
-                                         modelp1='Model-TEST',
+                                         modelp1='dnnB_1',
                                          simulationsp1 = 50)
     #return GameCreator.createCustomGame()
 

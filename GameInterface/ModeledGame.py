@@ -55,7 +55,6 @@ class ModeledGame:
             if self.gameFinished():
                 break
 
-
         self.data.append((InputBuilder.convToInput(self.game), np.zeros(252),
                           1 if self.game.current_player is self.game.player1 else 2, None))
 
